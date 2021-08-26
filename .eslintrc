@@ -33,6 +33,10 @@
     "react/require-default-props": "off",
 	"object-curly-newline": "off",
 	"react/jsx-one-expression-per-line": "off",
-	"react/jsx-wrap-multilines": "off"
+	"react/jsx-wrap-multilines": "off",
+	"operator-linebreak": [ 1, "after", { "overrides": {
+		"?": "ignore",
+		":": "ignore"
+	}}]
   }
 }

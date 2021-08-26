@@ -1,25 +1,30 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import * as Yup from 'yup';
 import { Formik } from 'formik';
 import {
   Box,
   Button,
-  Checkbox,
   Container,
-  FormHelperText,
+  FormControlLabel,
   Link,
+  Radio,
   TextField,
   Typography
 } from '@material-ui/core';
+import RegisterSchema from 'src/schemas/RegisterSchema';
+import React from 'react';
+import LinkedinIcon from 'src/icons/Linkedin';
 
 const Register = () => {
   const navigate = useNavigate();
 
+  const [selectedProfileType, setSelectedProfileType] =
+    React.useState('advocate');
+
   return (
     <>
       <Helmet>
-        <title>Register | Material Kit</title>
+        <title>Cadastre-se | Advoguez</title>
       </Helmet>
       <Box
         sx={{
@@ -34,20 +39,12 @@ const Register = () => {
           <Formik
             initialValues={{
               email: '',
-              firstName: '',
+              name: '',
               lastName: '',
               password: '',
-              policy: false
+              typeProfile: 'advocate'
             }}
-            validationSchema={
-              Yup.object().shape({
-                email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                firstName: Yup.string().max(255).required('First name is required'),
-                lastName: Yup.string().max(255).required('Last name is required'),
-                password: Yup.string().max(255).required('password is required'),
-                policy: Yup.boolean().oneOf([true], 'This field must be checked')
-              })
-            }
+            validationSchema={RegisterSchema}
             onSubmit={() => {
               navigate('/app/dashboard', { replace: true });
             }}
@@ -62,50 +59,28 @@ const Register = () => {
               values
             }) => (
               <form onSubmit={handleSubmit}>
-                <Box sx={{ mb: 3 }}>
-                  <Typography
-                    color="textPrimary"
-                    variant="h2"
-                  >
-                    Create new account
-                  </Typography>
-                  <Typography
-                    color="textSecondary"
-                    gutterBottom
-                    variant="body2"
-                  >
-                    Use your email to create new account
+                <Box sx={{ mb: 2 }}>
+                  <Typography color="primary" variant="h2" textAlign="center">
+                    Cadastre-se
                   </Typography>
                 </Box>
                 <TextField
-                  error={Boolean(touched.firstName && errors.firstName)}
+                  error={Boolean(touched.name && errors.name)}
                   fullWidth
-                  helperText={touched.firstName && errors.firstName}
-                  label="First name"
+                  helperText={touched.name && errors.name}
+                  label="Nome completo"
                   margin="normal"
-                  name="firstName"
+                  name="name"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.firstName}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.lastName && errors.lastName)}
-                  fullWidth
-                  helperText={touched.lastName && errors.lastName}
-                  label="Last name"
-                  margin="normal"
-                  name="lastName"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.lastName}
+                  value={values.name}
                   variant="outlined"
                 />
                 <TextField
                   error={Boolean(touched.email && errors.email)}
                   fullWidth
                   helperText={touched.email && errors.email}
-                  label="Email Address"
+                  label="Email"
                   margin="normal"
                   name="email"
                   onBlur={handleBlur}
@@ -118,7 +93,7 @@ const Register = () => {
                   error={Boolean(touched.password && errors.password)}
                   fullWidth
                   helperText={touched.password && errors.password}
-                  label="Password"
+                  label="Senha"
                   margin="normal"
                   name="password"
                   onBlur={handleBlur}
@@ -130,37 +105,48 @@ const Register = () => {
                 <Box
                   sx={{
                     alignItems: 'center',
-                    display: 'flex',
-                    ml: -1
+                    display: 'flex'
                   }}
                 >
-                  <Checkbox
-                    checked={values.policy}
-                    name="policy"
-                    onChange={handleChange}
-                  />
-                  <Typography
-                    color="textSecondary"
-                    variant="body1"
+                  <Box
+                    sx={{ mr: 3 }}
+                    error={Boolean(touched.profileType && errors.profileType)}
+                    fullWidth
+                    helperText={touched.profileType && errors.profileType}
                   >
-                    I have read the
-                    {' '}
-                    <Link
-                      color="primary"
-                      component={RouterLink}
-                      to="#"
-                      underline="always"
-                      variant="h6"
-                    >
-                      Terms and Conditions
-                    </Link>
-                  </Typography>
+                    <Typography color="primary" variant="h6">
+                      Tipo de perfil:
+                    </Typography>
+                  </Box>
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={selectedProfileType === 'advocate'}
+                        onChange={(event) => {
+                          setSelectedProfileType(event.target.value);
+                        }}
+                        color="primary"
+                        value="advocate"
+                        name="profileType"
+                      />
+                    }
+                    label="Advogado"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={selectedProfileType === 'client'}
+                        onChange={(event) => {
+                          setSelectedProfileType(event.target.value);
+                        }}
+                        color="primary"
+                        value="client"
+                        name="profileType"
+                      />
+                    }
+                    label="Cliente"
+                  />
                 </Box>
-                {Boolean(touched.policy && errors.policy) && (
-                  <FormHelperText error>
-                    {errors.policy}
-                  </FormHelperText>
-                )}
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"
@@ -170,21 +156,26 @@ const Register = () => {
                     type="submit"
                     variant="contained"
                   >
-                    Sign up now
+                    Cadastrar
+                  </Button>
+                  <Typography color="primary" variant="h4" textAlign="center">
+                    ou
+                  </Typography>
+                  <Button
+                    color="primary"
+                    fullWidth
+                    startIcon={<LinkedinIcon />}
+                    onClick={handleSubmit}
+                    size="large"
+                    variant="contained"
+                  >
+                    Cadastrar com Linkedin
                   </Button>
                 </Box>
-                <Typography
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  Have an account?
-                  {' '}
-                  <Link
-                    component={RouterLink}
-                    to="/login"
-                    variant="h6"
-                  >
-                    Sign in
+                <Typography color="textSecondary" variant="body1">
+                  Já possui uma conta?{' '}
+                  <Link component={RouterLink} to="/login" variant="h6">
+                    Entrar
                   </Link>
                 </Typography>
               </form>

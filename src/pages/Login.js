@@ -1,6 +1,5 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import * as Yup from 'yup';
 import { Formik } from 'formik';
 import {
   Box,
@@ -12,6 +11,8 @@ import {
   Typography
 } from '@material-ui/core';
 import axios from 'axios';
+import LinkedinIcon from 'src/icons/Linkedin';
+import LoginSchema from 'src/schemas/LoginSchema';
 
 async function sendLogin() {
   try {
@@ -36,10 +37,7 @@ const Login = () => {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          justifyContent: 'center',
-          width: '100%',
-          position: 'relative',
-          border: '60px solid #5664d2'
+          justifyContent: 'center'
         }}
       >
         <Container maxWidth="sm">
@@ -48,13 +46,7 @@ const Login = () => {
               email: '',
               password: ''
             }}
-            validationSchema={Yup.object().shape({
-              email: Yup.string()
-                .email('Informe um email válido')
-                .max(255)
-                .required('Campo obrigatório'),
-              password: Yup.string().max(255).required('Campo obrigatório')
-            })}
+            validationSchema={LoginSchema}
             onSubmit={() => {
               sendLogin();
               navigate('/app/dashboard', { replace: true });
@@ -70,7 +62,7 @@ const Login = () => {
               values
             }) => (
               <form onSubmit={handleSubmit}>
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 2 }}>
                   <Typography color="primary" variant="h2" textAlign="center">
                     Login
                   </Typography>
@@ -118,6 +110,19 @@ const Login = () => {
                     variant="contained"
                   >
                     Entrar
+                  </Button>
+                  <Typography color="primary" variant="h4" textAlign="center">
+                    ou
+                  </Typography>
+                  <Button
+                    color="primary"
+                    fullWidth
+                    startIcon={<LinkedinIcon />}
+                    onClick={handleSubmit}
+                    size="large"
+                    variant="contained"
+                  >
+                    Entrar com Linkedin
                   </Button>
                 </Box>
                 <Typography color="textSecondary" variant="body1">
