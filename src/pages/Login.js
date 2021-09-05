@@ -1,30 +1,25 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Formik } from 'formik';
 import {
   Box,
   Button,
-  Checkbox,
   Container,
   Link,
   TextField,
   Typography
 } from '@material-ui/core';
-import axios from 'axios';
 import LinkedinIcon from 'src/icons/Linkedin';
 import LoginSchema from 'src/schemas/LoginSchema';
-
-async function sendLogin() {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/teste');
-    console.log(response);
-  } catch (error) {
-    console.error(error);
-  }
-}
+import React, { useContext } from 'react';
+import { UserContext } from 'src/contexts/UserContext';
 
 const Login = () => {
-  const navigate = useNavigate();
+  const { userLogin } = useContext(UserContext);
+
+  async function signIn(values) {
+    userLogin(values.email, values.password);
+  }
 
   return (
     <>
@@ -47,10 +42,6 @@ const Login = () => {
               password: ''
             }}
             validationSchema={LoginSchema}
-            onSubmit={() => {
-              sendLogin();
-              navigate('/app/dashboard', { replace: true });
-            }}
           >
             {({
               errors,
@@ -62,7 +53,7 @@ const Login = () => {
               values
             }) => (
               <form onSubmit={handleSubmit}>
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2, mt: 10 }}>
                   <Typography color="primary" variant="h2" textAlign="center">
                     Login
                   </Typography>
@@ -70,7 +61,7 @@ const Login = () => {
                 <TextField
                   error={Boolean(touched.email && errors.email)}
                   fullWidth
-                  helperText={touched.email && errors.email}
+                  helperText={errors.email}
                   label="Usuário"
                   margin="normal"
                   name="email"
@@ -84,7 +75,7 @@ const Login = () => {
                 <TextField
                   error={Boolean(touched.password && errors.password)}
                   fullWidth
-                  helperText={touched.password && errors.password}
+                  helperText={errors.password}
                   label="Senha"
                   margin="normal"
                   name="password"
@@ -95,10 +86,6 @@ const Login = () => {
                   value={values.password}
                   variant="outlined"
                 />
-                <Typography color="textSecondary" variant="body1">
-                  <Checkbox onChange={handleChange} name="checkedB" />
-                  Mantenha-me conectado
-                </Typography>
 
                 <Box sx={{ py: 2 }}>
                   <Button
@@ -108,6 +95,7 @@ const Login = () => {
                     size="large"
                     type="submit"
                     variant="contained"
+                    onClick={() => signIn(values)}
                   >
                     Entrar
                   </Button>

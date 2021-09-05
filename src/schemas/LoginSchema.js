@@ -5,7 +5,10 @@ const LoginSchema = Yup.object().shape({
     .email('Informe um email válido')
     .max(255)
     .required('Campo obrigatório'),
-  password: Yup.string().max(255).required('Campo obrigatório')
+  password: Yup.string()
+    .min(8, 'Informe no mínimo 8 caracteres')
+    .max(255)
+    .required('Campo obrigatório')
 });
 
 export default LoginSchema;

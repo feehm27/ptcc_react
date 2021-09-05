@@ -37,6 +37,15 @@
 	"operator-linebreak": [ 1, "after", { "overrides": {
 		"?": "ignore",
 		":": "ignore"
-	}}]
+	}}],
+	"no-tabs": "off",
+	"indent": "off",
+	"quotes": "off",
+	"padded-blocks": "off",
+	"no-trailing-spaces": "off",
+	"no-multiple-empty-lines": "off",
+	"react/self-closing-comp": "off",
+	"react/prop-types": "off",
+	"arrow-body-style": "off"
   }
 }

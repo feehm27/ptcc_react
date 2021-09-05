@@ -59,7 +59,7 @@ const Register = () => {
               values
             }) => (
               <form onSubmit={handleSubmit}>
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2, mt: 5 }}>
                   <Typography color="primary" variant="h2" textAlign="center">
                     Cadastre-se
                   </Typography>
@@ -67,7 +67,7 @@ const Register = () => {
                 <TextField
                   error={Boolean(touched.name && errors.name)}
                   fullWidth
-                  helperText={touched.name && errors.name}
+                  helperText={errors.name}
                   label="Nome completo"
                   margin="normal"
                   name="name"
@@ -79,7 +79,7 @@ const Register = () => {
                 <TextField
                   error={Boolean(touched.email && errors.email)}
                   fullWidth
-                  helperText={touched.email && errors.email}
+                  helperText={errors.email}
                   label="Email"
                   margin="normal"
                   name="email"
@@ -92,7 +92,7 @@ const Register = () => {
                 <TextField
                   error={Boolean(touched.password && errors.password)}
                   fullWidth
-                  helperText={touched.password && errors.password}
+                  helperText={errors.password}
                   label="Senha"
                   margin="normal"
                   name="password"
@@ -108,12 +108,7 @@ const Register = () => {
                     display: 'flex'
                   }}
                 >
-                  <Box
-                    sx={{ mr: 3 }}
-                    error={Boolean(touched.profileType && errors.profileType)}
-                    fullWidth
-                    helperText={touched.profileType && errors.profileType}
-                  >
+                  <Box sx={{ mr: 3 }}>
                     <Typography color="primary" variant="h6">
                       Tipo de perfil:
                     </Typography>
