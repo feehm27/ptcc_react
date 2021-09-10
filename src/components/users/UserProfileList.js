@@ -20,7 +20,7 @@ const UserProfileList = ({ profiles, ...rest }) => {
   return (
     <Card {...rest}>
       <PerfectScrollbar>
-        <Box sx={{ minWidth: 1050 }}>
+        <Box>
           <Table>
             <TableHead>
               <TableRow>
@@ -50,7 +50,7 @@ const UserProfileList = ({ profiles, ...rest }) => {
                       type="submit"
                       variant="contained"
                       onClick={() => {
-                        navigate('/permissions', {
+                        navigate('/profiles/types', {
                           state: { profile, customers }
                         });
                       }}

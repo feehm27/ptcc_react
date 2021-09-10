@@ -17,7 +17,7 @@ import Login from './pages/Login';
 import MainLayout from './components/MainLayout';
 import Settings from './pages/Settings';
 import UserProfile from './pages/UserProfile';
-import Permissions from './components/Permissions';
+import ProfileTypes from './components/ProfileTypes';
 
 function App() {
   return (
@@ -40,7 +40,10 @@ function App() {
                 <ProtectedRoute path="/customers" element={<CustomerList />} />
                 <ProtectedRoute path="/products" element={<ProductList />} />
                 <ProtectedRoute path="/settings" element={<Settings />} />
-                <ProtectedRoute path="/permissions" element={<Permissions />} />
+                <ProtectedRoute
+                  path="/profiles/types"
+                  element={<ProfileTypes />}
+                />
                 <ProtectedRoute
                   path="/users/profile"
                   element={<UserProfile />}

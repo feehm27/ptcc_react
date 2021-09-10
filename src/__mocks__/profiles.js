@@ -31,6 +31,30 @@ export default [
   },
   {
     id: uuid(),
-    name: 'Advogado'
+    name: 'Advogado',
+    menus: [
+      {
+        id: 1,
+        name: 'Dashboard',
+        permissions: [
+          {
+            id: 1,
+            name: 'Visualizar',
+            is_active: true
+          }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Contrato',
+        permissions: [
+          {
+            id: 2,
+            name: 'Alterar',
+            is_active: false
+          }
+        ]
+      }
+    ]
   }
 ];
