@@ -4,8 +4,7 @@ const Logo = (props) => (
     src="/static/logo.png"
     {...props}
     style={{
-      display: 'block',
-      width: '100%'
+      display: 'block'
     }}
   />
 );

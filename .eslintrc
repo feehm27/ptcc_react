@@ -46,6 +46,10 @@
 	"no-multiple-empty-lines": "off",
 	"react/self-closing-comp": "off",
 	"react/prop-types": "off",
-	"arrow-body-style": "off"
+	"arrow-body-style": "off",
+	"no-else-return": "off",
+	"react/jsx-curly-newline": "off",
+	"implicit-arrow-linebreak": "off",
+	"prefer-arrow-callback": "off"
   }
 }

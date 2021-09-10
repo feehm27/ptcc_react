@@ -15,11 +15,18 @@ import React, { useContext } from 'react';
 import { UserContext } from 'src/contexts/UserContext';
 
 const Login = () => {
-  const { userLogin } = useContext(UserContext);
+  const { userLogin, error, loading } = useContext(UserContext);
 
-  async function signIn(values) {
-    userLogin(values.email, values.password);
+  /* cOLOCAR VALIDAÇÃO PARA CHAMAR O LOGIN SOMENTE SE OS DADOS PASSAREM PELO SCHEMA */
+  async function signIn(email, password) {
+    if (email && password) {
+      userLogin(email, password);
+    }
   }
+
+  const signInWithLinkedin = () => {
+    console.log('teste');
+  };
 
   return (
     <>
@@ -48,7 +55,6 @@ const Login = () => {
               handleBlur,
               handleChange,
               handleSubmit,
-              isSubmitting,
               touched,
               values
             }) => (
@@ -61,7 +67,7 @@ const Login = () => {
                 <TextField
                   error={Boolean(touched.email && errors.email)}
                   fullWidth
-                  helperText={errors.email}
+                  helperText={touched.email && errors.email}
                   label="Usuário"
                   margin="normal"
                   name="email"
@@ -73,9 +79,11 @@ const Login = () => {
                   variant="outlined"
                 />
                 <TextField
-                  error={Boolean(touched.password && errors.password)}
+                  error={Boolean(
+                    (touched.password && errors.password) || error
+                  )}
                   fullWidth
-                  helperText={errors.password}
+                  helperText={(touched.password && errors.password) || error}
                   label="Senha"
                   margin="normal"
                   name="password"
@@ -86,19 +94,30 @@ const Login = () => {
                   value={values.password}
                   variant="outlined"
                 />
-
                 <Box sx={{ py: 2 }}>
-                  <Button
-                    color="primary"
-                    disabled={isSubmitting}
-                    fullWidth
-                    size="large"
-                    type="submit"
-                    variant="contained"
-                    onClick={() => signIn(values)}
-                  >
-                    Entrar
-                  </Button>
+                  {loading ? (
+                    <Button
+                      color="primary"
+                      disabled
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                    >
+                      Carregando...
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                      onClick={() => signIn(values.email, values.password)}
+                    >
+                      Entrar
+                    </Button>
+                  )}
                   <Typography color="primary" variant="h4" textAlign="center">
                     ou
                   </Typography>
@@ -106,7 +125,7 @@ const Login = () => {
                     color="primary"
                     fullWidth
                     startIcon={<LinkedinIcon />}
-                    onClick={handleSubmit}
+                    onClick={() => signInWithLinkedin()}
                     size="large"
                     variant="contained"
                   >

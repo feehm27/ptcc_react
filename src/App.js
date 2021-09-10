@@ -4,11 +4,20 @@ import { ThemeProvider } from '@material-ui/core';
 import GlobalStyles from 'src/components/GlobalStyles';
 import 'src/mixins/chartjs';
 import theme from 'src/theme';
+import Register from './pages/Register';
+import NotFound from './pages/NotFound';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './helpers/Route/ProtectedRoute';
+import PageLayout from './components/PageLayout';
+import Account from './pages/Account';
+import CustomerList from './pages/CustomerList';
+import ProductList from './pages/ProductList';
 import { UserStorage } from './contexts/UserContext';
 import Login from './pages/Login';
 import MainLayout from './components/MainLayout';
-import Register from './pages/Register';
-import NotFound from './pages/NotFound';
+import Settings from './pages/Settings';
+import UserProfile from './pages/UserProfile';
+import Permissions from './components/Permissions';
 
 function App() {
   return (
@@ -25,6 +34,19 @@ function App() {
                 <Route path="*" element={<Navigate to="/404" />} />
                 <Route path="/" element={<Navigate to="/login" />} />
               </MainLayout>
+              <PageLayout>
+                <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+                <ProtectedRoute path="/account" element={<Account />} />
+                <ProtectedRoute path="/customers" element={<CustomerList />} />
+                <ProtectedRoute path="/products" element={<ProductList />} />
+                <ProtectedRoute path="/settings" element={<Settings />} />
+                <ProtectedRoute path="/permissions" element={<Permissions />} />
+                <ProtectedRoute
+                  path="/users/profile"
+                  element={<UserProfile />}
+                />
+                <ProtectedRoute path="404" element={<NotFound />} />
+              </PageLayout>
             </Routes>
           </UserStorage>
         </BrowserRouter>

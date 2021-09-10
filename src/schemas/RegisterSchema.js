@@ -6,7 +6,10 @@ const RegisterSchema = Yup.object().shape({
     .max(255)
     .required('Campo obrigatório'),
   name: Yup.string().max(255).required('Campo obrigatório'),
-  password: Yup.string().max(255).required('Campo obrigatório')
+  password: Yup.string()
+    .min(8, 'Informe no mínimo 8 caracteres')
+    .max(255)
+    .required('Campo obrigatório')
 });
 
 export default RegisterSchema;

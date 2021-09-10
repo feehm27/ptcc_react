@@ -1,4 +1,4 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Formik } from 'formik';
 import {
@@ -12,14 +12,45 @@ import {
   Typography
 } from '@material-ui/core';
 import RegisterSchema from 'src/schemas/RegisterSchema';
-import React from 'react';
 import LinkedinIcon from 'src/icons/Linkedin';
+import { API_URL } from 'src/services/api';
+import { useContext, useState } from 'react';
+import { UserContext } from 'src/contexts/UserContext';
 
 const Register = () => {
-  const navigate = useNavigate();
+  const [selectedProfileType, setSelectedProfileType] = useState('advocate');
+  const [registerErrors, setRegisterErrors] = useState([]);
+  const { userLogin, loading } = useContext(UserContext);
 
-  const [selectedProfileType, setSelectedProfileType] =
-    React.useState('advocate');
+  async function registerWithLinkedin() {
+    await API_URL.get('/api/callback')
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function register(values) {
+    const data = {
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      is_advocate: selectedProfileType === 'advocate' ? 1 : 0,
+      is_client: selectedProfileType === 'client' ? 1 : 0
+    };
+
+    await API_URL.post('/api/register', data)
+      .then((response) => {
+        const convertResponse = JSON.parse(response.config.data);
+        const { email, password } = convertResponse;
+        userLogin(email, password);
+      })
+      .catch((err) => {
+        setRegisterErrors(err.response.data.errors);
+      });
+  }
 
   return (
     <>
@@ -40,21 +71,16 @@ const Register = () => {
             initialValues={{
               email: '',
               name: '',
-              lastName: '',
               password: '',
               typeProfile: 'advocate'
             }}
             validationSchema={RegisterSchema}
-            onSubmit={() => {
-              navigate('/app/dashboard', { replace: true });
-            }}
           >
             {({
               errors,
               handleBlur,
               handleChange,
               handleSubmit,
-              isSubmitting,
               touched,
               values
             }) => (
@@ -67,7 +93,7 @@ const Register = () => {
                 <TextField
                   error={Boolean(touched.name && errors.name)}
                   fullWidth
-                  helperText={errors.name}
+                  helperText={touched.name && errors.name}
                   label="Nome completo"
                   margin="normal"
                   name="name"
@@ -77,14 +103,21 @@ const Register = () => {
                   variant="outlined"
                 />
                 <TextField
-                  error={Boolean(touched.email && errors.email)}
+                  error={Boolean(
+                    (touched.email && errors.email) || registerErrors.email
+                  )}
                   fullWidth
-                  helperText={errors.email}
+                  helperText={
+                    (touched.email && errors.email) || registerErrors.email
+                  }
                   label="Email"
                   margin="normal"
                   name="email"
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(event) => {
+                    handleChange(event);
+                    setRegisterErrors([]);
+                  }}
                   type="email"
                   value={values.email}
                   variant="outlined"
@@ -92,7 +125,7 @@ const Register = () => {
                 <TextField
                   error={Boolean(touched.password && errors.password)}
                   fullWidth
-                  helperText={errors.password}
+                  helperText={touched.password && errors.password}
                   label="Senha"
                   margin="normal"
                   name="password"
@@ -145,11 +178,12 @@ const Register = () => {
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"
-                    disabled={isSubmitting}
+                    disabled={loading}
                     fullWidth
                     size="large"
                     type="submit"
                     variant="contained"
+                    onClick={() => register(values)}
                   >
                     Cadastrar
                   </Button>
@@ -160,7 +194,7 @@ const Register = () => {
                     color="primary"
                     fullWidth
                     startIcon={<LinkedinIcon />}
-                    onClick={handleSubmit}
+                    onClick={() => registerWithLinkedin()}
                     size="large"
                     variant="contained"
                   >

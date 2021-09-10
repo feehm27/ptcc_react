@@ -3,10 +3,7 @@ import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Box, Divider, Drawer, Hidden, List } from '@material-ui/core';
 import {
-  AlertCircle as AlertCircleIcon,
   BarChart as BarChartIcon,
-  Lock as LockIcon,
-  UserPlus as UserPlusIcon,
   Users as UsersIcon,
   Camera as CameraIcon,
   ArrowRightCircle as ArrowRightIcon,
@@ -21,27 +18,27 @@ import NavItem from './NavItem';
 
 const items = [
   {
-    href: '/app/dashboard',
+    href: '/dashboard',
     icon: BarChartIcon,
     title: 'Dashboard'
   },
   {
-    href: '/app/customers',
+    href: '/customers',
     icon: InfoIcon,
     title: 'Meus Dados'
   },
   {
-    href: '/app/products',
+    href: '/products',
     icon: CameraIcon,
     title: 'Identidade Visual'
   },
   {
-    href: '/app/account',
+    href: '/account',
     icon: ArrowRightIcon,
     title: 'Gestão de Clientes'
   },
   {
-    href: '/app/settings',
+    href: '/settings',
     icon: ArrowRightIcon,
     title: 'Gestão de Contratos'
   },
@@ -76,24 +73,9 @@ const items = [
     title: 'Usuários'
   },
   {
-    href: '/404',
+    href: '/users/profile',
     icon: UserIcon,
     title: 'Perfil de Usuários'
-  },
-  {
-    href: '/login',
-    icon: LockIcon,
-    title: 'Login'
-  },
-  {
-    href: '/register',
-    icon: UserPlusIcon,
-    title: 'Register'
-  },
-  {
-    href: '/404',
-    icon: AlertCircleIcon,
-    title: 'Error'
   }
 ];
 
@@ -139,9 +121,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
           open={openMobile}
           variant="temporary"
           PaperProps={{
-            sx: {
-              width: 256
-            }
+            sx: {}
           }}
         >
           {content}
@@ -155,7 +135,8 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
           PaperProps={{
             sx: {
               width: 256,
-              top: 64
+              top: 64,
+              height: 'calc(100% - 64px)'
             }
           }}
         >
