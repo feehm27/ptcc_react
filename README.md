@@ -12,7 +12,6 @@ As seguintes features foram desenvolvidas:
 - [x] Login 
 - [x] Cadastro
 - [x] Logout 
-- [ ] Menus e permissões dos usuários
 
 ### 🛠 Tecnologias
 
