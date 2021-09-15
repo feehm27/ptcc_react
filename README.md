@@ -10,7 +10,7 @@
 As seguintes features foram desenvolvidas:
 
 - [x] Login 
-- [x] Cadastro
+- [x] Cadastro de usuário
 - [x] Logout 
 
 ### 🛠 Tecnologias
