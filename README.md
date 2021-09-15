@@ -22,11 +22,12 @@ As seguintes ferramentas foram usadas na construção do projeto:
 
 ### Pré-requisitos
 
+```sh
 # Siga os pré-requisitos do projeto advoguez_php
 $ https://github.com/feehm27/advoguez_php/blob/development/README.md
 
 # Clone este repositório
-$ git clone <https://github.com/feehm27/advoguez_php.git>
+$ git clone https://github.com/feehm27/advoguez_php.git
 
 # Acesse a pasta do projeto no terminal/cmd
 $ cd advoguez_react
@@ -38,4 +39,5 @@ $ npm install
 $ npm start
 
 # O servidor inciará na porta:3000 - acesse <http://localhost:3000> 
+```
 
