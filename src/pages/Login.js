@@ -1,29 +1,32 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import * as Yup from 'yup';
 import { Formik } from 'formik';
 import {
   Box,
   Button,
-  Checkbox,
   Container,
   Link,
   TextField,
   Typography
 } from '@material-ui/core';
-import axios from 'axios';
-
-async function sendLogin() {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/teste');
-    console.log(response);
-  } catch (error) {
-    console.error(error);
-  }
-}
+import LinkedinIcon from 'src/icons/Linkedin';
+import LoginSchema from 'src/schemas/LoginSchema';
+import React, { useContext } from 'react';
+import { UserContext } from 'src/contexts/UserContext';
 
 const Login = () => {
-  const navigate = useNavigate();
+  const { userLogin, error, loading } = useContext(UserContext);
+
+  /* cOLOCAR VALIDAÇÃO PARA CHAMAR O LOGIN SOMENTE SE OS DADOS PASSAREM PELO SCHEMA */
+  async function signIn(email, password) {
+    if (email && password) {
+      userLogin(email, password);
+    }
+  }
+
+  const signInWithLinkedin = () => {
+    console.log('teste');
+  };
 
   return (
     <>
@@ -36,10 +39,7 @@ const Login = () => {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          justifyContent: 'center',
-          width: '100%',
-          position: 'relative',
-          border: '60px solid #5664d2'
+          justifyContent: 'center'
         }}
       >
         <Container maxWidth="sm">
@@ -48,29 +48,18 @@ const Login = () => {
               email: '',
               password: ''
             }}
-            validationSchema={Yup.object().shape({
-              email: Yup.string()
-                .email('Informe um email válido')
-                .max(255)
-                .required('Campo obrigatório'),
-              password: Yup.string().max(255).required('Campo obrigatório')
-            })}
-            onSubmit={() => {
-              sendLogin();
-              navigate('/app/dashboard', { replace: true });
-            }}
+            validationSchema={LoginSchema}
           >
             {({
               errors,
               handleBlur,
               handleChange,
               handleSubmit,
-              isSubmitting,
               touched,
               values
             }) => (
               <form onSubmit={handleSubmit}>
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 2, mt: 10 }}>
                   <Typography color="primary" variant="h2" textAlign="center">
                     Login
                   </Typography>
@@ -90,9 +79,11 @@ const Login = () => {
                   variant="outlined"
                 />
                 <TextField
-                  error={Boolean(touched.password && errors.password)}
+                  error={Boolean(
+                    (touched.password && errors.password) || error
+                  )}
                   fullWidth
-                  helperText={touched.password && errors.password}
+                  helperText={(touched.password && errors.password) || error}
                   label="Senha"
                   margin="normal"
                   name="password"
@@ -103,21 +94,42 @@ const Login = () => {
                   value={values.password}
                   variant="outlined"
                 />
-                <Typography color="textSecondary" variant="body1">
-                  <Checkbox onChange={handleChange} name="checkedB" />
-                  Mantenha-me conectado
-                </Typography>
-
                 <Box sx={{ py: 2 }}>
+                  {loading ? (
+                    <Button
+                      color="primary"
+                      disabled
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                    >
+                      Carregando...
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                      onClick={() => signIn(values.email, values.password)}
+                    >
+                      Entrar
+                    </Button>
+                  )}
+                  <Typography color="primary" variant="h4" textAlign="center">
+                    ou
+                  </Typography>
                   <Button
                     color="primary"
-                    disabled={isSubmitting}
                     fullWidth
+                    startIcon={<LinkedinIcon />}
+                    onClick={() => signInWithLinkedin()}
                     size="large"
-                    type="submit"
                     variant="contained"
                   >
-                    Entrar
+                    Entrar com Linkedin
                   </Button>
                 </Box>
                 <Typography color="textSecondary" variant="body1">

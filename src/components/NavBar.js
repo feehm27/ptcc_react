@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -12,13 +12,15 @@ import {
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
+import { UserContext } from 'src/contexts/UserContext';
 import Logo from './Logo';
 
 const NavBar = ({ onMobileNavOpen, ...rest }) => {
   const [notifications] = useState([]);
+  const { userLogout } = useContext(UserContext);
 
   return (
-    <AppBar elevation={0} {...rest}>
+    <AppBar elevation={0} {...rest} sx={{ height: '64px' }}>
       <Toolbar>
         <RouterLink to="/">
           <Logo />
@@ -35,7 +37,7 @@ const NavBar = ({ onMobileNavOpen, ...rest }) => {
             </Badge>
           </IconButton>
           <IconButton color="inherit">
-            <InputIcon />
+            <InputIcon onClick={() => userLogout()} />
           </IconButton>
         </Hidden>
         <Hidden lgUp>

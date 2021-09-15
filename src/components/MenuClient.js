@@ -13,27 +13,27 @@ import NavItem from './NavItem';
 
 const items = [
   {
-    href: '/app/dashboard',
+    href: '/dashboard',
     icon: AlertCircleIcon,
     title: 'Página Inicial'
   },
   {
-    href: '/app/customers',
+    href: '/customers',
     icon: FileIcon,
     title: 'Contrato'
   },
   {
-    href: '/app/products',
+    href: '/products',
     icon: BookIcon,
     title: 'Acompanhar Processo'
   },
   {
-    href: '/app/account',
+    href: '/account',
     icon: CalendarIcon,
     title: 'Agendar Reunião'
   },
   {
-    href: '/app/settings',
+    href: '/settings',
     icon: MessageIcon,
     title: 'Contato'
   }

@@ -33,6 +33,23 @@
     "react/require-default-props": "off",
 	"object-curly-newline": "off",
 	"react/jsx-one-expression-per-line": "off",
-	"react/jsx-wrap-multilines": "off"
+	"react/jsx-wrap-multilines": "off",
+	"operator-linebreak": [ 1, "after", { "overrides": {
+		"?": "ignore",
+		":": "ignore"
+	}}],
+	"no-tabs": "off",
+	"indent": "off",
+	"quotes": "off",
+	"padded-blocks": "off",
+	"no-trailing-spaces": "off",
+	"no-multiple-empty-lines": "off",
+	"react/self-closing-comp": "off",
+	"react/prop-types": "off",
+	"arrow-body-style": "off",
+	"no-else-return": "off",
+	"react/jsx-curly-newline": "off",
+	"implicit-arrow-linebreak": "off",
+	"prefer-arrow-callback": "off"
   }
 }

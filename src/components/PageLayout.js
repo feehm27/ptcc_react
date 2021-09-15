@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { experimentalStyled } from '@material-ui/core';
+import { UserContext } from 'src/contexts/UserContext';
 import MenuAttorney from './MenuAttorney';
 import NavBar from './NavBar';
+
+import MenuClient from './MenuClient';
 
 const LayoutRoot = experimentalStyled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -37,13 +40,31 @@ const LayoutContent = experimentalStyled('div')({
 const PageLayout = () => {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
 
+  const { data } = useContext(UserContext);
+
+  /**
+   * Verifica o tipo de perfil do usuário logado
+   * @returns Boolean
+   */
+  const profileIsAdvocate = () => {
+    if (data !== null && data.is_client === 1) return false;
+    return true;
+  };
+
   return (
     <LayoutRoot>
       <NavBar onMobileNavOpen={() => setMobileNavOpen(true)} />
-      <MenuAttorney
-        onMobileClose={() => setMobileNavOpen(false)}
-        openMobile={isMobileNavOpen}
-      />
+      {profileIsAdvocate() ? (
+        <MenuAttorney
+          onMobileClose={() => setMobileNavOpen(false)}
+          openMobile={isMobileNavOpen}
+        />
+      ) : (
+        <MenuClient
+          onMobileClose={() => setMobileNavOpen(false)}
+          openMobile={isMobileNavOpen}
+        />
+      )}
       <LayoutWrapper>
         <LayoutContainer>
           <LayoutContent>

@@ -17,7 +17,7 @@ const Dashboard = () => (
     <Box
       sx={{
         backgroundColor: 'background.default',
-        minHeight: '100%',
+        minHeight: '50%',
         py: 3
       }}
     >
