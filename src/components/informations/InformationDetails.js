@@ -17,6 +17,7 @@ import { Formik } from 'formik';
 import ReactInputMask from 'react-input-mask';
 import InformationSchema from 'src/schemas/InformationSchema';
 import { useNavigate } from 'react-router';
+import { isEmpty } from 'lodash';
 import ToastAnimated, { showToast } from '../Toast';
 
 const civilStatus = [
@@ -109,6 +110,18 @@ const InformationDetails = () => {
     };
 
     if (values) {
+      if (address && address.street) {
+        values.street = address.street;
+      }
+      if (address && address.district) {
+        values.district = address.district;
+      }
+      if (address && address.city) {
+        values.city = address.city;
+      }
+      if (address && address.state) {
+        values.state = address.state;
+      }
       if (informations !== null) {
         values.id = informations.id;
       }
@@ -132,14 +145,14 @@ const InformationDetails = () => {
    * Obtém o endereço pelo cep digitado
    * @param {*} cep
    */
-  async function getAddressByZipCode(cep) {
+  async function getAddressByZipCode(cep, errors) {
     setLoadingAddress(true);
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then((res) => res.json())
       .then((data) => {
         if (data.erro) {
           setError({
-            cep: ['Endereço não encontrado. Preencha o endereço manualmente.']
+            cep: ['CEP não encontrado. Preencha o endereço manualmente.']
           });
           setLoadingAddress(false);
           setAddress([]);
@@ -150,6 +163,11 @@ const InformationDetails = () => {
             district: data.bairro,
             street: data.logradouro
           });
+
+          errors.cep = null;
+          errors.state = null;
+          errors.city = null;
+          errors.district = null;
           setLoadingAddress(false);
           setError({ cep: null });
         }
@@ -160,8 +178,24 @@ const InformationDetails = () => {
    * Envia os dados do formulário
    * @param {*} values
    */
-  const handleSubmit = (values) => {
-    sendInformations(values);
+  const handleSubmit = (values, errors, setFieldError) => {
+    if (address && address.street) {
+      delete errors.street;
+      setFieldError('street', null);
+    }
+    if (address && address.district) {
+      delete errors.district;
+      setFieldError('district', null);
+    }
+    if (address && address.city) {
+      delete errors.city;
+      setFieldError('city', null);
+    }
+    if (address && address.state) {
+      delete errors.state;
+      setFieldError('state', null);
+    }
+    if (isEmpty(errors)) sendInformations(values);
   };
 
   /**
@@ -217,13 +251,20 @@ const InformationDetails = () => {
       validationSchema={InformationSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, handleBlur, handleChange, values, submitForm }) => (
+      {({
+        errors,
+        handleBlur,
+        handleChange,
+        values,
+        submitForm,
+        setFieldError
+      }) => (
         <form
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
             setShowSuccess(false);
-            handleSubmit();
+            handleSubmit(values, errors, setFieldError);
           }}
         >
           <Card>
@@ -257,6 +298,9 @@ const InformationDetails = () => {
                     mask="999.999.999-99"
                     value={values.cpf}
                     onChange={(event) => {
+                      if (error && error.cpf) {
+                        error.cpf = null;
+                      }
                       handleChange(event);
                       setShowSuccess(false);
                     }}
@@ -390,7 +434,7 @@ const InformationDetails = () => {
                       handleChange(event);
                       const unmask = event.target.value.replace(/[^\d]/g, '');
                       if (unmask.length === 8) {
-                        getAddressByZipCode(unmask);
+                        getAddressByZipCode(unmask, errors);
                       }
                       setShowSuccess(false);
                     }}
@@ -415,7 +459,14 @@ const InformationDetails = () => {
                 </Grid>
 
                 {loadingAddress ? (
-                  <Skeleton></Skeleton>
+                  <Skeleton
+                    variant="rectangular"
+                    animation="wave"
+                    width="100%"
+                    height="100%"
+                  >
+                    <div style={{ paddingTop: '57%' }} />
+                  </Skeleton>
                 ) : (
                   <>
                     <Grid item md={6} xs={12}>
@@ -430,11 +481,11 @@ const InformationDetails = () => {
                           setShowSuccess(false);
                         }}
                         onChange={(event) => {
-                          address.street = null;
                           handleChange(event);
+                          address.street = null;
                           setShowSuccess(false);
                         }}
-                        value={values.street || address.street}
+                        value={address.street ? address.street : values.street}
                         variant="outlined"
                       />
                     </Grid>
@@ -473,8 +524,9 @@ const InformationDetails = () => {
                           handleChange(event);
                           setShowSuccess(false);
                         }}
-                        required
-                        value={values.district || address.district}
+                        value={
+                          address.district ? address.district : values.district
+                        }
                         variant="outlined"
                       />
                     </Grid>
@@ -513,8 +565,7 @@ const InformationDetails = () => {
                           handleChange(event);
                           setShowSuccess(false);
                         }}
-                        required
-                        value={values.state || address.state}
+                        value={address.state ? address.state : values.state}
                         variant="outlined"
                       />
                     </Grid>
@@ -534,8 +585,7 @@ const InformationDetails = () => {
                           handleChange(event);
                           setShowSuccess(false);
                         }}
-                        required
-                        value={values.city || address.city}
+                        value={address.city ? address.city : values.city}
                         variant="outlined"
                       />
                     </Grid>
