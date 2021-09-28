@@ -12,10 +12,20 @@ import {
   Typography
 } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import customers from 'src/__mocks__/customers';
+import { API } from 'src/services/api';
 
 const UserProfileList = ({ profiles, ...rest }) => {
   const navigate = useNavigate();
+
+  async function getMenus() {
+    const token = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+    await API.get('menu/permissions', config).then((response) => {
+      return response.data.data;
+    });
+  }
 
   return (
     <Card {...rest}>
@@ -50,8 +60,10 @@ const UserProfileList = ({ profiles, ...rest }) => {
                       type="submit"
                       variant="contained"
                       onClick={() => {
+                        const menus = getMenus();
+                        console.log(menus);
                         navigate('/profiles/types', {
-                          state: { profile, customers }
+                          state: { profile }
                         });
                       }}
                     >

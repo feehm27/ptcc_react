@@ -50,6 +50,11 @@
 	"no-else-return": "off",
 	"react/jsx-curly-newline": "off",
 	"implicit-arrow-linebreak": "off",
-	"prefer-arrow-callback": "off"
+	"prefer-arrow-callback": "off",
+	"no-unused-expressions": "off",
+	"react/destructuring-assignment": "off",
+	"no-param-reassign": "off",
+	"react/jsx-boolean-value": "off",
+	"react/jsx-indent": "off"
   }
 }

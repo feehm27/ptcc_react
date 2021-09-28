@@ -17,7 +17,9 @@ import Login from './pages/Login';
 import MainLayout from './components/MainLayout';
 import Settings from './pages/Settings';
 import UserProfile from './pages/UserProfile';
+import Permissions from './components/Permissions';
 import ProfileTypes from './components/ProfileTypes';
+import MyInformation from './pages/MyInformation';
 
 function App() {
   return (
@@ -37,9 +39,13 @@ function App() {
               <PageLayout>
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
                 <ProtectedRoute path="/account" element={<Account />} />
-                <ProtectedRoute path="/customers" element={<CustomerList />} />
+                <ProtectedRoute
+                  path="/informations"
+                  element={<MyInformation />}
+                />
                 <ProtectedRoute path="/products" element={<ProductList />} />
                 <ProtectedRoute path="/settings" element={<Settings />} />
+                <ProtectedRoute path="/customers" element={<CustomerList />} />
                 <ProtectedRoute
                   path="/profiles/types"
                   element={<ProfileTypes />}
@@ -47,6 +53,10 @@ function App() {
                 <ProtectedRoute
                   path="/users/profile"
                   element={<UserProfile />}
+                />
+                <ProtectedRoute
+                  path="/users/permissions"
+                  element={<Permissions />}
                 />
                 <ProtectedRoute path="404" element={<NotFound />} />
               </PageLayout>
