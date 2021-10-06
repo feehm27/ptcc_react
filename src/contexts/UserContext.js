@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_URL } from '../services/api';
+import { API, API_AUTHENTICATED } from '../services/api';
 
 export const UserContext = createContext();
 
@@ -16,7 +16,7 @@ export const UserStorage = ({ children }) => {
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
-    await API_URL.get('/api/me', config).then((response) => {
+    await API.get('me', config).then((response) => {
       setData(response.data);
       setLogin(true);
     });
@@ -25,8 +25,8 @@ export const UserStorage = ({ children }) => {
   async function userLogin(email, password) {
     setError(null);
     setLoading(true);
-    await API_URL.get('/sanctum/csrf-cookie').then(() => {
-      API_URL.post('/api/login', { email, password })
+    await API_AUTHENTICATED.get('/sanctum/csrf-cookie').then(() => {
+      API.post('login', { email, password })
         .then((response) => {
           const token = response.data.access_token;
           window.localStorage.setItem('token', token);

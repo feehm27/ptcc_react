@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container, Typography } from '@material-ui/core';
-import profiles from 'src/__mocks__/profiles';
 import UserProfileList from 'src/components/users/UserProfileList';
+import ProfileTypeConstants from 'src/constants/ProfileTypeConstants';
 
 const UserProfile = () => (
   <>
@@ -20,7 +20,7 @@ const UserProfile = () => (
           Perfil de Usuários
         </Typography>
         <Box sx={{ pt: 3 }}>
-          <UserProfileList profiles={profiles} />
+          <UserProfileList profiles={ProfileTypeConstants} />
         </Box>
       </Container>
     </Box>

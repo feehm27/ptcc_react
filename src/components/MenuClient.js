@@ -13,6 +13,7 @@ import NavItem from './NavItem';
 
 const items = [
   {
+    id: 12,
     href: '/dashboard',
     icon: AlertCircleIcon,
     title: 'Página Inicial'
@@ -28,11 +29,13 @@ const items = [
     title: 'Acompanhar Processo'
   },
   {
+    id: 13,
     href: '/account',
     icon: CalendarIcon,
     title: 'Agendar Reunião'
   },
   {
+    id: 14,
     href: '/settings',
     icon: MessageIcon,
     title: 'Contato'

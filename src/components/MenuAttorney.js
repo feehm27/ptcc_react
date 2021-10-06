@@ -18,56 +18,67 @@ import NavItem from './NavItem';
 
 const items = [
   {
+    id: 1,
     href: '/dashboard',
     icon: BarChartIcon,
     title: 'Dashboard'
   },
   {
-    href: '/customers',
+    id: 2,
+    href: '/informations',
     icon: InfoIcon,
     title: 'Meus Dados'
   },
   {
-    href: '/products',
+    id: 3,
+    href: '/identity',
     icon: CameraIcon,
     title: 'Identidade Visual'
   },
   {
-    href: '/account',
+    id: 4,
+    href: '/clients',
     icon: ArrowRightIcon,
     title: 'Gestão de Clientes'
   },
   {
+    id: 5,
     href: '/settings',
     icon: ArrowRightIcon,
     title: 'Gestão de Contratos'
   },
   {
+    id: 6,
     href: '/404',
     icon: ArrowRightIcon,
     title: 'Gestão de Processos'
   },
   {
-    href: '/404',
+    id: 7,
+    href: '/account',
     icon: CalendarIcon,
     title: 'Agenda de Reuniões'
   },
   {
+    id: 8,
     href: '/404',
     icon: MessageIcon,
     title: 'Mensagens'
   },
   {
+    id: 9,
     href: '/404',
     icon: BellIcon,
     title: 'Lembretes'
   },
   {
+    id: 10,
     href: '/404',
     icon: FileIcon,
     title: 'Relatórios'
   },
   {
+    id: 11,
     href: '/404',
     icon: UsersIcon,
     title: 'Usuários'

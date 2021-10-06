@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import RegisterSchema from 'src/schemas/RegisterSchema';
 import LinkedinIcon from 'src/icons/Linkedin';
-import { API_URL } from 'src/services/api';
+import { API } from 'src/services/api';
 import { useContext, useState } from 'react';
 import { UserContext } from 'src/contexts/UserContext';
 
@@ -23,7 +23,7 @@ const Register = () => {
   const { userLogin, loading } = useContext(UserContext);
 
   async function registerWithLinkedin() {
-    await API_URL.get('/api/callback')
+    await API.get('/callback')
       .then((response) => {
         console.log(response);
       })
@@ -41,7 +41,7 @@ const Register = () => {
       is_client: selectedProfileType === 'client' ? 1 : 0
     };
 
-    await API_URL.post('/api/register', data)
+    await API.post('register', data)
       .then((response) => {
         const convertResponse = JSON.parse(response.config.data);
         const { email, password } = convertResponse;
