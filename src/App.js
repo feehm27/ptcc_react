@@ -20,6 +20,8 @@ import UserProfile from './pages/UserProfile';
 import Permissions from './components/Permissions';
 import ProfileTypes from './components/ProfileTypes';
 import MyInformation from './pages/MyInformation';
+import Identity from './pages/Identity';
+import Client from './pages/Client';
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
                   path="/informations"
                   element={<MyInformation />}
                 />
+                <ProtectedRoute path="/identity" element={<Identity />} />
+                <ProtectedRoute path="/clients" element={<Client />} />
                 <ProtectedRoute path="/products" element={<ProductList />} />
                 <ProtectedRoute path="/settings" element={<Settings />} />
                 <ProtectedRoute path="/customers" element={<CustomerList />} />

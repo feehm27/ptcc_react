@@ -31,13 +31,13 @@ const items = [
   },
   {
     id: 3,
-    href: '/products',
+    href: '/identity',
     icon: CameraIcon,
     title: 'Identidade Visual'
   },
   {
     id: 4,
-    href: '/account',
+    href: '/clients',
     icon: ArrowRightIcon,
     title: 'Gestão de Clientes'
   },
@@ -55,7 +55,7 @@ const items = [
   },
   {
     id: 7,
-    href: '/404',
+    href: '/account',
     icon: CalendarIcon,
     title: 'Agenda de Reuniões'
   },
