@@ -9,29 +9,29 @@ import {
   Stack,
   Typography
 } from '@material-ui/core';
-
 import { Formik } from 'formik';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { UserContext } from 'src/contexts/UserContext';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const VisualIdentity = () => {
-  const { data, loading } = useContext(UserContext);
   const navigate = useNavigate();
+  const { data, loading } = useContext(UserContext);
   const [submitting, setSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState(false);
+
+  const showMessage = useRef(false);
 
   /**
    * Envia os dados do formulário
    */
   async function handleSubmit() {
     setSubmitting(true);
-    setShowSuccess(false);
+    showMessage.current = false;
 
     if (selectedImage) {
       const token = window.localStorage.getItem('token');
@@ -43,18 +43,16 @@ const VisualIdentity = () => {
       formData.append('image', selectedImage);
 
       await API.post('identity/upload', formData, config)
-        .then((response) => {
-          if (response.data.status === 200) {
-            setShowSuccess(true);
-          }
+        .then(() => {
+          showMessage.current = true;
         })
         .catch((err) => {
           const errorImage = err.response.data.errors;
           if (errorImage.image) {
             setError(errorImage.image[0]);
           }
+          showMessage.current = false;
           console.error(err);
-          setShowSuccess(false);
         });
     }
     setSubmitting(false);
@@ -81,7 +79,7 @@ const VisualIdentity = () => {
     if (selectedImage) {
       setImageUrl(URL.createObjectURL(selectedImage));
     }
-  }, [selectedImage, showSuccess]);
+  }, [selectedImage]);
 
   return loading ? (
     <Skeleton variant="rectangular" animation="wave" width="100%" height="100%">
@@ -93,15 +91,13 @@ const VisualIdentity = () => {
         initialValues={{
           file: null
         }}
-        onSubmit={handleSubmit}
       >
-        {({ errors, values, submitForm, setFieldError }) => (
+        {() => (
           <form
             autoComplete="off"
             onSubmit={(e) => {
               e.preventDefault();
-              setShowSuccess(false);
-              handleSubmit(values, errors, setFieldError);
+              handleSubmit();
             }}
           >
             <Card>
@@ -113,7 +109,11 @@ const VisualIdentity = () => {
                       accept="image/png, image/jpeg, image/jpg"
                       id="icon-button-file"
                       type="file"
-                      onChange={(e) => setSelectedImage(e.target.files[0])}
+                      onChange={(e) => {
+                        showMessage.current = false;
+                        setSelectedImage(e.target.files[0]);
+                        setError(null);
+                      }}
                       style={{ marginTop: '15px' }}
                     />
                     {error && (
@@ -171,36 +171,30 @@ const VisualIdentity = () => {
                     Carregando..
                   </Button>
                 ) : (
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    type="button"
-                    onClick={submitForm}
-                  >
+                  <Button color="primary" variant="contained" type="submit">
                     Salvar
                   </Button>
                 )}
               </Stack>
             </Box>
-            {showSuccess && (
-              <>
-                <ToastAnimated />
-                {showToast({
-                  type: 'success',
-                  message: 'Logomarca alterada com sucesso!'
-                })}
-                <div className="mt-3">
-                  {showToast({
-                    type: 'warning',
-                    message:
-                      'Deslogue e logue novamente para atualização da logo.'
-                  })}
-                </div>
-              </>
-            )}
           </form>
         )}
       </Formik>
+      {showMessage.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Logomarca alterada com sucesso!'
+          })}
+          <div className="mt-3">
+            {showToast({
+              type: 'warning',
+              message: 'Deslogue e logue novamente para atualização da logo.'
+            })}
+          </div>
+        </>
+      )}
     </>
   );
 };

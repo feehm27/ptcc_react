@@ -1,24 +1,21 @@
-import { Link as RouterLink } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import { Formik } from 'formik';
 import {
   Box,
   Button,
   Container,
-  FormControlLabel,
   Link,
-  Radio,
   TextField,
   Typography
 } from '@material-ui/core';
-import RegisterSchema from 'src/schemas/RegisterSchema';
-import LinkedinIcon from 'src/icons/Linkedin';
-import { API } from 'src/services/api';
+import { Formik } from 'formik';
 import { useContext, useState } from 'react';
+import { Helmet } from 'react-helmet';
+import { Link as RouterLink } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
+import LinkedinIcon from 'src/icons/Linkedin';
+import RegisterSchema from 'src/schemas/RegisterSchema';
+import { API } from 'src/services/api';
 
 const Register = () => {
-  const [selectedProfileType, setSelectedProfileType] = useState('advocate');
   const [registerErrors, setRegisterErrors] = useState([]);
   const { userLogin, loading } = useContext(UserContext);
 
@@ -37,8 +34,8 @@ const Register = () => {
       name: values.name,
       email: values.email,
       password: values.password,
-      is_advocate: selectedProfileType === 'advocate' ? 1 : 0,
-      is_client: selectedProfileType === 'client' ? 1 : 0
+      is_advocate: 1,
+      is_client: 0
     };
 
     await API.post('register', data)
@@ -135,46 +132,6 @@ const Register = () => {
                   value={values.password}
                   variant="outlined"
                 />
-                <Box
-                  sx={{
-                    alignItems: 'center',
-                    display: 'flex'
-                  }}
-                >
-                  <Box sx={{ mr: 3 }}>
-                    <Typography color="primary" variant="h6">
-                      Tipo de perfil:
-                    </Typography>
-                  </Box>
-                  <FormControlLabel
-                    control={
-                      <Radio
-                        checked={selectedProfileType === 'advocate'}
-                        onChange={(event) => {
-                          setSelectedProfileType(event.target.value);
-                        }}
-                        color="primary"
-                        value="advocate"
-                        name="profileType"
-                      />
-                    }
-                    label="Advogado"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Radio
-                        checked={selectedProfileType === 'client'}
-                        onChange={(event) => {
-                          setSelectedProfileType(event.target.value);
-                        }}
-                        color="primary"
-                        value="client"
-                        name="profileType"
-                      />
-                    }
-                    label="Cliente"
-                  />
-                </Box>
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"
