@@ -19,6 +19,8 @@ export const UserStorage = ({ children }) => {
     await API.get('me', config).then((response) => {
       setData(response.data);
       setLogin(true);
+      const { logo } = response.data;
+      window.localStorage.setItem('logo', logo);
     });
   }
 
@@ -49,6 +51,7 @@ export const UserStorage = ({ children }) => {
       setLoading(false);
       setLogin(false);
       window.localStorage.removeItem('token');
+      window.localStorage.removeItem('logo');
       navigate('/login');
     },
     [navigate]

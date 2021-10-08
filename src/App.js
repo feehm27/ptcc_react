@@ -31,9 +31,9 @@ function App() {
         <BrowserRouter>
           <UserStorage>
             <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="register" element={<Register />} />
               <MainLayout>
-                <Route path="/login" element={<Login />} />
-                <Route path="register" element={<Register />} />
                 <Route path="404" element={<NotFound />} />
                 <Route path="*" element={<Navigate to="/404" />} />
                 <Route path="/" element={<Navigate to="/login" />} />
