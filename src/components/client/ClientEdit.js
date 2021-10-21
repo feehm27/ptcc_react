@@ -1,3 +1,4 @@
+import DateFnsUtils from '@date-io/date-fns';
 import {
   Box,
   Button,
@@ -10,64 +11,33 @@ import {
   Stack,
   TextField
 } from '@material-ui/core';
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider
+} from '@material-ui/pickers';
+import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
-import InformationSchema from 'src/schemas/InformationSchema';
+import GenderConstants from 'src/constants/GenderConstants';
+import ClientEditSchema from 'src/schemas/ClientEditSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const civilStatus = CivilStatusConstants;
+const gender = GenderConstants;
 
-const banks = [
-  {
-    value: '0',
-    label: 'Selecione uma opção'
-  },
-  {
-    value: '1',
-    label: 'Banco do Brasil'
-  },
-  {
-    value: '2',
-    label: 'Banco Inter'
-  },
-  {
-    value: '3',
-    label: 'Bradesco'
-  },
-  {
-    value: '4',
-    label: 'Caixa Econômica Federal'
-  },
-  {
-    value: '5',
-    label: 'C6 Bank'
-  },
-  {
-    value: '6',
-    label: 'Itaú'
-  },
-  {
-    value: '7',
-    label: 'Nubank'
-  },
-  {
-    value: '8',
-    label: 'Santander Brasil S.A'
-  }
-];
-
-const InformationDetails = () => {
+const ClientEdit = () => {
   const navigate = useNavigate();
+  const { client } = useLocation().state;
   const [address, setAddress] = useState([]);
   const [error, setError] = useState(null);
-  const [informations, setInformations] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [loadingAddress, setLoadingAddress] = useState(false);
+  const [selectedDate, handleDateChange] = useState(client.birthday);
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [token, setToken] = useState();
@@ -76,7 +46,7 @@ const InformationDetails = () => {
    * Envia os dados do advogado
    * @param {*} values
    */
-  async function sendInformations(values) {
+  async function updatedClient(values) {
     setSubmitting(true);
     setShowSuccess(false);
 
@@ -97,14 +67,11 @@ const InformationDetails = () => {
       if (address && address.state) {
         values.state = address.state;
       }
-      if (informations !== null) {
-        values.id = informations.id;
-      }
 
-      await API.post('advocates/informations', values, config)
-        .then((response) => {
-          console.log(response);
-        })
+      values.birthday = moment(selectedDate).format('YYYY-MM-DD');
+
+      await API.put(`advocates/clients/${client.id}`, values, config)
+        .then(() => {})
         .catch((err) => {
           setError(err.response.data.errors);
           setShowSuccess(false);
@@ -170,60 +137,40 @@ const InformationDetails = () => {
       delete errors.state;
       setFieldError('state', null);
     }
-    if (isEmpty(errors)) sendInformations(values);
-  };
 
-  /**
-   * Obtém as informações do advogado
-   * @param {*} tokenUser
-   */
-  async function getInformations(tokenUser) {
-    setLoading(true);
-    const config = {
-      headers: { Authorization: `Bearer ${tokenUser}` }
-    };
-    await API.get('advocates/informations', config)
-      .then((response) => {
-        setInformations(response.data.data);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }
+    if (isEmpty(errors)) updatedClient(values);
+  };
 
   /**
    * Use Effect
    */
   useEffect(() => {
-    const tokenStorage = window.localStorage.getItem('token');
-    setToken(tokenStorage);
-    getInformations(tokenStorage);
+    setToken(window.localStorage.getItem('token'));
   }, []);
 
-  return loading ? (
-    <Skeleton variant="rectangular" animation="wave" width="100%" height="100%">
-      <div style={{ paddingTop: '57%' }} />
-    </Skeleton>
-  ) : (
+  return (
     <Formik
       initialValues={{
-        name: informations ? informations.name : '',
-        cpf: informations ? informations.cpf : '',
-        nationality: informations ? informations.nationality : '',
-        civil_status: informations ? informations.civil_status : '',
-        register_oab: informations ? informations.register_oab : '',
-        email: informations ? informations.email : '',
-        cep: informations ? informations.cep : '',
-        street: informations ? informations.street : '',
-        number: informations ? informations.number : '',
-        complement: informations ? informations.complement : '',
-        district: informations ? informations.district : '',
-        state: informations ? informations.state : '',
-        city: informations ? informations.city : '',
-        agency: informations ? informations.agency : '',
-        account: informations ? informations.account : '',
-        bank: informations ? informations.bank : ''
+        name: client.name || '',
+        email: client.email || '',
+        cpf: client.cpf || '',
+        rg: client.rg || '',
+        issuing_organ: client.issuing_organ || '',
+        nationality: client.nationality || '',
+        birthday: client.birthday || '',
+        gender: client.gender || '',
+        civil_status: client.civil_status || '',
+        telephone: client.telephone || '',
+        cellphone: client.cellphone || '',
+        cep: client.cep || '',
+        street: client.street || '',
+        number: client.number || '',
+        complement: client.complement || null,
+        district: client.district || '',
+        state: client.state || '',
+        city: client.city || ''
       }}
-      validationSchema={InformationSchema}
+      validationSchema={ClientEditSchema}
       onSubmit={handleSubmit}
     >
       {({
@@ -232,7 +179,8 @@ const InformationDetails = () => {
         handleChange,
         values,
         submitForm,
-        setFieldError
+        setFieldError,
+        touched
       }) => (
         <form
           autoComplete="off"
@@ -267,7 +215,32 @@ const InformationDetails = () => {
                     variant="outlined"
                   />
                 </Grid>
-
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={
+                      errors.email ||
+                      (error && error.email ? error.email[0] : '')
+                    }
+                    fullWidth
+                    helperText={
+                      errors.email ||
+                      (error && error.email ? error.email[0] : '')
+                    }
+                    label="Email"
+                    name="email"
+                    onBlur={(event) => {
+                      handleBlur(event);
+                      setShowSuccess(false);
+                    }}
+                    onChange={(event) => {
+                      handleChange(event);
+                      setShowSuccess(false);
+                    }}
+                    required
+                    value={values.email}
+                    variant="outlined"
+                  />
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <ReactInputMask
                     mask="999.999.999-99"
@@ -298,6 +271,70 @@ const InformationDetails = () => {
                     )}
                   </ReactInputMask>
                 </Grid>
+                <Grid item md={3} xs={12}>
+                  <TextField
+                    error={errors.rg}
+                    fullWidth
+                    helperText={errors.rg}
+                    label="RG"
+                    name="rg"
+                    onBlur={(event) => {
+                      handleBlur(event);
+                      setShowSuccess(false);
+                    }}
+                    onChange={(event) => {
+                      handleChange(event);
+                      setShowSuccess(false);
+                    }}
+                    required
+                    value={values.rg}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <TextField
+                    error={errors.issuing_organ}
+                    fullWidth
+                    helperText={errors.issuing_organ}
+                    label="Orgão Emissor"
+                    name="issuing_organ"
+                    onBlur={(event) => {
+                      handleBlur(event);
+                      setShowSuccess(false);
+                    }}
+                    onChange={(event) => {
+                      handleChange(event);
+                      setShowSuccess(false);
+                    }}
+                    required
+                    value={values.issuing_organ}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
+                    <KeyboardDatePicker
+                      error={Boolean(touched.birthday && errors.birthday)}
+                      disableFuture
+                      helperText={touched.birthday && errors.birthday}
+                      openTo="year"
+                      format="dd/MM/yyyy"
+                      label="Data de nascimento"
+                      views={['year', 'month', 'date']}
+                      value={selectedDate}
+                      onChange={(e) => {
+                        handleDateChange(e);
+                        setShowSuccess(false);
+                      }}
+                      onBlur={(e) => {
+                        setShowSuccess(false);
+                        handleBlur(e);
+                      }}
+                      name="birthday"
+                      required
+                    />
+                  </MuiPickersUtilsProvider>
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={errors.nationality}
@@ -317,6 +354,34 @@ const InformationDetails = () => {
                     value={values.nationality}
                     variant="outlined"
                   />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={errors.gender}
+                    fullWidth
+                    helperText={errors.gender}
+                    label="Gênero"
+                    name="gender"
+                    onBlur={(event) => {
+                      handleBlur(event);
+                      setShowSuccess(false);
+                    }}
+                    onChange={(event) => {
+                      handleChange(event);
+                      setShowSuccess(false);
+                    }}
+                    required
+                    select
+                    SelectProps={{ native: true }}
+                    value={values.gender}
+                    variant="outlined"
+                  >
+                    {gender.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </TextField>
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
@@ -347,51 +412,47 @@ const InformationDetails = () => {
                   </TextField>
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <TextField
-                    error={errors.register_oab}
-                    fullWidth
-                    helperText={errors.register_oab}
-                    label="Número de registro OAB"
-                    name="register_oab"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      setShowSuccess(false);
-                    }}
+                  <ReactInputMask
+                    mask="(99) 99999-9999"
+                    value={values.cellphone}
                     onChange={(event) => {
                       handleChange(event);
                       setShowSuccess(false);
                     }}
-                    required
-                    value={values.register_oab}
-                    variant="outlined"
-                    inputProps={{ maxLength: 8 }}
-                  />
+                  >
+                    {() => (
+                      <TextField
+                        error={errors.cellphone}
+                        fullWidth
+                        helperText={errors.cellphone}
+                        label="Telefone Celular"
+                        name="cellphone"
+                        required
+                        variant="outlined"
+                      />
+                    )}
+                  </ReactInputMask>
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <TextField
-                    error={
-                      errors.email ||
-                      (error && error.email ? error.email[0] : '')
-                    }
-                    fullWidth
-                    helperText={
-                      errors.email ||
-                      (error && error.email ? error.email[0] : '')
-                    }
-                    label="Email"
-                    name="email"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      setShowSuccess(false);
-                    }}
+                  <ReactInputMask
+                    mask="(99) 9999-9999"
+                    value={values.telephone}
                     onChange={(event) => {
                       handleChange(event);
                       setShowSuccess(false);
                     }}
-                    required
-                    value={values.email}
-                    variant="outlined"
-                  />
+                  >
+                    {() => (
+                      <TextField
+                        error={errors.telephone}
+                        fullWidth
+                        helperText={errors.telephone}
+                        label="Telefone Fixo"
+                        name="telephone"
+                        variant="outlined"
+                      />
+                    )}
+                  </ReactInputMask>
                 </Grid>
               </Grid>
             </CardContent>
@@ -573,86 +634,6 @@ const InformationDetails = () => {
                 )}
               </Grid>
             </CardContent>
-            <Card>
-              <CardHeader
-                title="Dados do pagamento"
-                subheader="Dados para preenchimento automático de pagamento no contrato"
-              />
-              <Divider />
-              <CardContent>
-                <Grid container spacing={3}>
-                  <Grid item md={6} xs={12}>
-                    <ReactInputMask
-                      mask="9999"
-                      value={values.agency}
-                      onChange={(event) => {
-                        handleChange(event);
-                        setShowSuccess(false);
-                      }}
-                    >
-                      {() => (
-                        <TextField
-                          error={errors.agency}
-                          fullWidth
-                          helperText={errors.agency}
-                          label="Agência (sem dígito verificador)"
-                          name="agency"
-                          variant="outlined"
-                        />
-                      )}
-                    </ReactInputMask>
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <ReactInputMask
-                      mask="99999999-9"
-                      value={values.account}
-                      onChange={(event) => {
-                        handleChange(event);
-                        setShowSuccess(false);
-                      }}
-                    >
-                      {() => (
-                        <TextField
-                          error={errors.account}
-                          fullWidth
-                          helperText={errors.account}
-                          label="Conta"
-                          name="account"
-                          variant="outlined"
-                        />
-                      )}
-                    </ReactInputMask>
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      error={errors.bank}
-                      fullWidth
-                      helperText={errors.bank}
-                      label="Banco"
-                      name="bank"
-                      onBlur={(event) => {
-                        handleBlur(event);
-                        setShowSuccess(false);
-                      }}
-                      onChange={(event) => {
-                        handleChange(event);
-                        setShowSuccess(false);
-                      }}
-                      select
-                      SelectProps={{ native: true }}
-                      value={values.bank}
-                      variant="outlined"
-                    >
-                      {banks.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </TextField>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
             <Divider />
             <Box
               sx={{
@@ -665,7 +646,7 @@ const InformationDetails = () => {
                 <Button
                   color="primary"
                   variant="outlined"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/clients')}
                 >
                   Voltar
                 </Button>
@@ -691,7 +672,7 @@ const InformationDetails = () => {
               <ToastAnimated />
               {showToast({
                 type: 'success',
-                message: 'Dados alterados com sucesso!'
+                message: 'Cliente atualizado com sucesso!'
               })}
             </>
           )}
@@ -701,4 +682,4 @@ const InformationDetails = () => {
   );
 };
 
-export default InformationDetails;
+export default ClientEdit;

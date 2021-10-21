@@ -13,7 +13,11 @@ const InformationSchema = Yup.object().shape({
       return true;
     }),
   nationality: Yup.string().required('Campo obrigatório'),
-  civil_status: Yup.string().required('Campo obrigatório'),
+  civil_status: Yup.string()
+    .required('Campo obrigatório')
+    .test('isNull', 'Campo obrigatório', (value) => {
+      return value !== '0';
+    }),
   register_oab: Yup.string().required('Campo obrigatório'),
   email: Yup.string()
     .email('Informe um email válido')

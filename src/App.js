@@ -22,6 +22,8 @@ import ProfileTypes from './components/ProfileTypes';
 import MyInformation from './pages/MyInformation';
 import Identity from './pages/Identity';
 import Client from './pages/Client';
+import ClientCreate from './components/client/ClientCreate';
+import ClientEdit from './components/client/ClientEdit';
 
 function App() {
   return (
@@ -47,6 +49,11 @@ function App() {
                 />
                 <ProtectedRoute path="/identity" element={<Identity />} />
                 <ProtectedRoute path="/clients" element={<Client />} />
+                <ProtectedRoute
+                  path="/clients/create"
+                  element={<ClientCreate />}
+                />
+                <ProtectedRoute path="/clients/edit" element={<ClientEdit />} />
                 <ProtectedRoute path="/products" element={<ProductList />} />
                 <ProtectedRoute path="/settings" element={<Settings />} />
                 <ProtectedRoute path="/customers" element={<CustomerList />} />

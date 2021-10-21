@@ -4,19 +4,12 @@
     "es6": true,
     "browser": true
   },
-  "extends": [
-    "airbnb"
-  ],
+  "extends": ["airbnb"],
   "settings": {
     "import/resolver": {
       "node": {
-        "paths": [
-          "."
-        ],
-        "extensions": [
-          ".js",
-          ".jsx"
-        ]
+        "paths": ["."],
+        "extensions": [".js", ".jsx"]
       }
     }
   },
@@ -31,30 +24,37 @@
     "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
-	"object-curly-newline": "off",
-	"react/jsx-one-expression-per-line": "off",
-	"react/jsx-wrap-multilines": "off",
-	"operator-linebreak": [ 1, "after", { "overrides": {
-		"?": "ignore",
-		":": "ignore"
-	}}],
-	"no-tabs": "off",
-	"indent": "off",
-	"quotes": "off",
-	"padded-blocks": "off",
-	"no-trailing-spaces": "off",
-	"no-multiple-empty-lines": "off",
-	"react/self-closing-comp": "off",
-	"react/prop-types": "off",
-	"arrow-body-style": "off",
-	"no-else-return": "off",
-	"react/jsx-curly-newline": "off",
-	"implicit-arrow-linebreak": "off",
-	"prefer-arrow-callback": "off",
-	"no-unused-expressions": "off",
-	"react/destructuring-assignment": "off",
-	"no-param-reassign": "off",
-	"react/jsx-boolean-value": "off",
-	"react/jsx-indent": "off"
+    "object-curly-newline": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-wrap-multilines": "off",
+    "operator-linebreak": [
+      1,
+      "after",
+      {
+        "overrides": {
+          "?": "ignore",
+          ":": "ignore"
+        }
+      }
+    ],
+    "no-tabs": "off",
+    "indent": "off",
+    "quotes": "off",
+    "padded-blocks": "off",
+    "no-trailing-spaces": "off",
+    "no-multiple-empty-lines": "off",
+    "react/self-closing-comp": "off",
+    "react/prop-types": "off",
+    "arrow-body-style": "off",
+    "no-else-return": "off",
+    "react/jsx-curly-newline": "off",
+    "implicit-arrow-linebreak": "off",
+    "prefer-arrow-callback": "off",
+    "no-unused-expressions": "off",
+    "react/destructuring-assignment": "off",
+    "no-param-reassign": "off",
+    "react/jsx-boolean-value": "off",
+    "react/jsx-indent": "off",
+    "react/jsx-closing-tag-location": "off"
   }
 }
