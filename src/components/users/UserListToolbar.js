@@ -10,10 +10,10 @@ import {
 import { Search as SearchIcon } from 'react-feather';
 import { useNavigate } from 'react-router';
 
-const ClientListToolbar = (clients) => {
+const UserListToolbar = (users) => {
   const navigate = useNavigate();
 
-  return clients.length === 0 ? (
+  return users.length === 0 ? (
     <Box>
       <Box
         sx={{
@@ -25,9 +25,9 @@ const ClientListToolbar = (clients) => {
         <Button
           color="primary"
           variant="contained"
-          onClick={() => navigate('/clients/create')}
+          onClick={() => navigate('/users/create')}
         >
-          Novo Cliente
+          Novo Usuário
         </Button>
       </Box>
     </Box>
@@ -42,17 +42,9 @@ const ClientListToolbar = (clients) => {
         <Button
           color="primary"
           variant="contained"
-          onClick={() => navigate('/clients/create')}
+          onClick={() => navigate('/users/create')}
         >
-          Novo Cliente
-        </Button>
-        <Button
-          sx={{ mx: 1 }}
-          color="primary"
-          variant="contained"
-          onClick={() => navigate('/clients/create')}
-        >
-          Exportar todos os clientes
+          Novo Usuário
         </Button>
       </Box>
       <Box sx={{ mt: 3, mb: 4 }}>
@@ -70,7 +62,7 @@ const ClientListToolbar = (clients) => {
                     </InputAdornment>
                   )
                 }}
-                placeholder="Buscar cliente"
+                placeholder="Buscar usuário"
                 variant="outlined"
               />
             </Box>
@@ -81,4 +73,4 @@ const ClientListToolbar = (clients) => {
   );
 };
 
-export default ClientListToolbar;
+export default UserListToolbar;

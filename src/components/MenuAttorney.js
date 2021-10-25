@@ -79,7 +79,7 @@ const items = [
   },
   {
     id: 11,
-    href: '/404',
+    href: '/users',
     icon: UsersIcon,
     title: 'Usuários'
   },

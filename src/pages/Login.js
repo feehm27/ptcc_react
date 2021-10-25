@@ -65,9 +65,9 @@ const Login = () => {
                   </Typography>
                 </Box>
                 <TextField
-                  error={Boolean(touched.email && errors.email)}
+                  error={Boolean(touched.email && errors.email) || error}
                   fullWidth
-                  helperText={touched.email && errors.email}
+                  helperText={(touched.email && errors.email) || error}
                   label="Usuário"
                   margin="normal"
                   name="email"
@@ -79,11 +79,9 @@ const Login = () => {
                   variant="outlined"
                 />
                 <TextField
-                  error={Boolean(
-                    (touched.password && errors.password) || error
-                  )}
+                  error={Boolean(touched.password && errors.password)}
                   fullWidth
-                  helperText={(touched.password && errors.password) || error}
+                  helperText={touched.password && errors.password}
                   label="Senha"
                   margin="normal"
                   name="password"
