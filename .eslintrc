@@ -55,6 +55,8 @@
     "no-param-reassign": "off",
     "react/jsx-boolean-value": "off",
     "react/jsx-indent": "off",
-    "react/jsx-closing-tag-location": "off"
+    "react/jsx-closing-tag-location": "off",
+    "function-paren-newline": "off",
+    "array-callback-return": "off"
   }
 }
