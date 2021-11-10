@@ -74,9 +74,13 @@ const ClientSchema = Yup.object().shape({
     .required('Campo obrigatório'),
   confirm_password: Yup.string()
     .required('Campo obrigatório')
-    .test('passwords-match', 'Senha diferente da informada', function (value) {
-      return this.parent.password_user === value;
-    })
+    .test(
+      'passwords-match',
+      'Senha diferente da informada',
+      function confirmPassword(value) {
+        return this.parent.password_user === value;
+      }
+    )
 });
 
 export default ClientSchema;
