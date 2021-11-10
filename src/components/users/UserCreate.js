@@ -11,14 +11,16 @@ import {
 } from '@material-ui/core';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { UserContext } from 'src/contexts/UserContext';
 import UserSchema from 'src/schemas/UserSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const UserCreate = () => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -36,7 +38,8 @@ const UserCreate = () => {
       email: values.email,
       password: values.password,
       is_advocate: values.profile === '1' ? 1 : 0,
-      is_client: values.profile === '2' ? 1 : 0
+      is_client: values.profile === '2' ? 1 : 0,
+      advocate_user_id: data.id
     };
 
     await API.post('register', treatedValues)

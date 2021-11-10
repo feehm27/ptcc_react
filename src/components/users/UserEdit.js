@@ -15,7 +15,7 @@ import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import UserSchema from 'src/schemas/UserSchema';
+import UserEditScheam from 'src/schemas/UserEditSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
@@ -43,7 +43,6 @@ const UserEdit = () => {
     const treatedValues = {
       name: values.name,
       email: values.email,
-      password: values.password,
       is_advocate: values.profile === '1' ? 1 : 0,
       is_client: values.profile === '2' ? 1 : 0
     };
@@ -88,7 +87,7 @@ const UserEdit = () => {
         profile: user.is_advocate ? '1' : '2',
         confirm_password: user.password || ''
       }}
-      validationSchema={UserSchema}
+      validationSchema={UserEditScheam}
       onSubmit={handleSubmit}
     >
       {({ errors, handleBlur, handleChange, values, submitForm }) => (
@@ -153,45 +152,16 @@ const UserEdit = () => {
                         variant="outlined"
                       />
                     </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.password}
-                        fullWidth
-                        helperText={errors.password}
-                        label="Senha"
-                        margin="normal"
-                        name="password"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="password"
-                        value={values.password}
-                        variant="outlined"
-                        required
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.confirm_password}
-                        fullWidth
-                        helperText={errors.confirm_password}
-                        label="Confirmar senha"
-                        margin="normal"
-                        name="confirm_password"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="password"
-                        value={values.confirm_password}
-                        variant="outlined"
-                        required
-                      />
-                    </Grid>
                     <Grid item md={12} xs={12}>
                       <FormControlLabel
                         control={
                           <Checkbox
                             checked={checked}
                             color="primary"
-                            onChange={handleChangeChecked}
+                            onChange={(e) => {
+                              handleChangeChecked(e);
+                              setShowSuccess(false);
+                            }}
                           />
                         }
                         label="Alterar perfil do usuário?"
