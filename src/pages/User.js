@@ -1,26 +1,26 @@
 import { Box, Container, Skeleton } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import ClientListToolbar from 'src/components/client/ClientListToolbar';
-import ClientManagement from 'src/components/client/ClientManagement';
+import UserListToolbar from 'src/components/users/UserListToolbar';
+import UserManagement from 'src/components/users/UserManagement';
 import { API } from 'src/services/api';
 
-const Client = () => {
-  const [clients, setClients] = useState([]);
+const User = () => {
+  const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Obtém as informações do advogado
+   * Obtém os usuários
    */
-  async function getClients() {
+  async function getUsers() {
     setIsLoading(true);
     const tokenUser = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${tokenUser}` }
     };
-    await API.get('advocates/clients', config)
+    await API.get('advocates/users', config)
       .then((response) => {
-        setClients(response.data.data);
+        setUsers(response.data.data);
       })
       .catch((err) => console.error(err));
     setIsLoading(false);
@@ -30,7 +30,7 @@ const Client = () => {
    * Use Effect
    */
   useEffect(() => {
-    getClients();
+    getUsers();
   }, []);
 
   return isLoading ? (
@@ -53,12 +53,12 @@ const Client = () => {
         }}
       >
         <Container maxWidth="lg">
-          <ClientListToolbar clients={clients} />
-          <ClientManagement clients={clients} />
+          <UserListToolbar users={users} />
+          <UserManagement users={users} />
         </Container>
       </Box>
     </>
   );
 };
 
-export default Client;
+export default User;

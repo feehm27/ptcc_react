@@ -9,8 +9,19 @@ export const UserStorage = ({ children }) => {
   const [login, setLogin] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingFacebook, setLoadingFacebook] = useState(false);
 
   const navigate = useNavigate();
+
+  const userLogout = useCallback(() => {
+    setData(null);
+    setError(null);
+    setLoading(false);
+    setLoadingFacebook(false);
+    setLogin(false);
+    window.localStorage.removeItem('token');
+    navigate('/login');
+  }, [navigate]);
 
   async function getUser(token) {
     const config = {
@@ -20,6 +31,24 @@ export const UserStorage = ({ children }) => {
       setData(response.data);
       setLogin(true);
     });
+  }
+
+  async function userFacebook(values) {
+    setError(null);
+    setLoadingFacebook(true);
+    await API.post('facebook', values)
+      .then((response) => {
+        const token = response.data.access_token;
+        window.localStorage.setItem('token', token);
+        getUser(token);
+        setLogin(true);
+        navigate('dashboard');
+      })
+      .catch((err) => {
+        setError(err.response.data.message);
+        setLogin(false);
+      });
+    setLoadingFacebook(false);
   }
 
   async function userLogin(email, password) {
@@ -42,23 +71,39 @@ export const UserStorage = ({ children }) => {
     setLoading(false);
   }
 
-  const userLogout = useCallback(
-    async function () {
-      setData(null);
-      setError(null);
-      setLoading(false);
-      setLogin(false);
-      window.localStorage.removeItem('token');
-      navigate('/login');
-    },
-    [navigate]
-  );
-
-  useEffect(() => {}, [userLogout]);
+  useEffect(() => {
+    async function autoLogin() {
+      const token = window.localStorage.getItem('token');
+      if (token) {
+        try {
+          setError(null);
+          setLoading(true);
+          await getUser(token);
+        } catch (err) {
+          userLogout();
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLogin(false);
+      }
+    }
+    autoLogin();
+  }, [userLogout]);
 
   return (
     <UserContext.Provider
-      value={{ userLogin, userLogout, getUser, data, login, error, loading }}
+      value={{
+        userLogin,
+        userLogout,
+        userFacebook,
+        getUser,
+        data,
+        login,
+        error,
+        loading,
+        loadingFacebook
+      }}
     >
       {children}
     </UserContext.Provider>

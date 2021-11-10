@@ -15,7 +15,7 @@ import {
   TableRow,
   Typography
 } from '@material-ui/core';
-import { Delete, DownloadRounded, Edit } from '@material-ui/icons';
+import { Edit, LockOpenRounded, LockRounded } from '@material-ui/icons';
 import moment from 'moment';
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -23,13 +23,13 @@ import { useNavigate } from 'react-router';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
-const ClientManagement = (listClients) => {
+const UserManagement = (listUsers) => {
   const navigate = useNavigate();
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState([]);
+  const [showLockOrUnlock, setShowLockOrUnlock] = useState(false);
+  const [selectedUser, setSelectedUser] = useState([]);
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -47,25 +47,30 @@ const ClientManagement = (listClients) => {
    * Envia os dados do advogado
    * @param {*} values
    */
-  async function deleteClient(clientId) {
-    setShowSuccess(false);
+  async function lockOrUnlockUser(userId, blocked) {
+    setShowLockOrUnlock(false);
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
 
-    await API.delete(`advocates/clients/${clientId}`, config)
+    const values = {
+      id: userId,
+      blocked
+    };
+
+    await API.put(`advocates/users/block`, values, config)
       .then(() => {})
       .catch((err) => {
         console.log(err);
-        setShowSuccess(false);
+        setShowLockOrUnlock(false);
       })
       .finally(() => {
-        setShowSuccess(true);
+        setShowLockOrUnlock(true);
       });
   }
 
-  return listClients.clients.length > 0 ? (
+  return listUsers.users.length > 0 ? (
     <Card>
       <PerfectScrollbar>
         <Box sx={{ minWidth: 1050 }}>
@@ -73,42 +78,53 @@ const ClientManagement = (listClients) => {
             <TableHead>
               <TableRow>
                 <TableCell>Nome</TableCell>
-                <TableCell>CPF</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Data de nascimento</TableCell>
-                <TableCell>Ações</TableCell>
+                <TableCell>Perfil</TableCell>
+                <TableCell>Data de Cadastro</TableCell>
+                <TableCell>Acões</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {listClients.clients.slice(0, limit).map((client) => (
-                <TableRow hover key={client.id}>
+              {listUsers.users.slice(0, limit).map((user) => (
+                <TableRow hover key={user.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
-                      {client.name}
+                      {user.name}
                     </Typography>
                   </TableCell>
-                  <TableCell>{client.cpf}</TableCell>
-                  <TableCell>{client.email}</TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {moment(client.birthday).format('MM/DD/YYYY')}
+                    {user.is_advocate ? 'Advogado' : 'Cliente'}
+                  </TableCell>
+                  <TableCell>
+                    {moment(user.created_at).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
                     <Edit
                       cursor="pointer"
                       onClick={() => {
-                        navigate('/clients/edit', {
-                          state: { client }
+                        navigate('/users/edit', {
+                          state: { user }
                         });
                       }}
                     ></Edit>
-                    <DownloadRounded cursor="pointer"></DownloadRounded>
-                    <Delete
-                      cursor="pointer"
-                      onClick={() => {
-                        setSelectedClient(client);
-                        setShowModal(true);
-                      }}
-                    ></Delete>
+                    {user.blocked ? (
+                      <LockOpenRounded
+                        cursor="pointer"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setShowModal(true);
+                        }}
+                      ></LockOpenRounded>
+                    ) : (
+                      <LockRounded
+                        cursor="pointer"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setShowModal(true);
+                        }}
+                      ></LockRounded>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -118,7 +134,7 @@ const ClientManagement = (listClients) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={listClients.clients.length}
+        count={listUsers.users.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -135,13 +151,15 @@ const ClientManagement = (listClients) => {
           >
             <DialogTitle id="alert-dialog-title">
               <Typography color="primary" variant="h5" textAlign="center">
-                Confirmar exclusão?
+                Confirmar{' '}
+                {selectedUser.blocked === 1 ? 'desbloqueio' : 'bloqueio'} do
+                usuário?
               </Typography>
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Os vínculos como contrato, processo e usuário relacionados ao
-                cliente também serão deletados.
+                Após o bloqueio o usuário não terá acesso a nenhuma
+                funcionalidade do sistema.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -151,7 +169,7 @@ const ClientManagement = (listClients) => {
               <Button
                 onClick={() => {
                   handleClose();
-                  deleteClient(selectedClient.id);
+                  lockOrUnlockUser(selectedUser.id, !selectedUser.blocked);
                 }}
                 autoFocuscolor="primary"
                 variant="contained"
@@ -162,12 +180,14 @@ const ClientManagement = (listClients) => {
           </Dialog>
         </div>
       )}
-      {showSuccess && (
+      {showLockOrUnlock && (
         <>
           <ToastAnimated />
           {showToast({
             type: 'success',
-            message: 'Cliente deletado com sucesso!'
+            message: `Usuário ${
+              selectedUser.blocked ? 'desbloqueado' : 'bloqueado'
+            } com sucesso!`
           })}
           {setTimeout(() => window.location.reload(), 1000)}
         </>
@@ -183,7 +203,7 @@ const ClientManagement = (listClients) => {
           <TableBody>
             <TableCell>
               <Typography color="textSecondary" variant="body1">
-                Não existem clientes cadastrados.
+                Não existem usuários cadastrados.
               </Typography>
             </TableCell>
           </TableBody>
@@ -193,4 +213,4 @@ const ClientManagement = (listClients) => {
   );
 };
 
-export default ClientManagement;
+export default UserManagement;

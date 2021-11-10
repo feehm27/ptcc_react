@@ -1,12 +1,10 @@
-import { useState, useContext, useEffect } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import Grid from '@material-ui/core/Grid';
-import { filter, uniqBy } from 'lodash';
 import {
   Box,
+  Button,
   Card,
   Checkbox,
   Skeleton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -14,12 +12,16 @@ import {
   TableRow,
   Typography
 } from '@material-ui/core';
-
-import { useLocation } from 'react-router';
+import Grid from '@material-ui/core/Grid';
+import { filter, findIndex, forEach, uniqBy } from 'lodash';
+import { useContext, useEffect, useState } from 'react';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import { useLocation, useNavigate } from 'react-router';
 import { UserContext } from 'src/contexts/UserContext';
 import { API } from 'src/services/api';
 
 const ProfileTypes = () => {
+  const navigate = useNavigate();
   const { profile } = useLocation().state;
   const { data } = useContext(UserContext);
 
@@ -28,17 +30,17 @@ const ProfileTypes = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectedUserMenuIds, setSelectedUserMenuIds] = useState([]);
-  const [selectedUserPermissionsIds, setSelectedUserPermissionsIds] = useState(
-    []
-  );
+  const [permissionsUser, setPermissionsUser] = useState([]);
 
-  const [Aahhhh, setAahhhh] = useState();
-  const [menus, setMenus] = useState([]);
+  const [allMenusPermissions, setAllMenusPermissions] = useState([]);
+  const [menusPermissionsUser, setMenusPermissionsUser] = useState([]);
   const [selectedMenuIds, setSelectedMenuIds] = useState([]);
   const [selectedPermissionsIds, setSelectedPermissionsIds] = useState([]);
 
+  const [updateMenus, setUpdateMenus] = useState([]);
+
   /**
-   * Obtém os menus e as permissões do usuário
+   * Obtém todos os menus e permissoes
    */
   async function getMenusAndPermissions(token) {
     setIsLoading(true);
@@ -47,38 +49,82 @@ const ProfileTypes = () => {
     };
 
     await API.get('/menu/permissions', config).then((response) => {
-      const menusResponse = filter(response.data.data, function (menu) {
+      const menusAndPermissions = filter(response.data.data, function (menu) {
         return menu.profile_type_id === profile.id;
       });
-
-      setMenus(menusResponse);
-      const newSelectedUserMenuIds = data.permissions.map((menu) => menu.id);
-      setSelectedUserMenuIds(newSelectedUserMenuIds);
+      
+      console.log('allMenusPermissions', menusAndPermissions);
+      setAllMenusPermissions(menusAndPermissions);
+      setUpdateMenus(menusAndPermissions);
     });
     setIsLoading(false);
+  }
+
+  const getMenusPermissionsUser = () => {
+    setMenusPermissionsUser(data.permissions);
+    console.log('menusPermissionsUser', data.permissions);
+    console.log(menusPermissionsUser);
+  };
+
+  const checkedAllMenusActive = () => {
+    console.log('aqui', menusPermissionsUser.permissions_user);
+    const menusUserActives = filter(
+      menusPermissionsUser.permissions_user,
+      function (menu) {
+        return menu.menu_is_active === 1;
+      }
+    );
+
+    return menusUserActives.length === allMenusPermissions.length;
+  };
+
+  const checkedAllPermissionsActive = () => {
+    const permissionsUsersActives = filter(
+      permissionsUser,
+      function (permission) {
+        return permission.is_active === 1;
+      }
+    );
+    return permissionsUsersActives.length === selectedMenu.permissions.length;
+  };
+
+  const checkedMenuIsActive = (menuId) => {
+    const index = findIndex(menusPermissionsUser.permissions_user, [
+      'menu_id',
+      menuId
+    ]);
+    if (index !== -1) {
+      return menusPermissionsUser.permissions_user[index].menu_is_active === 1;
+    }
+    return false;
+  };
+
+  const checkedPermissionIsActive = (permissionId) => {
+    const index = findIndex(selectedMenu.permissions, ['id', permissionId]);
+    if (index !== -1) {
+      return selectedMenu.permissions[index].permission_is_active === 1;
+    }
+    return false;
+  };
+
+  /**
+   * Atualiza as permissões do usuário
+   */
+  async function updatePermissions() {
+    console.log(updateMenus);
   }
 
   /**
    * Obtém os ids das permissões do usuário
    * @param {*} menu
    */
-  const getPermissionsIds = (menu) => {
-    console.log('evento', Aahhhh);
-
-    if (Aahhhh !== undefined && !Aahhhh) {
-      setSelectedUserPermissionsIds([]);
-      return;
-    }
-
-    const menusUser = filter(data.permissions, function (menuUser) {
+  const getPermissionsUser = (menu) => {
+    const menuSelected = filter(menusPermissionsUser, function (menuUser) {
       return menuUser.id === menu.id;
     });
 
-    if (menusUser.length > 0) {
-      const newSelectedUserPermissionsIds = menusUser[0].permissions.map(
-        (permission) => permission.id
-      );
-      setSelectedUserPermissionsIds(newSelectedUserPermissionsIds);
+    if (menuSelected.length > 0) {
+      setPermissionsUser(menuSelected[0].permissions);
     }
   };
 
@@ -89,8 +135,12 @@ const ProfileTypes = () => {
   const handleSelectAllMenus = (event) => {
     let newSelectedMenuIds;
 
+    forEach(updateMenus, function (menu) {
+      menu.is_active = event.target.checked ? 1 : 0;
+    });
+
     if (event.target.checked) {
-      newSelectedMenuIds = menus.map((menu) => menu.id);
+      newSelectedMenuIds = allMenusPermissions.map((menu) => menu.id);
     } else {
       newSelectedMenuIds = [];
     }
@@ -104,6 +154,12 @@ const ProfileTypes = () => {
    * @param {*} event
    */
   const handleSelectAllPermissions = (event) => {
+    forEach(updateMenus, function (menu) {
+      forEach(menu.permissions, function (permission) {
+        permission.is_active = event.target.checked ? 1 : 0;
+      });
+    });
+
     let newSelectedPermissionsIds;
 
     if (event.target.checked) {
@@ -114,7 +170,7 @@ const ProfileTypes = () => {
       newSelectedPermissionsIds = [];
     }
     setSelectedPermissionsIds(newSelectedPermissionsIds);
-    setSelectedUserPermissionsIds(newSelectedPermissionsIds);
+    setPermissionsUser(newSelectedPermissionsIds);
   };
 
   /**
@@ -159,42 +215,23 @@ const ProfileTypes = () => {
   /**
    * Seleciona um checbox do menu
    * @param {*} event
-   * @param {*} id
+   * @param {*} menuId
    */
-  const handleSelectOneMenu = (event, id) => {
-    setAahhhh(event.target.checked);
-
-    if (event.target.checked) {
-      const menusUser = filter(data.permissions, function (menuUser) {
-        return menuUser.id === id;
-      });
-
-      if (menusUser.length > 0) {
-        const newSelectedUserPermissionsIds = menusUser[0].permissions.map(
-          (permission) => permission.id
-        );
-        setSelectedUserPermissionsIds(newSelectedUserPermissionsIds);
-        setSelectedPermissionsIds(newSelectedUserPermissionsIds);
-      }
-    } else {
-      setSelectedPermissionsIds([]);
-      setSelectedUserPermissionsIds([]);
+  const handleSelectOneMenu = (event, menuId) => {
+    const index = findIndex(menusPermissionsUser, ['id', menuId]);
+    if (index !== -1) {
+      menusPermissionsUser[index].menu_is_active === event.target.checked;
+      setMenusPermissionsUser(menusPermissionsUser);
     }
-
-    const selectedIndex = selectedMenuIds.indexOf(id);
-    updateSelectedMenus(selectedIndex, id, false);
-
-    const selectedIndexUser = selectedUserMenuIds.indexOf(id);
-    updateSelectedMenus(selectedIndexUser, id, true);
+    console.log('nãomeserveparanada', updateSelectedMenus);
   };
 
   /**
    * Atualiza a lista de permissões
    * @param {*} index
    * @param {*} id
-   * @param {*} isSelectedUser
    */
-  const updateSelectedPermissions = (index, id, isSelectedUser) => {
+  const updateSelectedPermissions = (index, id) => {
     let newSelectedPermissionsIds = [];
 
     if (index === -1) {
@@ -219,7 +256,7 @@ const ProfileTypes = () => {
 
     if (newSelectedPermissionsIds.length === 1) {
       const filterSelectedPermissionsIds = filter(
-        selectedUserPermissionsIds,
+        permissionsUser,
         function (selectedMenuId) {
           return selectedMenuId !== newSelectedPermissionsIds[0];
         }
@@ -233,9 +270,8 @@ const ProfileTypes = () => {
       newSelectedPermissionsIds[0] = id;
     }
 
-    isSelectedUser
-      ? setSelectedUserPermissionsIds(newSelectedPermissionsIds)
-      : setSelectedPermissionsIds(newSelectedPermissionsIds);
+    setPermissionsUser(newSelectedPermissionsIds);
+    setSelectedPermissionsIds(newSelectedPermissionsIds);
   };
 
   /**
@@ -244,11 +280,35 @@ const ProfileTypes = () => {
    * @param {*} id
    */
   const handleSelectOnePermission = (event, id) => {
-    const selectedIndex = selectedPermissionsIds.indexOf(id);
-    updateSelectedPermissions(selectedIndex, id, false);
+    if (selectedPermissionsIds.length === 0) {
+      forEach(permissionsUser, function (key, index) {
+        selectedPermissionsIds[index] = key;
+      });
+    }
 
-    const selectedIndexUser = selectedUserPermissionsIds.indexOf(id);
-    updateSelectedPermissions(selectedIndexUser, id, true);
+    forEach(updateMenus, function (menu) {
+      forEach(menu.permissions, function (permission) {
+        if (permission.id === id) {
+          permission.is_active = event.target.checked ? 1 : 0;
+        }
+      });
+    });
+
+    if (event.target.checked) {
+      const selectedIndex = selectedPermissionsIds.indexOf(id);
+      updateSelectedPermissions(selectedIndex, id);
+    } else {
+      setPermissionsUser(
+        filter(permissionsUser, function (permissionId) {
+          return permissionId !== id;
+        })
+      );
+      setSelectedPermissionsIds(
+        filter(selectedPermissionsIds, function (permissionId) {
+          return permissionId !== id;
+        })
+      );
+    }
   };
 
   /**
@@ -257,184 +317,188 @@ const ProfileTypes = () => {
   useEffect(() => {
     const token = window.localStorage.getItem('token');
     getMenusAndPermissions(token);
+    getMenusPermissionsUser();
   }, []);
 
   return (
-    <Grid container spacing={0} item xs={12} sm={12}>
-      <Grid container item xs={6} sm={6}>
-        <Box sx={{ pt: 3, width: '100%', ml: 1 }}>
-          {isLoading ? (
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width="100%"
-              height="100%"
-            >
-              <div style={{ paddingTop: '57%' }} />
-            </Skeleton>
-          ) : (
-            <Card>
-              <PerfectScrollbar>
-                <Typography sx={{ m: 2 }} color="primary" variant="h3">
-                  Menus do {profile.name}
-                </Typography>
-                <Box>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={
-                              selectedMenuIds.length === menus.length ||
-                              selectedUserMenuIds.length === menus.length
-                            }
-                            color="primary"
-                            indeterminate={
-                              selectedMenuIds.length > 0 &&
-                              selectedMenuIds.length < menus.length
-                            }
-                            onChange={handleSelectAllMenus}
-                          />
-                        </TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {menus.map((menu) => (
-                        <TableRow
-                          hover
-                          key={menu.id}
-                          selected={
-                            selectedMenuIds.indexOf(menu.id) !== -1 ||
-                            selectedUserMenuIds.indexOf(menu.id) !== -1
-                          }
-                        >
+    <Grid>
+      <Grid container spacing={0} item xs={12} sm={12}>
+        <Grid container item xs={6} sm={6}>
+          <Box sx={{ pt: 3, width: '100%', ml: 1 }}>
+            {isLoading ? (
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                width="100%"
+                height="100%"
+              >
+                <div style={{ paddingTop: '57%' }} />
+              </Skeleton>
+            ) : (
+              <Card>
+                <PerfectScrollbar>
+                  <Typography sx={{ m: 2 }} color="primary" variant="h3">
+                    Menus do {profile.name}
+                  </Typography>
+                  <Box>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={
-                                selectedMenuIds.indexOf(menu.id) !== -1 ||
-                                selectedUserMenuIds.indexOf(menu.id) !== -1
-                              }
-                              onChange={(event) => {
-                                handleSelectOneMenu(event, menu.id);
-                              }}
-                              onClick={() => {
-                                setShowPermissions(true);
-                                setSelectedMenu(menu);
-                                getPermissionsIds(menu);
-                              }}
-                              value="true"
+                              checked={checkedAllMenusActive()}
+                              color="primary"
+                              onChange={handleSelectAllMenus}
                             />
                           </TableCell>
-                          <TableCell>
-                            <Box
-                              sx={{
-                                alignItems: 'center',
-                                display: 'flex'
-                              }}
-                            >
-                              <Typography
-                                color="textPrimary"
-                                variant="body1"
+                          <TableCell></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {allMenusPermissions.map((menu) => (
+                          <TableRow hover key={menu.id}>
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                checked={checkedMenuIsActive(menu.id)}
+                                onChange={(event) => {
+                                  handleSelectOneMenu(event, menu.id);
+                                }}
                                 onClick={() => {
                                   setShowPermissions(true);
                                   setSelectedMenu(menu);
-                                  getPermissionsIds(menu);
+                                  getPermissionsUser(menu);
+                                }}
+                                value="true"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  alignItems: 'center',
+                                  display: 'flex'
                                 }}
                               >
-                                {menu.name}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Box>
-              </PerfectScrollbar>
-            </Card>
-          )}
-        </Box>
-      </Grid>
-      {showPermissions && (
-        <Grid container item xs={6} sm={6}>
-          <Box sx={{ pt: 3, width: '100%', mr: 1 }}>
-            <Card>
-              <PerfectScrollbar>
-                <Typography sx={{ m: 2 }} color="primary" variant="h3">
-                  Permissões: {selectedMenu.name}
-                </Typography>
-                <Box>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={
-                              selectedPermissionsIds.length ===
-                                selectedMenu.permissions.length ||
-                              selectedUserPermissionsIds.length ===
-                                selectedMenu.permissions.length
-                            }
-                            color="primary"
-                            indeterminate={
-                              selectedPermissionsIds.length > 0 &&
-                              selectedPermissionsIds.length <
-                                selectedMenu.permissions.length
-                            }
-                            onChange={handleSelectAllPermissions}
-                          />
-                        </TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {selectedMenu.permissions.map((permission) => (
-                        <TableRow
-                          hover
-                          key={permission.id}
-                          selected={
-                            selectedPermissionsIds.indexOf(permission.id) !== -1
-                          }
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={
-                                selectedPermissionsIds.indexOf(
-                                  permission.id
-                                ) !== -1 ||
-                                selectedUserPermissionsIds.indexOf(
-                                  permission.id
-                                ) !== -1
-                              }
-                              onChange={(event) => {
-                                handleSelectOnePermission(event, permission.id);
-                              }}
-                              value="true"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Box
-                              sx={{
-                                alignItems: 'center',
-                                display: 'flex'
-                              }}
-                            >
-                              <Typography color="textPrimary" variant="body1">
-                                {permission.name}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Box>
-              </PerfectScrollbar>
-            </Card>
+                                <Typography
+                                  color="textPrimary"
+                                  variant="body1"
+                                  onClick={() => {
+                                    setShowPermissions(true);
+                                    setSelectedMenu(menu);
+                                    getPermissionsUser(menu);
+                                  }}
+                                >
+                                  {menu.name}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Box>
+                </PerfectScrollbar>
+              </Card>
+            )}
           </Box>
         </Grid>
-      )}
+        {showPermissions && (
+          <Grid container item xs={6} sm={6}>
+            <Box sx={{ pt: 3, width: '100%', mr: 1 }}>
+              <Card>
+                <PerfectScrollbar>
+                  <Typography sx={{ m: 2 }} color="primary" variant="h3">
+                    Permissões: {selectedMenu.name}
+                  </Typography>
+                  <Box>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={checkedAllPermissionsActive()}
+                              color="primary"
+                              indeterminate={
+                                selectedPermissionsIds.length > 0 &&
+                                selectedPermissionsIds.length <
+                                  selectedMenu.permissions.length
+                              }
+                              onChange={handleSelectAllPermissions}
+                            />
+                          </TableCell>
+                          <TableCell></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {selectedMenu.permissions.map((permission) => (
+                          <TableRow
+                            hover
+                            key={permission.id}
+                            selected={
+                              selectedPermissionsIds.indexOf(permission.id) !==
+                              -1
+                            }
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                checked={checkedPermissionIsActive(
+                                  permission.id
+                                )}
+                                onChange={(event) => {
+                                  handleSelectOnePermission(
+                                    event,
+                                    permission.id
+                                  );
+                                }}
+                                value="true"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  alignItems: 'center',
+                                  display: 'flex'
+                                }}
+                              >
+                                <Typography color="textPrimary" variant="body1">
+                                  {permission.name}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Box>
+                </PerfectScrollbar>
+              </Card>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          p: 2
+        }}
+      >
+        <Stack direction="row" spacing={2}>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => navigate('/users/profile')}
+          >
+            Voltar
+          </Button>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={updatePermissions}
+          >
+            Salvar
+          </Button>
+        </Stack>
+      </Box>
     </Grid>
   );
 };
