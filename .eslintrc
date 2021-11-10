@@ -57,6 +57,7 @@
     "react/jsx-indent": "off",
     "react/jsx-closing-tag-location": "off",
     "function-paren-newline": "off",
-    "array-callback-return": "off"
+    "array-callback-return": "off",
+    "eslint linebreak-style": "off"
   }
 }
