@@ -11,23 +11,12 @@ import { useContext, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
-import LinkedinIcon from 'src/icons/Linkedin';
 import RegisterSchema from 'src/schemas/RegisterSchema';
 import { API } from 'src/services/api';
 
 const Register = () => {
   const [registerErrors, setRegisterErrors] = useState([]);
   const { userLogin, loading } = useContext(UserContext);
-
-  async function registerWithLinkedin() {
-    await API.get('/callback')
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
 
   async function register(values) {
     const data = {
@@ -143,19 +132,6 @@ const Register = () => {
                     onClick={() => register(values)}
                   >
                     Cadastrar
-                  </Button>
-                  <Typography color="primary" variant="h4" textAlign="center">
-                    ou
-                  </Typography>
-                  <Button
-                    color="primary"
-                    fullWidth
-                    startIcon={<LinkedinIcon />}
-                    onClick={() => registerWithLinkedin()}
-                    size="large"
-                    variant="contained"
-                  >
-                    Cadastrar com Linkedin
                   </Button>
                 </Box>
                 <Typography color="textSecondary" variant="body1">
