@@ -13,6 +13,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography
 } from '@material-ui/core';
 import { Delete, DownloadRounded, Edit } from '@material-ui/icons';
@@ -93,22 +94,28 @@ const ClientManagement = (listClients) => {
                     {moment(client.birthday).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
-                    <Edit
-                      cursor="pointer"
-                      onClick={() => {
-                        navigate('/clients/edit', {
-                          state: { client }
-                        });
-                      }}
-                    ></Edit>
-                    <DownloadRounded cursor="pointer"></DownloadRounded>
-                    <Delete
-                      cursor="pointer"
-                      onClick={() => {
-                        setSelectedClient(client);
-                        setShowModal(true);
-                      }}
-                    ></Delete>
+                    <Tooltip title="Editar">
+                      <Edit
+                        cursor="pointer"
+                        onClick={() => {
+                          navigate('/clients/edit', {
+                            state: { client }
+                          });
+                        }}
+                      ></Edit>
+                    </Tooltip>
+                    <Tooltip title="Exportar">
+                      <DownloadRounded cursor="pointer"></DownloadRounded>
+                    </Tooltip>
+                    <Tooltip title="Excluir">
+                      <Delete
+                        cursor="pointer"
+                        onClick={() => {
+                          setSelectedClient(client);
+                          setShowModal(true);
+                        }}
+                      ></Delete>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}

@@ -13,6 +13,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography
 } from '@material-ui/core';
 import { Edit, LockOpenRounded, LockRounded } from '@material-ui/icons';
@@ -100,30 +101,37 @@ const UserManagement = (listUsers) => {
                     {moment(user.created_at).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
-                    <Edit
-                      cursor="pointer"
-                      onClick={() => {
-                        navigate('/users/edit', {
-                          state: { user }
-                        });
-                      }}
-                    ></Edit>
+                    <Tooltip title="Editar">
+                      <Edit
+                        cursor="pointer"
+                        onClick={() => {
+                          navigate('/users/edit', {
+                            state: { user }
+                          });
+                        }}
+                      ></Edit>
+                    </Tooltip>
+
                     {user.blocked ? (
-                      <LockOpenRounded
-                        cursor="pointer"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowModal(true);
-                        }}
-                      ></LockOpenRounded>
+                      <Tooltip title="Desbloquear">
+                        <LockOpenRounded
+                          cursor="pointer"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowModal(true);
+                          }}
+                        ></LockOpenRounded>
+                      </Tooltip>
                     ) : (
-                      <LockRounded
-                        cursor="pointer"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowModal(true);
-                        }}
-                      ></LockRounded>
+                      <Tooltip title="Bloquear">
+                        <LockRounded
+                          cursor="pointer"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowModal(true);
+                          }}
+                        ></LockRounded>
+                      </Tooltip>
                     )}
                   </TableCell>
                 </TableRow>
@@ -156,12 +164,21 @@ const UserManagement = (listUsers) => {
                 usuário?
               </Typography>
             </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Após o bloqueio o usuário não terá acesso a nenhuma
-                funcionalidade do sistema.
-              </DialogContentText>
-            </DialogContent>
+            {selectedUser.blocked === 1 ? (
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Após o desbloqueio o usuário terá acesso a todas as
+                  funcionalidades do sistema.
+                </DialogContentText>
+              </DialogContent>
+            ) : (
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Após o bloqueio o usuário não terá acesso a nenhuma
+                  funcionalidade do sistema.
+                </DialogContentText>
+              </DialogContent>
+            )}
             <DialogActions>
               <Button onClick={handleClose} color="primary">
                 Cancelar
