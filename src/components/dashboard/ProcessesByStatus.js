@@ -9,11 +9,11 @@ import {
   colors,
   useTheme
 } from '@material-ui/core';
-import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIcon from '@material-ui/icons/Phone';
-import TabletIcon from '@material-ui/icons/Tablet';
+import ThumbsUpDownIcon from '@material-ui/icons/ThumbsUpDown';
+import GavelIcon from '@material-ui/icons/Gavel';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 
-const TrafficByDevice = (props) => {
+const ProcessesByStatus = (props) => {
   const theme = useTheme();
 
   const data = {
@@ -30,7 +30,7 @@ const TrafficByDevice = (props) => {
         hoverBorderColor: colors.common.white
       }
     ],
-    labels: ['Desktop', 'Tablet', 'Mobile']
+    labels: ['Inicial', 'Conciliação', 'Julgamento']
   };
 
   const options = {
@@ -57,28 +57,28 @@ const TrafficByDevice = (props) => {
 
   const devices = [
     {
-      title: 'Desktop',
+      title: 'Inicial',
       value: 63,
-      icon: LaptopMacIcon,
+      icon: CallMadeIcon,
       color: colors.indigo[500]
     },
     {
-      title: 'Tablet',
+      title: 'Conciliação',
       value: 15,
-      icon: TabletIcon,
+      icon: ThumbsUpDownIcon,
       color: colors.red[600]
     },
     {
-      title: 'Mobile',
+      title: 'Julgamento',
       value: 23,
-      icon: PhoneIcon,
+      icon: GavelIcon,
       color: colors.orange[600]
     }
   ];
 
   return (
     <Card {...props}>
-      <CardHeader title="Traffic by Device" />
+      <CardHeader title="Processos por status" />
       <Divider />
       <CardContent>
         <Box
@@ -87,10 +87,7 @@ const TrafficByDevice = (props) => {
             position: 'relative'
           }}
         >
-          <Doughnut
-            data={data}
-            options={options}
-          />
+          <Doughnut data={data} options={options} />
         </Box>
         <Box
           sx={{
@@ -99,12 +96,7 @@ const TrafficByDevice = (props) => {
             pt: 2
           }}
         >
-          {devices.map(({
-            color,
-            icon: Icon,
-            title,
-            value
-          }) => (
+          {devices.map(({ color, icon: Icon, title, value }) => (
             <Box
               key={title}
               sx={{
@@ -113,18 +105,11 @@ const TrafficByDevice = (props) => {
               }}
             >
               <Icon color="action" />
-              <Typography
-                color="textPrimary"
-                variant="body1"
-              >
+              <Typography color="textPrimary" variant="body1">
                 {title}
               </Typography>
-              <Typography
-                style={{ color }}
-                variant="h2"
-              >
-                {value}
-                %
+              <Typography style={{ color }} variant="h2">
+                {value}%
               </Typography>
             </Box>
           ))}
@@ -134,4 +119,4 @@ const TrafficByDevice = (props) => {
   );
 };
 
-export default TrafficByDevice;
+export default ProcessesByStatus;
