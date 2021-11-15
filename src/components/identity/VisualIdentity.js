@@ -54,6 +54,8 @@ const VisualIdentity = () => {
           showMessage.current = false;
           console.error(err);
         });
+    } else {
+      setError(' Selecione uma nova imagem para alteração.');
     }
     setSubmitting(false);
   }
@@ -187,12 +189,7 @@ const VisualIdentity = () => {
             type: 'success',
             message: 'Logomarca alterada com sucesso!'
           })}
-          <div className="mt-3">
-            {showToast({
-              type: 'warning',
-              message: 'Deslogue e logue novamente para atualização da logo.'
-            })}
-          </div>
+          {setTimeout(() => window.location.reload(), 1000)}
         </>
       )}
     </>
