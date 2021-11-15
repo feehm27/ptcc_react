@@ -49,10 +49,13 @@ const ProfileTypes = () => {
     };
 
     await API.get('/menu/permissions', config).then((response) => {
-      const menusAndPermissions = filter(response.data.data, function (menu) {
-        return menu.profile_type_id === profile.id;
-      });
-      
+      const menusAndPermissions = filter(
+        response.data.data,
+        function filterMenuPermissions(menu) {
+          return menu.profile_type_id === profile.id;
+        }
+      );
+
       console.log('allMenusPermissions', menusAndPermissions);
       setAllMenusPermissions(menusAndPermissions);
       setUpdateMenus(menusAndPermissions);
@@ -70,7 +73,7 @@ const ProfileTypes = () => {
     console.log('aqui', menusPermissionsUser.permissions_user);
     const menusUserActives = filter(
       menusPermissionsUser.permissions_user,
-      function (menu) {
+      function filterMenusActives(menu) {
         return menu.menu_is_active === 1;
       }
     );

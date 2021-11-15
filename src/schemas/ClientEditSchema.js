@@ -20,10 +20,11 @@ const ClientEditSchema = Yup.object().shape({
   issuing_organ: Yup.string().required('Campo obrigatório'),
   birthday: Yup.date().nullable().required('Campo obrigatório'),
   nationality: Yup.string().required('Campo obrigatório'),
-  gender: Yup.string().required('Campo obrigatório')
-  .test('isNull', 'Campo obrigatório', (value) => {
-    return value !== '0';
-  }),
+  gender: Yup.string()
+    .required('Campo obrigatório')
+    .test('isNull', 'Campo obrigatório', (value) => {
+      return value !== '0';
+    }),
   civil_status: Yup.string()
     .required('Campo obrigatório')
     .test('isNull', 'Campo obrigatório', (value) => {
