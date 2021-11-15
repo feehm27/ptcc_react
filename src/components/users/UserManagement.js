@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
@@ -17,6 +18,7 @@ import {
   Typography
 } from '@material-ui/core';
 import { Edit, LockOpenRounded, LockRounded } from '@material-ui/icons';
+import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -30,7 +32,9 @@ const UserManagement = (listUsers) => {
   const [page, setPage] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showLockOrUnlock, setShowLockOrUnlock] = useState(false);
+  const [rows, setRows] = useState(listUsers.users);
   const [selectedUser, setSelectedUser] = useState([]);
+  const [searched, setSearched] = useState('');
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -71,9 +75,47 @@ const UserManagement = (listUsers) => {
       });
   }
 
+  /**
+   * Busca os usuários na tabela
+   * @param {} value
+   */
+  const searchUsers = (value) => {
+    if (value === '' || value === undefined) {
+      setRows(listUsers.users);
+    } else {
+      const filteredRows = rows.filter((row) => {
+        return row.name.toLowerCase().includes(value.toLowerCase());
+      });
+      setRows(filteredRows);
+    }
+  };
+
+  /**
+   * Cancela a busca na tabela dos usuários
+   */
+  const cancelSearch = () => {
+    setSearched('');
+    searchUsers(searched);
+  };
+
   return listUsers.users.length > 0 ? (
-    <Card>
+    <Card sx={{ mt: 3, mb: 4 }}>
       <PerfectScrollbar>
+        <Box>
+          <Card>
+            <CardContent>
+              <Box>
+                <SearchBar
+                  style={{ display: '-webkit-inline-box' }}
+                  placeholder="Buscar usuário"
+                  value={searched}
+                  onChange={(value) => searchUsers(value)}
+                  onCancelSearch={() => cancelSearch()}
+                ></SearchBar>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
         <Box sx={{ minWidth: 1050 }}>
           <Table>
             <TableHead>
@@ -86,7 +128,7 @@ const UserManagement = (listUsers) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {listUsers.users.slice(0, limit).map((user) => (
+              {rows.slice(0, limit).map((user) => (
                 <TableRow hover key={user.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
@@ -142,7 +184,7 @@ const UserManagement = (listUsers) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={listUsers.users.length}
+        count={rows.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -211,7 +253,7 @@ const UserManagement = (listUsers) => {
       )}
     </Card>
   ) : (
-    <Card>
+    <Card sx={{ mt: 3, mb: 4 }}>
       <Box sx={{ minWidth: 1050 }}>
         <Table>
           <TableHead>
