@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
@@ -13,9 +14,11 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography
 } from '@material-ui/core';
 import { Edit, LockOpenRounded, LockRounded } from '@material-ui/icons';
+import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -29,7 +32,9 @@ const UserManagement = (listUsers) => {
   const [page, setPage] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showLockOrUnlock, setShowLockOrUnlock] = useState(false);
+  const [rows, setRows] = useState(listUsers.users);
   const [selectedUser, setSelectedUser] = useState([]);
+  const [searched, setSearched] = useState('');
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -70,9 +75,47 @@ const UserManagement = (listUsers) => {
       });
   }
 
+  /**
+   * Busca os usuários na tabela
+   * @param {} value
+   */
+  const searchUsers = (value) => {
+    if (value === '' || value === undefined) {
+      setRows(listUsers.users);
+    } else {
+      const filteredRows = rows.filter((row) => {
+        return row.name.toLowerCase().includes(value.toLowerCase());
+      });
+      setRows(filteredRows);
+    }
+  };
+
+  /**
+   * Cancela a busca na tabela dos usuários
+   */
+  const cancelSearch = () => {
+    setSearched('');
+    searchUsers(searched);
+  };
+
   return listUsers.users.length > 0 ? (
-    <Card>
+    <Card sx={{ mt: 3, mb: 4 }}>
       <PerfectScrollbar>
+        <Box>
+          <Card>
+            <CardContent>
+              <Box>
+                <SearchBar
+                  style={{ display: '-webkit-inline-box' }}
+                  placeholder="Buscar usuário"
+                  value={searched}
+                  onChange={(value) => searchUsers(value)}
+                  onCancelSearch={() => cancelSearch()}
+                ></SearchBar>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
         <Box sx={{ minWidth: 1050 }}>
           <Table>
             <TableHead>
@@ -85,7 +128,7 @@ const UserManagement = (listUsers) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {listUsers.users.slice(0, limit).map((user) => (
+              {rows.slice(0, limit).map((user) => (
                 <TableRow hover key={user.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
@@ -100,30 +143,37 @@ const UserManagement = (listUsers) => {
                     {moment(user.created_at).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
-                    <Edit
-                      cursor="pointer"
-                      onClick={() => {
-                        navigate('/users/edit', {
-                          state: { user }
-                        });
-                      }}
-                    ></Edit>
+                    <Tooltip title="Editar">
+                      <Edit
+                        cursor="pointer"
+                        onClick={() => {
+                          navigate('/users/edit', {
+                            state: { user }
+                          });
+                        }}
+                      ></Edit>
+                    </Tooltip>
+
                     {user.blocked ? (
-                      <LockOpenRounded
-                        cursor="pointer"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowModal(true);
-                        }}
-                      ></LockOpenRounded>
+                      <Tooltip title="Desbloquear">
+                        <LockOpenRounded
+                          cursor="pointer"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowModal(true);
+                          }}
+                        ></LockOpenRounded>
+                      </Tooltip>
                     ) : (
-                      <LockRounded
-                        cursor="pointer"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowModal(true);
-                        }}
-                      ></LockRounded>
+                      <Tooltip title="Bloquear">
+                        <LockRounded
+                          cursor="pointer"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowModal(true);
+                          }}
+                        ></LockRounded>
+                      </Tooltip>
                     )}
                   </TableCell>
                 </TableRow>
@@ -134,7 +184,7 @@ const UserManagement = (listUsers) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={listUsers.users.length}
+        count={rows.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -156,12 +206,21 @@ const UserManagement = (listUsers) => {
                 usuário?
               </Typography>
             </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Após o bloqueio o usuário não terá acesso a nenhuma
-                funcionalidade do sistema.
-              </DialogContentText>
-            </DialogContent>
+            {selectedUser.blocked === 1 ? (
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Após o desbloqueio o usuário terá acesso a todas as
+                  funcionalidades do sistema.
+                </DialogContentText>
+              </DialogContent>
+            ) : (
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Após o bloqueio o usuário não terá acesso a nenhuma
+                  funcionalidade do sistema.
+                </DialogContentText>
+              </DialogContent>
+            )}
             <DialogActions>
               <Button onClick={handleClose} color="primary">
                 Cancelar
@@ -194,7 +253,7 @@ const UserManagement = (listUsers) => {
       )}
     </Card>
   ) : (
-    <Card>
+    <Card sx={{ mt: 3, mb: 4 }}>
       <Box sx={{ minWidth: 1050 }}>
         <Table>
           <TableHead>
