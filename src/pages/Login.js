@@ -6,6 +6,7 @@ import {
   TextField,
   Typography
 } from '@material-ui/core';
+import Facebook from '@material-ui/icons/Facebook';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import React, { useContext } from 'react';
@@ -13,8 +14,8 @@ import ReactFacebookLogin from 'react-facebook-login';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
-import Facebook from 'src/icons/Facebook';
 import LoginSchema from 'src/schemas/LoginSchema';
+import styled from 'styled-components';
 
 const Login = () => {
   const { userLogin, error, loading, userFacebook, loadingFacebook } =
@@ -22,17 +23,26 @@ const Login = () => {
 
   /**
    * Loga o usuário
-   * @param {*} email
-   * @param {*} password
+   * @param {*} values
    * @param {*} errors
    */
-  async function signIn(email, password, errors) {
-    if (isEmpty(errors)) userLogin(email, password);
-  }
+  const handleSubmit = (values, errors) => {
+    if (isEmpty(errors)) userLogin(values.email, values.password);
+  };
 
   const signInWithFacebook = () => {
     console.log('clicado');
   };
+
+  const BtnFacebook = styled.a`
+    .metro{
+      width: 100%;
+      padding: 8px 22px;
+    },
+    .kep-login-facebook.metro{
+      border-radius: 3px;
+    }
+  }`;
 
   /**
    * Loga o usuário com o Facebook
@@ -70,16 +80,22 @@ const Login = () => {
               password: ''
             }}
             validationSchema={LoginSchema}
+            onSubmit={handleSubmit}
           >
             {({
               errors,
               handleBlur,
               handleChange,
-              handleSubmit,
               touched,
-              values
+              values,
+              submitForm
             }) => (
-              <form onSubmit={handleSubmit}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit(values, errors);
+                }}
+              >
                 <Box sx={{ mb: 2, mt: 10 }}>
                   <Typography color="primary" variant="h2" textAlign="center">
                     Login
@@ -119,7 +135,7 @@ const Login = () => {
                       color="primary"
                       disabled
                       fullWidth
-                      size="large"
+                      size="medium"
                       type="submit"
                       variant="contained"
                     >
@@ -127,14 +143,18 @@ const Login = () => {
                     </Button>
                   ) : (
                     <Button
-                      color="primary"
+                      style={{
+                        fontFamily: 'Helvetica,sans-serif',
+                        fontWeight: '700',
+                        backgroundColor: '#4c69ba',
+                        fontSize: '14px',
+                        padding: '8px 22px'
+                      }}
                       fullWidth
-                      size="large"
-                      type="submit"
+                      color="primary"
                       variant="contained"
-                      onClick={() =>
-                        signIn(values.email, values.password, errors)
-                      }
+                      type="submit"
+                      onClick={submitForm}
                     >
                       Entrar
                     </Button>
@@ -147,24 +167,36 @@ const Login = () => {
                       color="primary"
                       disabled
                       fullWidth
-                      size="large"
+                      size="medium"
                       type="submit"
                       variant="contained"
                     >
                       Carregando...
                     </Button>
                   ) : (
-                    <ReactFacebookLogin
-                      appId="392768758992552"
-                      autoLoad={false}
-                      fields="name,email"
-                      onClick={signInWithFacebook}
-                      callback={responseFacebook}
-                      textButton="Entrar com Facebook"
-                      icon={<Facebook></Facebook>}
-                    >
-                      Entrar com Facebook
-                    </ReactFacebookLogin>
+                    <BtnFacebook>
+                      <ReactFacebookLogin
+                        justifyContent="center"
+                        appId="392768758992552"
+                        autoLoad={false}
+                        fields="name,email"
+                        onClick={signInWithFacebook}
+                        callback={responseFacebook}
+                        textButton={
+                          <span
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '14px'
+                            }}
+                          >
+                            <Facebook></Facebook>
+                            Entrar com Facebook
+                          </span>
+                        }
+                      ></ReactFacebookLogin>
+                    </BtnFacebook>
                   )}
                 </Box>
                 <Typography color="textSecondary" variant="body1">
