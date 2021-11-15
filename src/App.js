@@ -19,6 +19,7 @@ import Client from './pages/Client';
 import CustomerList from './pages/CustomerList';
 import Dashboard from './pages/Dashboard';
 import Identity from './pages/Identity';
+import Construction from './pages/Construction';
 import Login from './pages/Login';
 import MyInformation from './pages/MyInformation';
 import NotFound from './pages/NotFound';
@@ -39,11 +40,12 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <MainLayout>
-                <Route path="404" element={<NotFound />} />
                 <Route path="*" element={<Navigate to="/404" />} />
                 <Route path="/" element={<Navigate to="/login" />} />
               </MainLayout>
               <PageLayout>
+                <Route path="404" element={<NotFound />} />
+                <Route path="construction" element={<Construction />} />
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
                 <ProtectedRoute path="/account" element={<Account />} />
                 <ProtectedRoute

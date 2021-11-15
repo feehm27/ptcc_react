@@ -21,72 +21,84 @@ const items = [
     id: 1,
     href: '/dashboard',
     icon: BarChartIcon,
-    title: 'Dashboard'
+    title: 'Dashboard',
+    disabled: false
   },
   {
     id: 2,
     href: '/informations',
     icon: InfoIcon,
-    title: 'Meus Dados'
+    title: 'Meus Dados',
+    disabled: false
   },
   {
     id: 3,
     href: '/identity',
     icon: CameraIcon,
-    title: 'Identidade Visual'
+    title: 'Identidade Visual',
+    disabled: false
   },
   {
     id: 4,
     href: '/clients',
     icon: ArrowRightIcon,
-    title: 'Gestão de Clientes'
+    title: 'Gestão de Clientes',
+    disabled: false
   },
   {
     id: 5,
-    href: '/settings',
+    href: '/construction',
     icon: ArrowRightIcon,
-    title: 'Gestão de Contratos'
+    title: 'Gestão de Contratos',
+    disabled: true
   },
   {
     id: 6,
-    href: '/404',
+    href: '/construction',
     icon: ArrowRightIcon,
-    title: 'Gestão de Processos'
+    title: 'Gestão de Processos',
+    disabled: true
   },
   {
     id: 7,
-    href: '/account',
+    href: '/construction',
     icon: CalendarIcon,
-    title: 'Agenda de Reuniões'
+    title: 'Agenda de Reuniões',
+    disabled: true
   },
   {
     id: 8,
-    href: '/404',
+    href: '/construction',
     icon: MessageIcon,
-    title: 'Mensagens'
+    title: 'Mensagens',
+    disabled: true
   },
   {
     id: 9,
-    href: '/404',
+    href: '/construction',
     icon: BellIcon,
-    title: 'Lembretes'
+    title: 'Lembretes',
+    disabled: true
   },
   {
     id: 10,
-    href: '/404',
+    href: '/construction',
     icon: FileIcon,
-    title: 'Relatórios'
+    title: 'Relatórios',
+    disabled: true
   },
   {
     id: 11,
     href: '/users',
     icon: UsersIcon,
-    title: 'Usuários'
+    title: 'Usuários',
+    disabled: false
   },
   {
     href: '/users/profile',
     icon: UserIcon,
-    title: 'Perfil de Usuários'
+    title: 'Perfil de Usuários',
+    disabled: false
   }
 ];
 
@@ -116,6 +128,12 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
               key={item.title}
               title={item.title}
               icon={item.icon}
+              disabled={item.disabled}
+              onClick={(e) => {
+                if (item.disabled) {
+                  e.preventDefault();
+                }
+              }}
             />
           ))}
         </List>
