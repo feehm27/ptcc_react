@@ -18,6 +18,7 @@ import Account from './pages/Account';
 import Client from './pages/Client';
 import CustomerList from './pages/CustomerList';
 import Dashboard from './pages/Dashboard';
+import DashboardClient from './pages/DashboardClient';
 import Identity from './pages/Identity';
 import Construction from './pages/Construction';
 import Login from './pages/Login';
@@ -47,6 +48,10 @@ function App() {
                 <Route path="404" element={<NotFound />} />
                 <Route path="construction" element={<Construction />} />
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+                <ProtectedRoute
+                  path="/dashboard-client"
+                  element={<DashboardClient />}
+                />
                 <ProtectedRoute path="/account" element={<Account />} />
                 <ProtectedRoute
                   path="/informations"

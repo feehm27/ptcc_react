@@ -14,31 +14,36 @@ import NavItem from './NavItem';
 const items = [
   {
     id: 12,
-    href: '/dashboard',
+    href: '/dashboard-client',
     icon: AlertCircleIcon,
-    title: 'Página Inicial'
+    title: 'Página Inicial',
+    disabled: false
   },
   {
-    href: '/customers',
+    href: '/construction',
     icon: FileIcon,
-    title: 'Contrato'
+    title: 'Contrato',
+    disabled: true
   },
   {
-    href: '/products',
+    href: '/construction',
     icon: BookIcon,
-    title: 'Acompanhar Processo'
+    title: 'Acompanhar Processo',
+    disabled: true
   },
   {
     id: 13,
-    href: '/account',
+    href: '/construction',
     icon: CalendarIcon,
-    title: 'Agendar Reunião'
+    title: 'Agendar Reunião',
+    disabled: true
   },
   {
     id: 14,
-    href: '/settings',
+    href: '/construction',
     icon: MessageIcon,
-    title: 'Contato'
+    title: 'Contato',
+    disabled: true
   }
 ];
 
@@ -68,6 +73,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
               key={item.title}
               title={item.title}
               icon={item.icon}
+              disabled={item.disabled}
             />
           ))}
         </List>
