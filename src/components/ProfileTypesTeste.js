@@ -13,7 +13,7 @@ import {
   Typography
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import { filter } from 'lodash';
+import { filter, find } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useLocation, useNavigate } from 'react-router';
@@ -37,6 +37,9 @@ const ProfileTypesTeste = () => {
   const [checkedMenu, setCheckedMenu] = useState(false);
   const [checkedPermission, setCheckedPermission] = useState(false);
   const [checkedMenuSelected, setCheckedMenuSelected] = useState([]);
+  const [checkedPermissionSelected, setCheckedPermissionSelected] = useState(
+    []
+  );
 
   /**
    * Obtém os menus e as permissões do usuário
@@ -121,13 +124,38 @@ const ProfileTypesTeste = () => {
    * @param {*} permissionId
    */
   const changePermission = (e, permissionId) => {
-    setPermissionsChecked(
-      permissionsChecked[selectedMenu.id - 1].forEach((permission) => {
-        if (permission.id === permissionId) {
-          permission.checked = e.target.checked;
-        }
-      })
+    permissionsChecked[selectedMenu.id - 1].map((permission) => {
+      if (permission.permission_id === permissionId) {
+        permission.checked = e.target.checked;
+      }
+    });
+
+    const permissionSelected = {
+      menuId: selectedMenu.id,
+      id: permissionId,
+      checked: e.target.checked
+    };
+
+    setPermissionsChecked(permissionsChecked);
+    setCheckedPermissionSelected(permissionSelected);
+  };
+
+  const checkedSelectedAllPermissions = (permissionId) => {
+    if (
+      checkedPermissionSelected.menuId === selectedMenu.id &&
+      checkedPermissionSelected.id === permissionId
+    ) {
+      return checkedPermissionSelected.checked;
+    }
+
+    const findPermission = find(
+      permissionsChecked[selectedMenu.id - 1],
+      function (permission) {
+        return permission.permission_id === permissionId;
+      }
     );
+
+    return findPermission.checked;
   };
 
   /**
@@ -136,8 +164,6 @@ const ProfileTypesTeste = () => {
    * @returns
    */
   const checkedOnePermission = (permissionId) => {
-    console.log('permissions', permissionsChecked);
-
     const permissionFromMenu = filter(
       permissionsChecked[selectedMenu.id - 1],
       function filterOnePermission(permissionUser) {
@@ -290,7 +316,10 @@ const ProfileTypesTeste = () => {
                           <TableRow hover key={permission.id}>
                             <TableCell padding="checkbox">
                               <Checkbox
-                                checked={checkedOnePermission(permission.id)}
+                                checked={
+                                  checkedOnePermission(permission.id) ||
+                                  checkedSelectedAllPermissions(permission.id)
+                                }
                                 onChange={(e) => {
                                   changePermission(e, permission.id);
                                 }}
