@@ -68,7 +68,6 @@ const ProfileTypesTeste = () => {
    * @returns
    */
   const checkedAllPermissions = () => {
-    console.log('permissionsChecked', permissionsChecked);
     const permissions = filter(
       permissionsChecked[selectedMenu.id - 1],
       function filterPermissions(permissionUser) {
@@ -95,9 +94,6 @@ const ProfileTypesTeste = () => {
    * @returns
    */
   const checkedOneMenu = (menuId) => {
-    if (menusChecked.menusChecked !== undefined) {
-      return menusChecked.menusChecked[menuId - 1].checked;
-    }
     return menusChecked[menuId - 1].checked;
   };
 
@@ -127,9 +123,7 @@ const ProfileTypesTeste = () => {
   const changePermission = (e, permissionId) => {
     setPermissionsChecked(
       permissionsChecked[selectedMenu.id - 1].forEach((permission) => {
-        console.log('permissionId', permissionId);
         if (permission.id === permissionId) {
-          console.log('aqui');
           permission.checked = e.target.checked;
         }
       })
@@ -142,15 +136,14 @@ const ProfileTypesTeste = () => {
    * @returns
    */
   const checkedOnePermission = (permissionId) => {
-    console.log('permissionsChecked', permissionsChecked);
+    console.log('permissions', permissionsChecked);
+
     const permissionFromMenu = filter(
       permissionsChecked[selectedMenu.id - 1],
       function filterOnePermission(permissionUser) {
         return permissionUser.permission_id === permissionId;
       }
     );
-
-    console.log('permissionsFromMenu', permissionFromMenu);
     return permissionFromMenu[0].checked;
   };
 
@@ -159,26 +152,20 @@ const ProfileTypesTeste = () => {
       menuChecked.checked = e.target.checked;
     });
 
-    setMenusChecked({ menusChecked }, () => {
-      newMenusChecked;
-      console.log(menusChecked);
-    });
-
+    setMenusChecked({ ...menusChecked, ...newMenusChecked });
     setCheckedMenu(e.target.checked);
   };
 
   const handleChangeAllPermissions = (e) => {
-    const newPermissionChecked = permissionsChecked[
-      selectedMenu.id - 1
-    ].forEach((permissionChecked) => {
-      permissionChecked.checked = e.target.checked;
-    });
+    let newPermissionChecked = [];
 
-    setPermissionsChecked({ permissionsChecked }, () => {
-      newPermissionChecked;
-      console.log(permissionsChecked);
-    });
+    newPermissionChecked = permissionsChecked[selectedMenu.id - 1].forEach(
+      (permissionChecked) => {
+        permissionChecked.checked = e.target.checked;
+      }
+    );
 
+    setPermissionsChecked({ ...permissionsChecked, ...newPermissionChecked });
     setCheckedPermission(e.target.checked);
   };
 
