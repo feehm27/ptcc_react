@@ -58,10 +58,18 @@ const ProfileTypesTeste = () => {
           return menu.profile_type_id === profile.id;
         }
       );
+
       setAllMenusPermissions(menusAndPermissions);
+
+      const newMenusChecked = data.checkeds.menus_checked.filter((checkeds) => {
+        return menusAndPermissions.find(
+          (allMenus) => checkeds.menu_id === allMenus.id
+        );
+      });
+
+      setMenusChecked(newMenusChecked);
     });
 
-    setMenusChecked(data.checkeds.menus_checked);
     setPermissionsChecked(data.checkeds.permissions_checked);
     setIsLoading(false);
   }
@@ -88,6 +96,7 @@ const ProfileTypesTeste = () => {
     const menus = filter(menusChecked, function filterMenus(menuChecked) {
       return menuChecked.checked === 1;
     });
+
     return menus.length === allMenusPermissions.length;
   };
 
@@ -107,12 +116,18 @@ const ProfileTypesTeste = () => {
    */
   const changeMenu = (e, menuId) => {
     menusChecked[menuId - 1].checked = e.target.checked;
+
+    setCheckedMenu(e.target.checked);
     setMenusChecked(menusChecked);
 
     const menuSelected = {
       id: menuId,
       checked: e.target.checked
     };
+
+    permissionsChecked[menuId - 1].map((permission) => {
+      permission.checked = e.target.checked;
+    });
 
     setCheckedMenuSelected(menuSelected);
     return menusChecked[menuId - 1].checked;
@@ -129,6 +144,8 @@ const ProfileTypesTeste = () => {
         permission.checked = e.target.checked;
       }
     });
+
+    setCheckedPermission(e.target.checked);
 
     const permissionSelected = {
       menuId: selectedMenu.id,
@@ -150,7 +167,7 @@ const ProfileTypesTeste = () => {
 
     const findPermission = find(
       permissionsChecked[selectedMenu.id - 1],
-      function (permission) {
+      function findPermission(permission) {
         return permission.permission_id === permissionId;
       }
     );
@@ -364,11 +381,7 @@ const ProfileTypesTeste = () => {
           >
             Voltar
           </Button>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => console.log('aqui')}
-          >
+          <Button color="primary" variant="contained" onClick={() => {}}>
             Salvar
           </Button>
         </Stack>
