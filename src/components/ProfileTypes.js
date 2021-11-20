@@ -13,15 +13,17 @@ import {
   Typography
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import { filter, findIndex, forEach, uniqBy } from 'lodash';
+import { filter, find, findIndex } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useLocation, useNavigate } from 'react-router';
 import { UserContext } from 'src/contexts/UserContext';
 import { API } from 'src/services/api';
+import ToastAnimated, { showToast } from './Toast';
 
 const ProfileTypes = () => {
   const navigate = useNavigate();
+
   const { profile } = useLocation().state;
   const { data } = useContext(UserContext);
 
@@ -29,18 +31,25 @@ const ProfileTypes = () => {
   const [selectedMenu, setSelectedMenu] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [selectedUserMenuIds, setSelectedUserMenuIds] = useState([]);
-  const [permissionsUser, setPermissionsUser] = useState([]);
-
   const [allMenusPermissions, setAllMenusPermissions] = useState([]);
-  const [menusPermissionsUser, setMenusPermissionsUser] = useState([]);
-  const [selectedMenuIds, setSelectedMenuIds] = useState([]);
-  const [selectedPermissionsIds, setSelectedPermissionsIds] = useState([]);
+  const [menusChecked, setMenusChecked] = useState([]);
+  const [permissionsChecked, setPermissionsChecked] = useState([]);
 
-  const [updateMenus, setUpdateMenus] = useState([]);
+  const [checkedMenu, setCheckedMenu] = useState(false);
+  const [checkedPermission, setCheckedPermission] = useState(false);
+  const [checkedMenuSelected, setCheckedMenuSelected] = useState([]);
+
+  const [checkedPermissionSelected, setCheckedPermissionSelected] = useState(
+    []
+  );
+
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   /**
-   * Obtém todos os menus e permissoes
+   * Obtém os menus e as permissões do usuário
+   * * @param {*} token
    */
   async function getMenusAndPermissions(token) {
     setIsLoading(true);
@@ -56,263 +65,205 @@ const ProfileTypes = () => {
         }
       );
 
-      console.log('allMenusPermissions', menusAndPermissions);
       setAllMenusPermissions(menusAndPermissions);
-      setUpdateMenus(menusAndPermissions);
+
+      const newMenusChecked = data.checkeds.menus_checked.filter((checkeds) => {
+        return menusAndPermissions.find(
+          (allMenus) => checkeds.menu_id === allMenus.id
+        );
+      });
+
+      setMenusChecked(newMenusChecked);
     });
+
+    setPermissionsChecked(data.checkeds.permissions_checked);
     setIsLoading(false);
   }
 
-  const getMenusPermissionsUser = () => {
-    setMenusPermissionsUser(data.permissions);
-    console.log('menusPermissionsUser', data.permissions);
-    console.log(menusPermissionsUser);
-  };
-
-  const checkedAllMenusActive = () => {
-    console.log('aqui', menusPermissionsUser.permissions_user);
-    const menusUserActives = filter(
-      menusPermissionsUser.permissions_user,
-      function filterMenusActives(menu) {
-        return menu.menu_is_active === 1;
+  /**
+   * Verifica se todas as permissões do usuário estão habilitadas
+   * @returns
+   */
+  const checkedAllPermissions = () => {
+    const permissions = filter(
+      permissionsChecked[selectedMenu.id - 1],
+      function filterPermissions(permissionUser) {
+        return permissionUser.checked === 1 || permissionUser.checked === true;
       }
     );
-
-    return menusUserActives.length === allMenusPermissions.length;
-  };
-
-  const checkedAllPermissionsActive = () => {
-    const permissionsUsersActives = filter(
-      permissionsUser,
-      function (permission) {
-        return permission.is_active === 1;
-      }
-    );
-    return permissionsUsersActives.length === selectedMenu.permissions.length;
-  };
-
-  const checkedMenuIsActive = (menuId) => {
-    const index = findIndex(menusPermissionsUser.permissions_user, [
-      'menu_id',
-      menuId
-    ]);
-    if (index !== -1) {
-      return menusPermissionsUser.permissions_user[index].menu_is_active === 1;
-    }
-    return false;
-  };
-
-  const checkedPermissionIsActive = (permissionId) => {
-    const index = findIndex(selectedMenu.permissions, ['id', permissionId]);
-    if (index !== -1) {
-      return selectedMenu.permissions[index].permission_is_active === 1;
-    }
-    return false;
+    return permissions.length === selectedMenu.permissions.length;
   };
 
   /**
-   * Atualiza as permissões do usuário
+   * Verifica se todos os menus do usuário estão habilitados
+   * @returns
    */
-  async function updatePermissions() {
-    console.log(updateMenus);
-  }
-
-  /**
-   * Obtém os ids das permissões do usuário
-   * @param {*} menu
-   */
-  const getPermissionsUser = (menu) => {
-    const menuSelected = filter(menusPermissionsUser, function (menuUser) {
-      return menuUser.id === menu.id;
+  const checkedAllMenus = () => {
+    const menus = filter(menusChecked, function filterMenus(menuChecked) {
+      return menuChecked.checked === 1 || menuChecked.checked === true;
     });
-
-    if (menuSelected.length > 0) {
-      setPermissionsUser(menuSelected[0].permissions);
-    }
+    return menus.length === allMenusPermissions.length;
   };
 
   /**
-   * Seleciona todos os checkboxs do menu
-   * @param {*} event
+   * Verifica se o menu do usuário está habilitado
+   * @param {*} menuId
+   * @returns
    */
-  const handleSelectAllMenus = (event) => {
-    let newSelectedMenuIds;
-
-    forEach(updateMenus, function (menu) {
-      menu.is_active = event.target.checked ? 1 : 0;
-    });
-
-    if (event.target.checked) {
-      newSelectedMenuIds = allMenusPermissions.map((menu) => menu.id);
-    } else {
-      newSelectedMenuIds = [];
-    }
-
-    setSelectedMenuIds(newSelectedMenuIds);
-    setSelectedUserMenuIds(newSelectedMenuIds);
+  const checkedOneMenu = (menuId) => {
+    const index = findIndex(menusChecked, { menu_id: menuId });
+    return menusChecked[index].checked;
   };
 
   /**
-   * Seleciona todos os checkbox  das permissões
-   * @param {*} event
-   */
-  const handleSelectAllPermissions = (event) => {
-    forEach(updateMenus, function (menu) {
-      forEach(menu.permissions, function (permission) {
-        permission.is_active = event.target.checked ? 1 : 0;
-      });
-    });
-
-    let newSelectedPermissionsIds;
-
-    if (event.target.checked) {
-      newSelectedPermissionsIds = selectedMenu.permissions.map(
-        (permission) => permission.id
-      );
-    } else {
-      newSelectedPermissionsIds = [];
-    }
-    setSelectedPermissionsIds(newSelectedPermissionsIds);
-    setPermissionsUser(newSelectedPermissionsIds);
-  };
-
-  /**
-   * Atualiza a lista de menus
-   * @param {*} index
-   * @param {*} id
-   * @param {*} isSelectedUser
-   */
-  const updateSelectedMenus = (index, id, isSelectedUser) => {
-    let newSelectedMenuIds = [];
-
-    if (index === -1) {
-      newSelectedMenuIds = newSelectedMenuIds.concat(selectedMenuIds, id);
-    } else if (index === 0) {
-      newSelectedMenuIds = newSelectedMenuIds.concat(selectedMenuIds.slice(1));
-    } else if (index === selectedMenuIds.length - 1) {
-      newSelectedMenuIds = newSelectedMenuIds.concat(
-        selectedMenuIds.slice(0, -1)
-      );
-    } else if (index > 0) {
-      newSelectedMenuIds = newSelectedMenuIds.concat(
-        selectedMenuIds.slice(0, index),
-        selectedMenuIds.slice(index + 1)
-      );
-    }
-
-    if (newSelectedMenuIds.length === 1) {
-      const filterSelectedMenuIds = filter(
-        selectedUserMenuIds,
-        function (selectedMenuId) {
-          return selectedMenuId !== newSelectedMenuIds[0];
-        }
-      );
-      newSelectedMenuIds = filterSelectedMenuIds;
-    }
-
-    isSelectedUser
-      ? setSelectedUserMenuIds(newSelectedMenuIds)
-      : setSelectedMenuIds(newSelectedMenuIds);
-  };
-
-  /**
-   * Seleciona um checbox do menu
-   * @param {*} event
+   * Muda o estado do menu
+   * @param {*} checked
    * @param {*} menuId
    */
-  const handleSelectOneMenu = (event, menuId) => {
-    const index = findIndex(menusPermissionsUser, ['id', menuId]);
-    if (index !== -1) {
-      menusPermissionsUser[index].menu_is_active === event.target.checked;
-      setMenusPermissionsUser(menusPermissionsUser);
-    }
-    console.log('nãomeserveparanada', updateSelectedMenus);
-  };
+  const changeMenu = (e, menuId) => {
+    const index = findIndex(menusChecked, { menu_id: menuId });
 
-  /**
-   * Atualiza a lista de permissões
-   * @param {*} index
-   * @param {*} id
-   */
-  const updateSelectedPermissions = (index, id) => {
-    let newSelectedPermissionsIds = [];
+    menusChecked[index].checked = e.target.checked;
 
-    if (index === -1) {
-      newSelectedPermissionsIds = newSelectedPermissionsIds.concat(
-        selectedPermissionsIds,
-        id
-      );
-    } else if (index === 0) {
-      newSelectedPermissionsIds = newSelectedPermissionsIds.concat(
-        selectedPermissionsIds.slice(1)
-      );
-    } else if (index === selectedPermissionsIds.length - 1) {
-      newSelectedPermissionsIds = newSelectedPermissionsIds.concat(
-        selectedPermissionsIds.slice(0, -1)
-      );
-    } else if (index > 0) {
-      newSelectedPermissionsIds = newSelectedPermissionsIds.concat(
-        selectedPermissionsIds.slice(0, index),
-        selectedPermissionsIds.slice(index + 1)
-      );
-    }
+    setCheckedMenu(e.target.checked);
+    setMenusChecked(menusChecked);
 
-    if (newSelectedPermissionsIds.length === 1) {
-      const filterSelectedPermissionsIds = filter(
-        permissionsUser,
-        function (selectedMenuId) {
-          return selectedMenuId !== newSelectedPermissionsIds[0];
-        }
-      );
-      newSelectedPermissionsIds = filterSelectedPermissionsIds;
-    }
+    const menuSelected = {
+      id: menuId,
+      checked: e.target.checked
+    };
 
-    newSelectedPermissionsIds = uniqBy(newSelectedPermissionsIds);
-
-    if (newSelectedPermissionsIds.length === 0) {
-      newSelectedPermissionsIds[0] = id;
-    }
-
-    setPermissionsUser(newSelectedPermissionsIds);
-    setSelectedPermissionsIds(newSelectedPermissionsIds);
-  };
-
-  /**
-   * Seleciona um checkbox das permissões
-   * @param {*} event
-   * @param {*} id
-   */
-  const handleSelectOnePermission = (event, id) => {
-    if (selectedPermissionsIds.length === 0) {
-      forEach(permissionsUser, function (key, index) {
-        selectedPermissionsIds[index] = key;
-      });
-    }
-
-    forEach(updateMenus, function (menu) {
-      forEach(menu.permissions, function (permission) {
-        if (permission.id === id) {
-          permission.is_active = event.target.checked ? 1 : 0;
-        }
-      });
+    permissionsChecked[menuId - 1].map((permission) => {
+      permission.checked = e.target.checked;
     });
 
-    if (event.target.checked) {
-      const selectedIndex = selectedPermissionsIds.indexOf(id);
-      updateSelectedPermissions(selectedIndex, id);
-    } else {
-      setPermissionsUser(
-        filter(permissionsUser, function (permissionId) {
-          return permissionId !== id;
-        })
-      );
-      setSelectedPermissionsIds(
-        filter(selectedPermissionsIds, function (permissionId) {
-          return permissionId !== id;
-        })
-      );
-    }
+    setCheckedMenuSelected(menuSelected);
+    return menusChecked[index].checked;
   };
+
+  /**
+   * Muda o estado do menu
+   * @param {*} checked
+   * @param {*} permissionId
+   */
+  const changePermission = (e, permissionId) => {
+    permissionsChecked[selectedMenu.id - 1].map((permission) => {
+      if (permission.permission_id === permissionId) {
+        permission.checked = e.target.checked;
+      }
+    });
+
+    setCheckedPermission(e.target.checked);
+
+    const permissionSelected = {
+      menuId: selectedMenu.id,
+      id: permissionId,
+      checked: e.target.checked
+    };
+
+    setPermissionsChecked(permissionsChecked);
+    setCheckedPermissionSelected(permissionSelected);
+  };
+
+  const checkedSelectedAllMenus = (menuId) => {
+    if (checkedMenuSelected.id === menuId) {
+      return checkedMenuSelected.checked;
+    }
+
+    const index = findIndex(menusChecked, { menu_id: menuId });
+
+    return menusChecked[index].checked;
+  };
+
+  const checkedSelectedAllPermissions = (permissionId) => {
+    if (
+      checkedPermissionSelected.menuId === selectedMenu.id &&
+      checkedPermissionSelected.id === permissionId
+    ) {
+      return checkedPermissionSelected.checked;
+    }
+
+    const findPermission = find(
+      permissionsChecked[selectedMenu.id - 1],
+      function findPermission(permission) {
+        return permission.permission_id === permissionId;
+      }
+    );
+
+    return findPermission.checked;
+  };
+
+  /**
+   * Verifica se a permissão do usuário está habilitada
+   * @param {*} permissionId
+   * @returns
+   */
+  const checkedOnePermission = (permissionId) => {
+    const permissionFromMenu = filter(
+      permissionsChecked[selectedMenu.id - 1],
+      function filterOnePermission(permissionUser) {
+        return permissionUser.permission_id === permissionId;
+      }
+    );
+    return permissionFromMenu[0].checked;
+  };
+
+  const handleChangeAllMenus = (e) => {
+    menusChecked.forEach((menuChecked) => {
+      menuChecked.checked = e.target.checked;
+    });
+    setMenusChecked(menusChecked);
+    setCheckedMenu(e.target.checked);
+  };
+
+  const handleChangeAllPermissions = (e) => {
+    let newPermissionChecked = [];
+
+    newPermissionChecked = permissionsChecked[selectedMenu.id - 1].forEach(
+      (permissionChecked) => {
+        permissionChecked.checked = e.target.checked;
+      }
+    );
+
+    setPermissionsChecked({ ...permissionsChecked, ...newPermissionChecked });
+    setCheckedPermission(e.target.checked);
+  };
+
+  /**
+   * Envia os dados do advogado
+   * @param {*} values
+   */
+  async function savePermissions() {
+    setSubmitting(true);
+    setShowSuccess(false);
+    setShowError(false);
+
+    const menusAndPermissions = JSON.stringify({
+      menus: menusChecked,
+      permissions: permissionsChecked
+    });
+
+    const token = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+
+    await API.post(
+      'menu/permissions',
+      { menus_permissions: menusAndPermissions },
+      config
+    )
+      .then((response) => {
+        console.log(response);
+        setShowSuccess(true);
+        setSubmitting(false);
+      })
+      .catch(() => {
+        setShowError(true);
+        setShowSuccess(false);
+        setSubmitting(false);
+      });
+  }
 
   /**
    * Use Effect
@@ -320,7 +271,8 @@ const ProfileTypes = () => {
   useEffect(() => {
     const token = window.localStorage.getItem('token');
     getMenusAndPermissions(token);
-    getMenusPermissionsUser();
+    setShowSuccess(false);
+    setShowError(false);
   }, []);
 
   return (
@@ -349,9 +301,13 @@ const ProfileTypes = () => {
                         <TableRow>
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={checkedAllMenusActive()}
+                              checked={checkedAllMenus() || checkedMenu}
                               color="primary"
-                              onChange={handleSelectAllMenus}
+                              onChange={(e) => {
+                                setShowSuccess(false);
+                                setShowError(false);
+                                handleChangeAllMenus(e);
+                              }}
                             />
                           </TableCell>
                           <TableCell></TableCell>
@@ -362,14 +318,16 @@ const ProfileTypes = () => {
                           <TableRow hover key={menu.id}>
                             <TableCell padding="checkbox">
                               <Checkbox
-                                checked={checkedMenuIsActive(menu.id)}
-                                onChange={(event) => {
-                                  handleSelectOneMenu(event, menu.id);
-                                }}
-                                onClick={() => {
+                                checked={
+                                  checkedOneMenu(menu.id) ||
+                                  checkedSelectedAllMenus(menu.id)
+                                }
+                                onChange={(e) => {
+                                  setShowSuccess(false);
+                                  setShowError(false);
                                   setShowPermissions(true);
                                   setSelectedMenu(menu);
-                                  getPermissionsUser(menu);
+                                  changeMenu(e, menu.id);
                                 }}
                                 value="true"
                               />
@@ -385,9 +343,10 @@ const ProfileTypes = () => {
                                   color="textPrimary"
                                   variant="body1"
                                   onClick={() => {
+                                    setShowSuccess(false);
+                                    setShowError(false);
                                     setShowPermissions(true);
                                     setSelectedMenu(menu);
-                                    getPermissionsUser(menu);
                                   }}
                                 >
                                   {menu.name}
@@ -418,14 +377,15 @@ const ProfileTypes = () => {
                         <TableRow>
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={checkedAllPermissionsActive()}
-                              color="primary"
-                              indeterminate={
-                                selectedPermissionsIds.length > 0 &&
-                                selectedPermissionsIds.length <
-                                  selectedMenu.permissions.length
+                              checked={
+                                checkedAllPermissions() || checkedPermission
                               }
-                              onChange={handleSelectAllPermissions}
+                              color="primary"
+                              onChange={(e) => {
+                                setShowSuccess(false);
+                                setShowError(false);
+                                handleChangeAllPermissions(e);
+                              }}
                             />
                           </TableCell>
                           <TableCell></TableCell>
@@ -433,24 +393,17 @@ const ProfileTypes = () => {
                       </TableHead>
                       <TableBody>
                         {selectedMenu.permissions.map((permission) => (
-                          <TableRow
-                            hover
-                            key={permission.id}
-                            selected={
-                              selectedPermissionsIds.indexOf(permission.id) !==
-                              -1
-                            }
-                          >
+                          <TableRow hover key={permission.id}>
                             <TableCell padding="checkbox">
                               <Checkbox
-                                checked={checkedPermissionIsActive(
-                                  permission.id
-                                )}
-                                onChange={(event) => {
-                                  handleSelectOnePermission(
-                                    event,
-                                    permission.id
-                                  );
+                                checked={
+                                  checkedOnePermission(permission.id) ||
+                                  checkedSelectedAllPermissions(permission.id)
+                                }
+                                onChange={(e) => {
+                                  setShowSuccess(false);
+                                  setShowError(false);
+                                  changePermission(e, permission.id);
                                 }}
                                 value="true"
                               />
@@ -493,15 +446,44 @@ const ProfileTypes = () => {
           >
             Voltar
           </Button>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={updatePermissions}
-          >
-            Salvar
-          </Button>
+          {submitting ? (
+            <Button color="primary" variant="contained" disabled>
+              Carregando..
+            </Button>
+          ) : (
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={(e) => {
+                savePermissions();
+                e.preventDefault();
+                setShowSuccess(false);
+                setShowError(false);
+              }}
+            >
+              Salvar
+            </Button>
+          )}
         </Stack>
       </Box>
+      {showSuccess && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Permissões atualizadas com sucesso!'
+          })}
+        </>
+      )}
+      {showError && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'error',
+            message: 'Ocorreu um erro ao atualizar as permissões!'
+          })}
+        </>
+      )}
     </Grid>
   );
 };
