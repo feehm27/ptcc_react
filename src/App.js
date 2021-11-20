@@ -9,7 +9,6 @@ import ClientEdit from './components/client/ClientEdit';
 import MainLayout from './components/MainLayout';
 import PageLayout from './components/PageLayout';
 import Permissions from './components/Permissions';
-import ProfileTypesTeste from './components/ProfileTypesTeste';
 import UserCreate from './components/users/UserCreate';
 import UserEdit from './components/users/UserEdit';
 import { UserStorage } from './contexts/UserContext';
@@ -29,6 +28,7 @@ import Register from './pages/Register';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
+import ProfileTypes from './components/ProfileTypes';
 
 function App() {
   return (
@@ -72,7 +72,7 @@ function App() {
                 <ProtectedRoute path="/customers" element={<CustomerList />} />
                 <ProtectedRoute
                   path="/profiles/types"
-                  element={<ProfileTypesTeste />}
+                  element={<ProfileTypes />}
                 />
                 <ProtectedRoute
                   path="/users/profile"

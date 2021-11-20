@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   Box,
   Button,
@@ -11,22 +9,12 @@ import {
   TableRow,
   Typography
 } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
-import { API } from 'src/services/api';
 
 const UserProfileList = ({ profiles, ...rest }) => {
   const navigate = useNavigate();
-
-  async function getMenus() {
-    const token = window.localStorage.getItem('token');
-    const config = {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-    await API.get('menu/permissions', config).then((response) => {
-      return response.data.data;
-    });
-  }
-
   return (
     <Card {...rest}>
       <PerfectScrollbar>
@@ -60,8 +48,6 @@ const UserProfileList = ({ profiles, ...rest }) => {
                       type="submit"
                       variant="contained"
                       onClick={() => {
-                        const menus = getMenus();
-                        console.log(menus);
                         navigate('/profiles/types', {
                           state: { profile }
                         });
