@@ -2,8 +2,8 @@ import { Box, Divider, Drawer, Hidden, List } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { useContext, useEffect } from 'react';
 import {
+  Activity as ActivityIcon,
   ArrowRightCircle as ArrowRightIcon,
-  BarChart as BarChartIcon,
   Bell as BellIcon,
   Calendar as CalendarIcon,
   Camera as CameraIcon,
@@ -25,7 +25,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     {
       id: 1,
       href: '/dashboard',
-      icon: BarChartIcon,
+      icon: ActivityIcon,
       title: 'Dashboard',
       disabled: false,
       allowed: data && data.checkeds.menus_checked[0].checked === 1

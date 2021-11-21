@@ -19,13 +19,14 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useLocation, useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
 import GenderConstants from 'src/constants/GenderConstants';
 import ClientEditSchema from 'src/schemas/ClientEditSchema';
 import { API } from 'src/services/api';
+import { UserContext } from 'src/contexts/UserContext';
 import ToastAnimated, { showToast } from '../Toast';
 
 const civilStatus = CivilStatusConstants;
@@ -33,6 +34,7 @@ const gender = GenderConstants;
 
 const ClientEdit = () => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
   const { client } = useLocation().state;
   const [address, setAddress] = useState([]);
   const [error, setError] = useState(null);
@@ -91,7 +93,7 @@ const ClientEdit = () => {
     setLoadingAddress(true);
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then((res) => res.json())
-      .then((data) => {
+      .then((response) => {
         if (data.erro) {
           setError({
             cep: ['CEP não encontrado. Preencha o endereço manualmente.']
@@ -100,10 +102,10 @@ const ClientEdit = () => {
           setAddress([]);
         } else {
           setAddress({
-            state: data.uf,
-            city: data.localidade,
-            district: data.bairro,
-            street: data.logradouro
+            state: response.uf,
+            city: response.localidade,
+            district: response.bairro,
+            street: response.logradouro
           });
 
           errors.cep = null;
@@ -659,6 +661,10 @@ const ClientEdit = () => {
                     color="primary"
                     variant="contained"
                     type="submit"
+                    disabled={
+                      data &&
+                      data.checkeds.permissions_checked[3][2].checked === 0
+                    }
                     onClick={submitForm}
                   >
                     Salvar

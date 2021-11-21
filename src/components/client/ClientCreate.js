@@ -19,13 +19,14 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
 import GenderConstants from 'src/constants/GenderConstants';
 import ClientSchema from 'src/schemas/ClientSchema';
 import { API } from 'src/services/api';
+import { UserContext } from 'src/contexts/UserContext';
 import ToastAnimated, { showToast } from '../Toast';
 
 const civilStatus = CivilStatusConstants;
@@ -33,6 +34,7 @@ const gender = GenderConstants;
 
 const ClientCreate = () => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
   const [address, setAddress] = useState([]);
   const [error, setError] = useState(null);
   const [loadingAddress, setLoadingAddress] = useState(false);
@@ -92,8 +94,8 @@ const ClientCreate = () => {
     setLoadingAddress(true);
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then((res) => res.json())
-      .then((data) => {
-        if (data.erro) {
+      .then((response) => {
+        if (response.erro) {
           setError({
             cep: ['CEP não encontrado. Preencha o endereço manualmente.']
           });
@@ -101,10 +103,10 @@ const ClientCreate = () => {
           setAddress([]);
         } else {
           setAddress({
-            state: data.uf,
-            city: data.localidade,
-            district: data.bairro,
-            street: data.logradouro
+            state: response.uf,
+            city: response.localidade,
+            district: response.bairro,
+            street: response.logradouro
           });
 
           errors.cep = null;
@@ -746,6 +748,10 @@ const ClientCreate = () => {
                     color="primary"
                     variant="contained"
                     type="submit"
+                    disabled={
+                      data &&
+                      data.checkeds.permissions_checked[3][0].checked === 0
+                    }
                     onClick={submitForm}
                   >
                     Salvar

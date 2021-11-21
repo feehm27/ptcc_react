@@ -187,9 +187,6 @@ const UserCreate = () => {
                       value={values.profile}
                       variant="outlined"
                     >
-                      <option key="0" value="0">
-                        Selecione uma opção
-                      </option>
                       <option key="1" value="1">
                         Advogado
                       </option>
@@ -227,6 +224,10 @@ const UserCreate = () => {
                     variant="contained"
                     type="submit"
                     onClick={submitForm}
+                    disabled={
+                      data &&
+                      data.checkeds.permissions_checked[10][0].checked === 0
+                    }
                   >
                     Salvar
                   </Button>

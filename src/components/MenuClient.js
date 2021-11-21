@@ -2,7 +2,7 @@ import { Box, Divider, Drawer, Hidden, List } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { useContext, useEffect } from 'react';
 import {
-  AlertCircle as AlertCircleIcon,
+  Activity as ActivityIcon,
   Book as BookIcon,
   Calendar as CalendarIcon,
   FileText as FileIcon,
@@ -20,7 +20,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
     {
       id: 10,
       href: '/dashboard-client',
-      icon: AlertCircleIcon,
+      icon: ActivityIcon,
       title: 'Página Inicial',
       disabled: false,
       allowed: data && data.checkeds.menus_checked[11].checked === 1

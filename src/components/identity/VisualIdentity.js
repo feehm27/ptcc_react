@@ -173,7 +173,15 @@ const VisualIdentity = () => {
                     Carregando..
                   </Button>
                 ) : (
-                  <Button color="primary" variant="contained" type="submit">
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    type="submit"
+                    disabled={
+                      data &&
+                      data.checkeds.permissions_checked[2][0].checked === 0
+                    }
+                  >
                     Salvar
                   </Button>
                 )}

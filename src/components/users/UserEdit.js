@@ -13,14 +13,16 @@ import {
 } from '@material-ui/core';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import UserEditScheam from 'src/schemas/UserEditSchema';
 import { API } from 'src/services/api';
+import { UserContext } from 'src/contexts/UserContext';
 import ToastAnimated, { showToast } from '../Toast';
 
 const UserEdit = () => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
   const { user } = useLocation().state;
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -188,9 +190,6 @@ const UserEdit = () => {
                         value={values.profile}
                         variant="outlined"
                       >
-                        <option key="0" value="0">
-                          Selecione uma opção
-                        </option>
                         <option key="1" value="1">
                           Advogado
                         </option>
@@ -227,6 +226,10 @@ const UserEdit = () => {
                       color="primary"
                       variant="contained"
                       type="submit"
+                      disabled={
+                        data &&
+                        data.checkeds.permissions_checked[10][0].checked === 0
+                      }
                       onClick={submitForm}
                     >
                       Salvar

@@ -12,10 +12,11 @@ import {
 } from '@material-ui/core';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
+import { UserContext } from 'src/contexts/UserContext';
 import InformationSchema from 'src/schemas/InformationSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
@@ -63,6 +64,8 @@ const banks = [
 
 const InformationDetails = () => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
+
   const [address, setAddress] = useState([]);
   const [error, setError] = useState(null);
   const [informations, setInformations] = useState([]);
@@ -102,9 +105,7 @@ const InformationDetails = () => {
       }
 
       await API.post('advocates/informations', values, config)
-        .then((response) => {
-          console.log(response);
-        })
+        .then(() => {})
         .catch((err) => {
           setError(err.response.data.errors);
           setShowSuccess(false);
@@ -124,8 +125,8 @@ const InformationDetails = () => {
     setLoadingAddress(true);
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then((res) => res.json())
-      .then((data) => {
-        if (data.erro) {
+      .then((response) => {
+        if (response.erro) {
           setError({
             cep: ['CEP não encontrado. Preencha o endereço manualmente.']
           });
@@ -133,10 +134,10 @@ const InformationDetails = () => {
           setAddress([]);
         } else {
           setAddress({
-            state: data.uf,
-            city: data.localidade,
-            district: data.bairro,
-            street: data.logradouro
+            state: response.uf,
+            city: response.localidade,
+            district: response.bairro,
+            street: response.logradouro
           });
 
           errors.cep = null;
@@ -678,6 +679,10 @@ const InformationDetails = () => {
                     color="primary"
                     variant="contained"
                     type="submit"
+                    disabled={
+                      data &&
+                      data.checkeds.permissions_checked[1][0].checked === 0
+                    }
                     onClick={submitForm}
                   >
                     Salvar
