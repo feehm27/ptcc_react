@@ -1,8 +1,11 @@
 import { Box, Button } from '@material-ui/core';
 import { useNavigate } from 'react-router';
+import { useContext } from 'react';
+import { UserContext } from 'src/contexts/UserContext';
 
 const ClientListToolbar = (clients) => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
 
   return clients.length === 0 ? (
     <Box>
@@ -17,6 +20,9 @@ const ClientListToolbar = (clients) => {
           color="primary"
           variant="contained"
           onClick={() => navigate('/clients/create')}
+          disabled={
+            data && data.checkeds.permissions_checked[3][0].checked === 0
+          }
         >
           Novo Cliente
         </Button>
@@ -33,6 +39,9 @@ const ClientListToolbar = (clients) => {
         <Button
           color="primary"
           variant="contained"
+          disabled={
+            data && data.checkeds.permissions_checked[3][0].checked === 0
+          }
           onClick={() => navigate('/clients/create')}
         >
           Novo Cliente
@@ -41,6 +50,9 @@ const ClientListToolbar = (clients) => {
           sx={{ mx: 1 }}
           color="primary"
           variant="contained"
+          disabled={
+            data && data.checkeds.permissions_checked[3][4].checked === 0
+          }
           onClick={() => navigate('/clients/create')}
         >
           Exportar todos os clientes

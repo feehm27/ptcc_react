@@ -17,17 +17,19 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Delete, DownloadRounded, Edit } from '@material-ui/icons';
+import { Delete, DownloadRounded, Edit, Visibility } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 import { API } from 'src/services/api';
+import { UserContext } from 'src/contexts/UserContext';
 import ToastAnimated, { showToast } from '../Toast';
 
 const ClientManagement = (listClients) => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listClients.clients);
@@ -136,27 +138,93 @@ const ClientManagement = (listClients) => {
                     {moment(client.birthday).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
+                    <Tooltip title="Visualizar">
+                      {data &&
+                      data.checkeds.permissions_checked[3][1].checked === 0 ? (
+                        <Visibility
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                        ></Visibility>
+                      ) : (
+                        <Visibility
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/clients/edit', {
+                              state: { client, show: true }
+                            });
+                          }}
+                        ></Visibility>
+                      )}
+                    </Tooltip>
                     <Tooltip title="Editar">
-                      <Edit
-                        cursor="pointer"
-                        onClick={() => {
-                          navigate('/clients/edit', {
-                            state: { client }
-                          });
-                        }}
-                      ></Edit>
+                      {data &&
+                      data.checkeds.permissions_checked[3][2].checked === 0 ? (
+                        <Edit
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/clients/edit', {
+                              state: { client, show: false }
+                            });
+                          }}
+                        ></Edit>
+                      ) : (
+                        <Edit
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/clients/edit', {
+                              state: { client }
+                            });
+                          }}
+                        ></Edit>
+                      )}
                     </Tooltip>
                     <Tooltip title="Exportar">
-                      <DownloadRounded cursor="pointer"></DownloadRounded>
+                      {data &&
+                      data.checkeds.permissions_checked[3][3].checked === 0 ? (
+                        <DownloadRounded
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                          cursor="pointer"
+                        ></DownloadRounded>
+                      ) : (
+                        <DownloadRounded cursor="pointer"></DownloadRounded>
+                      )}
                     </Tooltip>
                     <Tooltip title="Excluir">
-                      <Delete
-                        cursor="pointer"
-                        onClick={() => {
-                          setSelectedClient(client);
-                          setShowModal(true);
-                        }}
-                      ></Delete>
+                      {data &&
+                      data.checkeds.permissions_checked[3][4].checked === 0 ? (
+                        <Delete
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                          cursor="pointer"
+                          onClick={() => {
+                            setSelectedClient(client);
+                            setShowModal(true);
+                          }}
+                        ></Delete>
+                      ) : (
+                        <Delete
+                          cursor="pointer"
+                          onClick={() => {
+                            setSelectedClient(client);
+                            setShowModal(true);
+                          }}
+                        ></Delete>
+                      )}
                     </Tooltip>
                   </TableCell>
                 </TableRow>

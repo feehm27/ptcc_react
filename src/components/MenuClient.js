@@ -1,54 +1,61 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { Box, Divider, Drawer, Hidden, List } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import { useContext, useEffect } from 'react';
 import {
-  AlertCircle as AlertCircleIcon,
+  Activity as ActivityIcon,
+  Book as BookIcon,
   Calendar as CalendarIcon,
-  MessageSquare as MessageIcon,
   FileText as FileIcon,
-  Book as BookIcon
+  MessageSquare as MessageIcon
 } from 'react-feather';
+import { useLocation } from 'react-router-dom';
+import { UserContext } from 'src/contexts/UserContext';
 import NavItem from './NavItem';
-
-const items = [
-  {
-    id: 12,
-    href: '/dashboard-client',
-    icon: AlertCircleIcon,
-    title: 'Página Inicial',
-    disabled: false
-  },
-  {
-    href: '/construction',
-    icon: FileIcon,
-    title: 'Contrato',
-    disabled: true
-  },
-  {
-    href: '/construction',
-    icon: BookIcon,
-    title: 'Acompanhar Processo',
-    disabled: true
-  },
-  {
-    id: 13,
-    href: '/construction',
-    icon: CalendarIcon,
-    title: 'Agendar Reunião',
-    disabled: true
-  },
-  {
-    id: 14,
-    href: '/construction',
-    icon: MessageIcon,
-    title: 'Contato',
-    disabled: true
-  }
-];
 
 const MenuClient = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
+  const { data } = useContext(UserContext);
+
+  const items = [
+    {
+      id: 10,
+      href: '/dashboard-client',
+      icon: ActivityIcon,
+      title: 'Página Inicial',
+      disabled: false,
+      allowed: data && data.checkeds.menus_checked[11].checked === 1
+    },
+    {
+      href: '/construction',
+      icon: FileIcon,
+      title: 'Contrato',
+      disabled: true,
+      allowed: true
+    },
+    {
+      href: '/construction',
+      icon: BookIcon,
+      title: 'Acompanhar Processo',
+      disabled: true,
+      allowed: true
+    },
+    {
+      id: 13,
+      href: '/construction',
+      icon: CalendarIcon,
+      title: 'Agendar Reunião',
+      disabled: true,
+      allowed: data && data.checkeds.menus_checked[12].checked === 1
+    },
+    {
+      id: 14,
+      href: '/construction',
+      icon: MessageIcon,
+      title: 'Contato',
+      disabled: true,
+      allowed: data && data.checkeds.menus_checked[13].checked === 1
+    }
+  ];
 
   useEffect(() => {
     if (openMobile && onMobileClose) {
@@ -69,7 +76,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
         <List>
           {items.map((item) => (
             <NavItem
-              href={item.href}
+              href={item.allowed ? item.href : '/not-allowed'}
               key={item.title}
               title={item.title}
               icon={item.icon}

@@ -1,8 +1,11 @@
 import { Box, Button } from '@material-ui/core';
 import { useNavigate } from 'react-router';
+import { useContext } from 'react';
+import { UserContext } from 'src/contexts/UserContext';
 
 const UserListToolbar = (users) => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
 
   return users.length === 0 ? (
     <Box>
@@ -16,6 +19,9 @@ const UserListToolbar = (users) => {
         <Button
           color="primary"
           variant="contained"
+          disabled={
+            data && data.checkeds.permissions_checked[10][0].checked === 0
+          }
           onClick={() => navigate('/users/create')}
         >
           Novo Usuário
@@ -33,6 +39,9 @@ const UserListToolbar = (users) => {
         <Button
           color="primary"
           variant="contained"
+          disabled={
+            data && data.checkeds.permissions_checked[10][0].checked === 0
+          }
           onClick={() => navigate('/users/create')}
         >
           Novo Usuário

@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import { filter, find, findIndex } from 'lodash';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useLocation, useNavigate } from 'react-router';
 import { UserContext } from 'src/contexts/UserContext';
@@ -42,10 +42,10 @@ const ProfileTypes = () => {
   const [checkedPermissionSelected, setCheckedPermissionSelected] = useState(
     []
   );
-
-  const [showError, setShowError] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const showSuccess = useRef(false);
+  const showError = useRef(false);
 
   /**
    * Obtém os menus e as permissões do usuário
@@ -235,8 +235,8 @@ const ProfileTypes = () => {
    */
   async function savePermissions() {
     setSubmitting(true);
-    setShowSuccess(false);
-    setShowError(false);
+    showSuccess.current = false;
+    showError.current = false;
 
     const menusAndPermissions = JSON.stringify({
       menus: menusChecked,
@@ -253,16 +253,15 @@ const ProfileTypes = () => {
       { menus_permissions: menusAndPermissions },
       config
     )
-      .then((response) => {
-        console.log(response);
-        setShowSuccess(true);
-        setSubmitting(false);
+      .then(() => {
+        showSuccess.current = true;
       })
       .catch(() => {
-        setShowError(true);
-        setShowSuccess(false);
+        showSuccess.current = false;
+        showError.current = true;
         setSubmitting(false);
       });
+    setSubmitting(false);
   }
 
   /**
@@ -271,8 +270,7 @@ const ProfileTypes = () => {
   useEffect(() => {
     const token = window.localStorage.getItem('token');
     getMenusAndPermissions(token);
-    setShowSuccess(false);
-    setShowError(false);
+    showError.current = false;
   }, []);
 
   return (
@@ -304,8 +302,8 @@ const ProfileTypes = () => {
                               checked={checkedAllMenus() || checkedMenu}
                               color="primary"
                               onChange={(e) => {
-                                setShowSuccess(false);
-                                setShowError(false);
+                                showSuccess.current = false;
+                                showError.current = false;
                                 handleChangeAllMenus(e);
                               }}
                             />
@@ -323,8 +321,8 @@ const ProfileTypes = () => {
                                   checkedSelectedAllMenus(menu.id)
                                 }
                                 onChange={(e) => {
-                                  setShowSuccess(false);
-                                  setShowError(false);
+                                  showSuccess.current = false;
+                                  showError.current = false;
                                   setShowPermissions(true);
                                   setSelectedMenu(menu);
                                   changeMenu(e, menu.id);
@@ -343,8 +341,8 @@ const ProfileTypes = () => {
                                   color="textPrimary"
                                   variant="body1"
                                   onClick={() => {
-                                    setShowSuccess(false);
-                                    setShowError(false);
+                                    showSuccess.current = false;
+                                    showError.current = false;
                                     setShowPermissions(true);
                                     setSelectedMenu(menu);
                                   }}
@@ -382,8 +380,8 @@ const ProfileTypes = () => {
                               }
                               color="primary"
                               onChange={(e) => {
-                                setShowSuccess(false);
-                                setShowError(false);
+                                showSuccess.current = false;
+                                showError.current = false;
                                 handleChangeAllPermissions(e);
                               }}
                             />
@@ -401,8 +399,8 @@ const ProfileTypes = () => {
                                   checkedSelectedAllPermissions(permission.id)
                                 }
                                 onChange={(e) => {
-                                  setShowSuccess(false);
-                                  setShowError(false);
+                                  showSuccess.current = false;
+                                  showError.current = false;
                                   changePermission(e, permission.id);
                                 }}
                                 value="true"
@@ -457,8 +455,8 @@ const ProfileTypes = () => {
               onClick={(e) => {
                 savePermissions();
                 e.preventDefault();
-                setShowSuccess(false);
-                setShowError(false);
+                showSuccess.current = false;
+                showError.current = false;
               }}
             >
               Salvar
@@ -466,7 +464,7 @@ const ProfileTypes = () => {
           )}
         </Stack>
       </Box>
-      {showSuccess && (
+      {showSuccess.current && (
         <>
           <ToastAnimated />
           {showToast({
@@ -475,7 +473,7 @@ const ProfileTypes = () => {
           })}
         </>
       )}
-      {showError && (
+      {showError.current && (
         <>
           <ToastAnimated />
           {showToast({

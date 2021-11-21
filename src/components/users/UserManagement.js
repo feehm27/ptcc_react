@@ -17,17 +17,24 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Edit, LockOpenRounded, LockRounded } from '@material-ui/icons';
+import {
+  Edit,
+  LockOpenRounded,
+  LockRounded,
+  Visibility
+} from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 import { API } from 'src/services/api';
+import { UserContext } from 'src/contexts/UserContext';
 import ToastAnimated, { showToast } from '../Toast';
 
 const UserManagement = (listUsers) => {
   const navigate = useNavigate();
+  const { data } = useContext(UserContext);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [showModal, setShowModal] = useState(false);
@@ -143,36 +150,96 @@ const UserManagement = (listUsers) => {
                     {moment(user.created_at).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
+                    <Tooltip title="Visualizar">
+                      {data &&
+                      data.checkeds.permissions_checked[10][1].checked === 0 ? (
+                        <Visibility
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                          cursor="pointer"
+                        ></Visibility>
+                      ) : (
+                        <Visibility
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/users/edit', {
+                              state: { user, show: true }
+                            });
+                          }}
+                        ></Visibility>
+                      )}
+                    </Tooltip>
                     <Tooltip title="Editar">
-                      <Edit
-                        cursor="pointer"
-                        onClick={() => {
-                          navigate('/users/edit', {
-                            state: { user }
-                          });
-                        }}
-                      ></Edit>
+                      {data &&
+                      data.checkeds.permissions_checked[10][2].checked === 0 ? (
+                        <Edit
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                          cursor="pointer"
+                        ></Edit>
+                      ) : (
+                        <Edit
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/users/edit', {
+                              state: { user, show: false }
+                            });
+                          }}
+                        ></Edit>
+                      )}
                     </Tooltip>
 
                     {user.blocked ? (
                       <Tooltip title="Desbloquear">
-                        <LockOpenRounded
-                          cursor="pointer"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowModal(true);
-                          }}
-                        ></LockOpenRounded>
+                        {data &&
+                        data.checkeds.permissions_checked[10][3].checked ===
+                          0 ? (
+                          <LockOpenRounded
+                            style={{
+                              color: '#c0c0c0',
+                              cursor: 'not-allowed',
+                              pointerEvents: 'none'
+                            }}
+                            cursor="pointer"
+                          ></LockOpenRounded>
+                        ) : (
+                          <LockOpenRounded
+                            cursor="pointer"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowModal(true);
+                            }}
+                          ></LockOpenRounded>
+                        )}
                       </Tooltip>
                     ) : (
                       <Tooltip title="Bloquear">
-                        <LockRounded
-                          cursor="pointer"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowModal(true);
-                          }}
-                        ></LockRounded>
+                        {data &&
+                        data.checkeds.permissions_checked[10][3].checked ===
+                          0 ? (
+                          <LockRounded
+                            cursor="pointer"
+                            style={{
+                              color: '#c0c0c0',
+                              cursor: 'not-allowed',
+                              pointerEvents: 'none'
+                            }}
+                          ></LockRounded>
+                        ) : (
+                          <LockRounded
+                            cursor="pointer"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowModal(true);
+                            }}
+                          ></LockRounded>
+                        )}
                       </Tooltip>
                     )}
                   </TableCell>

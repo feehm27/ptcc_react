@@ -9,26 +9,27 @@ import ClientEdit from './components/client/ClientEdit';
 import MainLayout from './components/MainLayout';
 import PageLayout from './components/PageLayout';
 import Permissions from './components/Permissions';
+import ProfileTypes from './components/ProfileTypes';
 import UserCreate from './components/users/UserCreate';
 import UserEdit from './components/users/UserEdit';
 import { UserStorage } from './contexts/UserContext';
 import ProtectedRoute from './helpers/Route/ProtectedRoute';
 import Account from './pages/Account';
 import Client from './pages/Client';
+import Construction from './pages/Construction';
 import CustomerList from './pages/CustomerList';
 import Dashboard from './pages/Dashboard';
 import DashboardClient from './pages/DashboardClient';
 import Identity from './pages/Identity';
-import Construction from './pages/Construction';
 import Login from './pages/Login';
 import MyInformation from './pages/MyInformation';
+import NotAllowed from './pages/NotAllowed';
 import NotFound from './pages/NotFound';
 import ProductList from './pages/ProductList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
-import ProfileTypes from './components/ProfileTypes';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               <PageLayout>
                 <Route path="404" element={<NotFound />} />
                 <Route path="construction" element={<Construction />} />
+                <Route path="not-allowed" element={<NotAllowed />} />
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
                 <ProtectedRoute
                   path="/dashboard-client"

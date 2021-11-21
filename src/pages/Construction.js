@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container, Typography } from '@material-ui/core';
+import { Box, Button, Container, Typography } from '@material-ui/core';
 
 const Construction = () => (
   <>
@@ -17,12 +17,16 @@ const Construction = () => (
     >
       <Container maxWidth="md" sx={{ mt: 2 }}>
         <Typography align="center" color="textPrimary" variant="h1">
-          Página em Construção..
+          <Button color="primary" variant="contained">
+            Ops.. Página em construção...
+          </Button>
         </Typography>
-        <Typography align="center" color="textPrimary" variant="subtitle2">
-          Ops, ainda estamos desenvolvendo esta página. Em breve ela estará
-          disponível para visualização.
+        <Typography align="center" color="textPrimary" variant="h1">
+          <Button color="primary" variant="contained">
+            Em breve disponibilizaremos para visualização.
+          </Button>
         </Typography>
+
         <Box sx={{ textAlign: 'center' }}>
           <img
             alt="Under development"

@@ -30,6 +30,9 @@ export const UserStorage = ({ children }) => {
     await API.get('me', config).then((response) => {
       setData(response.data);
       setLogin(true);
+      response.data.is_advocate === 1
+        ? navigate('dashboard')
+        : navigate('dashboard-client');
     });
   }
 
@@ -41,8 +44,6 @@ export const UserStorage = ({ children }) => {
         const token = response.data.access_token;
         window.localStorage.setItem('token', token);
         getUser(token);
-        setLogin(true);
-        navigate('dashboard');
       })
       .catch((err) => {
         setError(err.response.data.message);
@@ -60,8 +61,6 @@ export const UserStorage = ({ children }) => {
           const token = response.data.access_token;
           window.localStorage.setItem('token', token);
           getUser(token);
-          setLogin(true);
-          navigate('dashboard');
         })
         .catch((err) => {
           setError(err.response.data.message);
