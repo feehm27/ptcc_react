@@ -15,7 +15,6 @@ import NavItem from './NavItem';
 const MenuClient = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
   const { data } = useContext(UserContext);
-  const menusPermissions = data.checkeds.menus_checked;
 
   const items = [
     {
@@ -24,7 +23,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
       icon: AlertCircleIcon,
       title: 'Página Inicial',
       disabled: false,
-      allowed: menusPermissions[11].checked === 1
+      allowed: data && data.checkeds.menus_checked[11].checked === 1
     },
     {
       href: '/construction',
@@ -46,7 +45,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
       icon: CalendarIcon,
       title: 'Agendar Reunião',
       disabled: true,
-      allowed: menusPermissions[12].checked === 1
+      allowed: data && data.checkeds.menus_checked[12].checked === 1
     },
     {
       id: 14,
@@ -54,7 +53,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
       icon: MessageIcon,
       title: 'Contato',
       disabled: true,
-      allowed: menusPermissions[13].checked === 1
+      allowed: data && data.checkeds.menus_checked[13].checked === 1
     }
   ];
 

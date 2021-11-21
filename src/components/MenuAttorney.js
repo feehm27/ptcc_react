@@ -19,7 +19,6 @@ import NavItem from './NavItem';
 
 const MenuAttorney = ({ onMobileClose, openMobile }) => {
   const { data } = useContext(UserContext);
-  const menusPermissions = data.checkeds.menus_checked;
   const location = useLocation();
 
   const items = [
@@ -29,7 +28,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: BarChartIcon,
       title: 'Dashboard',
       disabled: false,
-      allowed: menusPermissions[0].checked === 1
+      allowed: data && data.checkeds.menus_checked[0].checked === 1
     },
     {
       id: 2,
@@ -37,7 +36,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: InfoIcon,
       title: 'Meus Dados',
       disabled: false,
-      allowed: menusPermissions[1].checked === 1
+      allowed: data && data.checkeds.menus_checked[1].checked === 1
     },
     {
       id: 3,
@@ -45,7 +44,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: CameraIcon,
       title: 'Identidade Visual',
       disabled: false,
-      allowed: menusPermissions[2].checked === 1
+      allowed: data && data.checkeds.menus_checked[2].checked === 1
     },
     {
       id: 4,
@@ -53,7 +52,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ArrowRightIcon,
       title: 'Gestão de Clientes',
       disabled: false,
-      allowed: menusPermissions[3].checked === 1
+      allowed: data && data.checkeds.menus_checked[3].checked === 1
     },
     {
       id: 5,
@@ -61,7 +60,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ArrowRightIcon,
       title: 'Gestão de Contratos',
       disabled: true,
-      allowed: menusPermissions[4].checked === 1
+      allowed: data && data.checkeds.menus_checked[4].checked === 1
     },
     {
       id: 6,
@@ -69,7 +68,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ArrowRightIcon,
       title: 'Gestão de Processos',
       disabled: true,
-      allowed: menusPermissions[5].checked === 1
+      allowed: data && data.checkeds.menus_checked[5].checked === 1
     },
     {
       id: 7,
@@ -77,7 +76,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: CalendarIcon,
       title: 'Agenda de Reuniões',
       disabled: true,
-      allowed: menusPermissions[6].checked === 1
+      allowed: data && data.checkeds.menus_checked[6].checked === 1
     },
     {
       id: 8,
@@ -85,7 +84,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: MessageIcon,
       title: 'Mensagens',
       disabled: true,
-      allowed: menusPermissions[7].checked === 1
+      allowed: data && data.checkeds.menus_checked[7].checked === 1
     },
     {
       id: 9,
@@ -93,7 +92,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: BellIcon,
       title: 'Lembretes',
       disabled: true,
-      allowed: menusPermissions[8].checked === 1
+      allowed: data && data.checkeds.menus_checked[8].checked === 1
     },
     {
       id: 10,
@@ -101,7 +100,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: FileIcon,
       title: 'Relatórios',
       disabled: true,
-      allowed: menusPermissions[9].checked === 1
+      allowed: data && data.checkeds.menus_checked[9].checked === 1
     },
     {
       id: 11,
@@ -109,7 +108,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: UsersIcon,
       title: 'Usuários',
       disabled: false,
-      allowed: menusPermissions[10].checked === 1
+      allowed: data && data.checkeds.menus_checked[10].checked === 1
     },
     {
       id: 12,
@@ -117,7 +116,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: UserIcon,
       title: 'Perfil de Usuários',
       disabled: false,
-      allowed: menusPermissions[11].checked === 1
+      allowed: data && data.checkeds.menus_checked[11].checked === 1
     }
   ];
 
