@@ -17,7 +17,12 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Edit, LockOpenRounded, LockRounded } from '@material-ui/icons';
+import {
+  Edit,
+  LockOpenRounded,
+  LockRounded,
+  Visibility
+} from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useContext, useState } from 'react';
@@ -145,6 +150,28 @@ const UserManagement = (listUsers) => {
                     {moment(user.created_at).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
+                    <Tooltip title="Visualizar">
+                      {data &&
+                      data.checkeds.permissions_checked[10][1].checked === 0 ? (
+                        <Visibility
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                          cursor="pointer"
+                        ></Visibility>
+                      ) : (
+                        <Visibility
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/users/edit', {
+                              state: { user, show: true }
+                            });
+                          }}
+                        ></Visibility>
+                      )}
+                    </Tooltip>
                     <Tooltip title="Editar">
                       {data &&
                       data.checkeds.permissions_checked[10][2].checked === 0 ? (
@@ -155,18 +182,13 @@ const UserManagement = (listUsers) => {
                             pointerEvents: 'none'
                           }}
                           cursor="pointer"
-                          onClick={() => {
-                            navigate('/users/edit', {
-                              state: { user }
-                            });
-                          }}
                         ></Edit>
                       ) : (
                         <Edit
                           cursor="pointer"
                           onClick={() => {
                             navigate('/users/edit', {
-                              state: { user }
+                              state: { user, show: false }
                             });
                           }}
                         ></Edit>

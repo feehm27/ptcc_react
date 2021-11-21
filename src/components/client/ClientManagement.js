@@ -17,7 +17,7 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Delete, DownloadRounded, Edit } from '@material-ui/icons';
+import { Delete, DownloadRounded, Edit, Visibility } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useContext, useState } from 'react';
@@ -138,6 +138,27 @@ const ClientManagement = (listClients) => {
                     {moment(client.birthday).format('MM/DD/YYYY')}
                   </TableCell>
                   <TableCell>
+                    <Tooltip title="Visualizar">
+                      {data &&
+                      data.checkeds.permissions_checked[3][1].checked === 0 ? (
+                        <Visibility
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                        ></Visibility>
+                      ) : (
+                        <Visibility
+                          cursor="pointer"
+                          onClick={() => {
+                            navigate('/clients/edit', {
+                              state: { client, show: true }
+                            });
+                          }}
+                        ></Visibility>
+                      )}
+                    </Tooltip>
                     <Tooltip title="Editar">
                       {data &&
                       data.checkeds.permissions_checked[3][2].checked === 0 ? (
@@ -150,7 +171,7 @@ const ClientManagement = (listClients) => {
                           cursor="pointer"
                           onClick={() => {
                             navigate('/clients/edit', {
-                              state: { client }
+                              state: { client, show: false }
                             });
                           }}
                         ></Edit>

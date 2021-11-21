@@ -23,7 +23,7 @@ import ToastAnimated, { showToast } from '../Toast';
 const UserEdit = () => {
   const navigate = useNavigate();
   const { data } = useContext(UserContext);
-  const { user } = useLocation().state;
+  const { user, show } = useLocation().state;
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -126,6 +126,7 @@ const UserEdit = () => {
                         value={values.name}
                         required
                         variant="outlined"
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
@@ -152,6 +153,7 @@ const UserEdit = () => {
                         required
                         value={values.email}
                         variant="outlined"
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={12} xs={12}>
@@ -160,6 +162,7 @@ const UserEdit = () => {
                           <Checkbox
                             checked={checked}
                             color="primary"
+                            disabled={show}
                             onChange={(e) => {
                               handleChangeChecked(e);
                               setShowSuccess(false);
@@ -171,7 +174,7 @@ const UserEdit = () => {
                     </Grid>
                     <Grid item md={6} xs={12}>
                       <TextField
-                        disabled={!checked}
+                        disabled={!checked || show}
                         error={errors.profile}
                         fullWidth
                         helperText={errors.profile}
@@ -227,8 +230,10 @@ const UserEdit = () => {
                       variant="contained"
                       type="submit"
                       disabled={
-                        data &&
-                        data.checkeds.permissions_checked[10][0].checked === 0
+                        (data &&
+                          data.checkeds.permissions_checked[10][0].checked ===
+                            0) ||
+                        show
                       }
                       onClick={submitForm}
                     >

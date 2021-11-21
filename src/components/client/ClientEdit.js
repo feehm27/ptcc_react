@@ -35,7 +35,7 @@ const gender = GenderConstants;
 const ClientEdit = () => {
   const navigate = useNavigate();
   const { data } = useContext(UserContext);
-  const { client } = useLocation().state;
+  const { client, show } = useLocation().state;
   const [address, setAddress] = useState([]);
   const [error, setError] = useState(null);
   const [loadingAddress, setLoadingAddress] = useState(false);
@@ -215,6 +215,7 @@ const ClientEdit = () => {
                     value={values.name}
                     required
                     variant="outlined"
+                    disabled={show}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -241,37 +242,75 @@ const ClientEdit = () => {
                     required
                     value={values.email}
                     variant="outlined"
+                    disabled={show}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <ReactInputMask
-                    mask="999.999.999-99"
-                    value={values.cpf}
-                    onChange={(event) => {
-                      if (error && error.cpf) {
-                        error.cpf = null;
-                      }
-                      handleChange(event);
-                      setShowSuccess(false);
-                    }}
-                  >
-                    {() => (
-                      <TextField
-                        error={
-                          errors.cpf || (error && error.cpf ? error.cpf[0] : '')
+                  {show ? (
+                    <ReactInputMask
+                      mask="999.999.999-99"
+                      value={values.cpf}
+                      disabled={show}
+                      onChange={(event) => {
+                        if (error && error.cpf) {
+                          error.cpf = null;
                         }
-                        fullWidth
-                        helperText={
-                          errors.cpf || (error && error.cpf ? error.cpf[0] : '')
+                        handleChange(event);
+                        setShowSuccess(false);
+                      }}
+                    >
+                      {() => (
+                        <TextField
+                          error={
+                            errors.cpf ||
+                            (error && error.cpf ? error.cpf[0] : '')
+                          }
+                          fullWidth
+                          helperText={
+                            errors.cpf ||
+                            (error && error.cpf ? error.cpf[0] : '')
+                          }
+                          label="CPF"
+                          name="cpf"
+                          required
+                          variant="outlined"
+                          maxLength="14"
+                          disabled={show}
+                        />
+                      )}
+                    </ReactInputMask>
+                  ) : (
+                    <ReactInputMask
+                      mask="999.999.999-99"
+                      value={values.cpf}
+                      onChange={(event) => {
+                        if (error && error.cpf) {
+                          error.cpf = null;
                         }
-                        label="CPF"
-                        name="cpf"
-                        required
-                        variant="outlined"
-                        maxLength="14"
-                      />
-                    )}
-                  </ReactInputMask>
+                        handleChange(event);
+                        setShowSuccess(false);
+                      }}
+                    >
+                      {() => (
+                        <TextField
+                          error={
+                            errors.cpf ||
+                            (error && error.cpf ? error.cpf[0] : '')
+                          }
+                          fullWidth
+                          helperText={
+                            errors.cpf ||
+                            (error && error.cpf ? error.cpf[0] : '')
+                          }
+                          label="CPF"
+                          name="cpf"
+                          required
+                          variant="outlined"
+                          maxLength="14"
+                        />
+                      )}
+                    </ReactInputMask>
+                  )}
                 </Grid>
                 <Grid item md={3} xs={12}>
                   <TextField
@@ -291,6 +330,7 @@ const ClientEdit = () => {
                     required
                     value={values.rg}
                     variant="outlined"
+                    disabled={show}
                   />
                 </Grid>
                 <Grid item md={3} xs={12}>
@@ -311,6 +351,7 @@ const ClientEdit = () => {
                     required
                     value={values.issuing_organ}
                     variant="outlined"
+                    disabled={show}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -334,6 +375,7 @@ const ClientEdit = () => {
                       }}
                       name="birthday"
                       required
+                      disabled={show}
                     />
                   </MuiPickersUtilsProvider>
                 </Grid>
@@ -355,6 +397,7 @@ const ClientEdit = () => {
                     required
                     value={values.nationality}
                     variant="outlined"
+                    disabled={show}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -377,6 +420,7 @@ const ClientEdit = () => {
                     SelectProps={{ native: true }}
                     value={values.gender}
                     variant="outlined"
+                    disabled={show}
                   >
                     {gender.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -405,6 +449,7 @@ const ClientEdit = () => {
                     SelectProps={{ native: true }}
                     value={values.civil_status}
                     variant="outlined"
+                    disabled={show}
                   >
                     {civilStatus.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -415,6 +460,7 @@ const ClientEdit = () => {
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <ReactInputMask
+                    disabled={show}
                     mask="(99) 99999-9999"
                     value={values.cellphone}
                     onChange={(event) => {
@@ -431,12 +477,14 @@ const ClientEdit = () => {
                         name="cellphone"
                         required
                         variant="outlined"
+                        disabled={show}
                       />
                     )}
                   </ReactInputMask>
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <ReactInputMask
+                    disabled={show}
                     mask="(99) 9999-9999"
                     value={values.telephone}
                     onChange={(event) => {
@@ -452,6 +500,7 @@ const ClientEdit = () => {
                         label="Telefone Fixo"
                         name="telephone"
                         variant="outlined"
+                        disabled={show}
                       />
                     )}
                   </ReactInputMask>
@@ -466,6 +515,7 @@ const ClientEdit = () => {
               <Grid container spacing={3}>
                 <Grid item md={6} xs={12}>
                   <ReactInputMask
+                    disabled={show}
                     mask="99.999-999"
                     value={values.cep}
                     onChange={(event) => {
@@ -491,6 +541,7 @@ const ClientEdit = () => {
                         required
                         variant="outlined"
                         maxLength="8"
+                        disabled={show}
                       />
                     )}
                   </ReactInputMask>
@@ -526,6 +577,7 @@ const ClientEdit = () => {
                         value={address.street ? address.street : values.street}
                         variant="outlined"
                         required
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
@@ -546,6 +598,7 @@ const ClientEdit = () => {
                         value={values.number}
                         variant="outlined"
                         required
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
@@ -569,6 +622,7 @@ const ClientEdit = () => {
                         }
                         variant="outlined"
                         required
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
@@ -588,6 +642,7 @@ const ClientEdit = () => {
                         }}
                         value={values.complement}
                         variant="outlined"
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
@@ -609,6 +664,7 @@ const ClientEdit = () => {
                         value={address.state ? address.state : values.state}
                         variant="outlined"
                         required
+                        disabled={show}
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
@@ -630,6 +686,7 @@ const ClientEdit = () => {
                         value={address.city ? address.city : values.city}
                         variant="outlined"
                         required
+                        disabled={show}
                       />
                     </Grid>
                   </>
@@ -662,8 +719,10 @@ const ClientEdit = () => {
                     variant="contained"
                     type="submit"
                     disabled={
-                      data &&
-                      data.checkeds.permissions_checked[3][2].checked === 0
+                      (data &&
+                        data.checkeds.permissions_checked[3][2].checked ===
+                          0) ||
+                      show
                     }
                     onClick={submitForm}
                   >
