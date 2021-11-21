@@ -115,7 +115,8 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       href: '/users/profile',
       icon: UserIcon,
       title: 'Perfil de Usuários',
-      disabled: false
+      disabled: false,
+      allowed: true
     }
   ];
 
