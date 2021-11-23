@@ -205,6 +205,16 @@ const Login = () => {
                     <span>Cadastre-se</span>
                   </Link>
                 </Typography>
+                <Typography color="textSecondary" variant="body1">
+                  Esqueceu sua senha ?{' '}
+                  <Link
+                    component={RouterLink}
+                    to="/reset-password"
+                    variant="h6"
+                  >
+                    <span>Recuperar senha</span>
+                  </Link>
+                </Typography>
               </form>
             )}
           </Formik>
