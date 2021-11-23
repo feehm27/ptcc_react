@@ -15,6 +15,7 @@ import UserEdit from './components/users/UserEdit';
 import { UserStorage } from './contexts/UserContext';
 import ProtectedRoute from './helpers/Route/ProtectedRoute';
 import Account from './pages/Account';
+import ChangePassword from './pages/ChangePassword';
 import Client from './pages/Client';
 import Construction from './pages/Construction';
 import CustomerList from './pages/CustomerList';
@@ -27,6 +28,7 @@ import NotAllowed from './pages/NotAllowed';
 import NotFound from './pages/NotFound';
 import ProductList from './pages/ProductList';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
@@ -41,6 +43,11 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="register" element={<Register />} />
+              <Route path="reset-password" element={<ResetPassword />} />
+              <Route
+                path="change-password/:token"
+                element={<ChangePassword />}
+              />
               <MainLayout>
                 <Route path="*" element={<Navigate to="/404" />} />
                 <Route path="/" element={<Navigate to="/login" />} />
