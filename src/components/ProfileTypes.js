@@ -126,8 +126,13 @@ const ProfileTypes = () => {
 
     Object.values(menusChecked)[index].checked = e.target.checked;
 
-    setCheckedMenu(e.target.checked);
     setMenusChecked(Object.values(menusChecked));
+
+    const allMenusCheckeds = Object.values(menusChecked).every((menu) => {
+      return menu.checked === true || menu.checked === 1;
+    });
+
+    setCheckedMenu(allMenusCheckeds);
 
     const menuSelected = {
       id: menuId,
@@ -137,6 +142,13 @@ const ProfileTypes = () => {
     permissionsChecked[menuId - 1].map((permission) => {
       permission.checked = e.target.checked;
     });
+
+    const allPermissionsCheckeds = permissionsChecked[menuId - 1].every(
+      (permission) => {
+        return permission.checked === true || permission.checked === 1;
+      }
+    );
+    setCheckedPermission(allPermissionsCheckeds);
 
     setCheckedMenuSelected(menuSelected);
     return Object.values(menusChecked)[index].checked;
@@ -154,7 +166,13 @@ const ProfileTypes = () => {
       }
     });
 
-    setCheckedPermission(e.target.checked);
+    const allPermissionsCheckeds = permissionsChecked[
+      selectedMenu.id - 1
+    ].every((permission) => {
+      return permission.checked === true || permission.checked === 1;
+    });
+
+    setCheckedPermission(allPermissionsCheckeds);
 
     const permissionSelected = {
       menuId: selectedMenu.id,
