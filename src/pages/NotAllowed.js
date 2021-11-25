@@ -14,13 +14,13 @@ const NotAllowed = () => (
       </Typography>
       <Box sx={{ textAlign: 'center' }}>
         <img
-          alt="Under development"
-          src="/static/images/not-allowed.png"
+          alt="Sem permissão"
+          src="https://advoguez-images.s3.sa-east-1.amazonaws.com/not_allowed.png"
           style={{
             marginTop: 50,
             display: 'inline-block',
             maxWidth: '100%',
-            width: 480
+            width: 380
           }}
         />
       </Box>
