@@ -85,6 +85,14 @@ const ClientEdit = () => {
     }
   }
 
+  const checkedPermission = () => {
+    if (data && !data.isAdmin) {
+      return data.checkeds.permissions_checked[3][2].checked === 0 || show;
+    } else {
+      return false || show;
+    }
+  };
+
   /**
    * Obtém o endereço pelo cep digitado
    * @param {*} cep
@@ -718,12 +726,7 @@ const ClientEdit = () => {
                     color="primary"
                     variant="contained"
                     type="submit"
-                    disabled={
-                      (data &&
-                        data.checkeds.permissions_checked[3][2].checked ===
-                          0) ||
-                      show
-                    }
+                    disabled={checkedPermission()}
                     onClick={submitForm}
                   >
                     Salvar

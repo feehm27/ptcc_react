@@ -21,7 +21,9 @@ const ClientListToolbar = (clients) => {
           variant="contained"
           onClick={() => navigate('/clients/create')}
           disabled={
-            data && data.checkeds.permissions_checked[3][0].checked === 0
+            data && !data.isAdmin
+              ? data.checkeds.permissions_checked[3][0].checked === 0
+              : false
           }
         >
           Novo Cliente
@@ -40,7 +42,9 @@ const ClientListToolbar = (clients) => {
           color="primary"
           variant="contained"
           disabled={
-            data && data.checkeds.permissions_checked[3][0].checked === 0
+            data && !data.isAdmin
+              ? data.checkeds.permissions_checked[3][0].checked === 0
+              : false
           }
           onClick={() => navigate('/clients/create')}
         >
@@ -51,7 +55,9 @@ const ClientListToolbar = (clients) => {
           color="primary"
           variant="contained"
           disabled={
-            data && data.checkeds.permissions_checked[3][4].checked === 0
+            data && !data.isAdmin
+              ? data.checkeds.permissions_checked[3][4].checked === 0
+              : false
           }
           onClick={() => navigate('/clients/create')}
         >

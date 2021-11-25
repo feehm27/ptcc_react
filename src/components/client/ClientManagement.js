@@ -50,6 +50,17 @@ const ClientManagement = (listClients) => {
     setShowModal(false);
   };
 
+  const checkedPermission = (positionMenu, positionPermission) => {
+    if (data && !data.isAdmin) {
+      return (
+        data.checkeds.permissions_checked[positionMenu][positionPermission]
+          .checked === 0
+      );
+    } else {
+      return false;
+    }
+  };
+
   /**
    * Envia os dados do advogado
    * @param {*} values
@@ -139,8 +150,7 @@ const ClientManagement = (listClients) => {
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar">
-                      {data &&
-                      data.checkeds.permissions_checked[3][1].checked === 0 ? (
+                      {checkedPermission(3, 1) ? (
                         <Visibility
                           style={{
                             color: '#c0c0c0',
@@ -160,8 +170,7 @@ const ClientManagement = (listClients) => {
                       )}
                     </Tooltip>
                     <Tooltip title="Editar">
-                      {data &&
-                      data.checkeds.permissions_checked[3][2].checked === 0 ? (
+                      {checkedPermission(3, 2) ? (
                         <Edit
                           style={{
                             color: '#c0c0c0',
@@ -187,8 +196,7 @@ const ClientManagement = (listClients) => {
                       )}
                     </Tooltip>
                     <Tooltip title="Exportar">
-                      {data &&
-                      data.checkeds.permissions_checked[3][3].checked === 0 ? (
+                      {checkedPermission(3, 3) ? (
                         <DownloadRounded
                           style={{
                             color: '#c0c0c0',
@@ -202,8 +210,7 @@ const ClientManagement = (listClients) => {
                       )}
                     </Tooltip>
                     <Tooltip title="Excluir">
-                      {data &&
-                      data.checkeds.permissions_checked[3][4].checked === 0 ? (
+                      {checkedPermission(3, 4) ? (
                         <Delete
                           style={{
                             color: '#c0c0c0',

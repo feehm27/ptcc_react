@@ -178,8 +178,9 @@ const VisualIdentity = () => {
                     variant="contained"
                     type="submit"
                     disabled={
-                      data &&
-                      data.checkeds.permissions_checked[2][0].checked === 0
+                      data && !data.isAdmin
+                        ? data.checkeds.permissions_checked[2][0].checked === 0
+                        : false
                     }
                   >
                     Salvar

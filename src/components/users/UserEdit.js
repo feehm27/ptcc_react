@@ -73,6 +73,14 @@ const UserEdit = () => {
     if (isEmpty(errors)) updateUser(values);
   };
 
+  const checkedPermission = () => {
+    if (data && !data.isAdmin) {
+      return data.checkeds.permissions_checked[10][0].checked === 0 || show;
+    } else {
+      return false || show;
+    }
+  };
+
   /**
    * Use Effect
    */
@@ -229,12 +237,7 @@ const UserEdit = () => {
                       color="primary"
                       variant="contained"
                       type="submit"
-                      disabled={
-                        (data &&
-                          data.checkeds.permissions_checked[10][0].checked ===
-                            0) ||
-                        show
-                      }
+                      disabled={checkedPermission()}
                       onClick={submitForm}
                     >
                       Salvar
