@@ -24,33 +24,11 @@ const ChangePassword = () => {
   const [registerError, setRegisterErrors] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  async function changePassword(password) {
-    setSubmitting(true);
-    showSuccess.current = false;
-    const config = {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-
-    await API.put('/user/change/password', { password }, config)
-      .then((response) => {
-        if (response.data.status_code === 400) {
-          setRegisterErrors(response.data.data);
-        } else {
-          showSuccess.current = true;
-          setRegisterErrors('');
-        }
-      })
-      .catch(() => {
-        setRegisterErrors('Um erro inesperado aconteceu.');
-        showSuccess.current = false;
-      });
-
-    setSubmitting(false);
-  }
-
   async function checkUser(password, errors) {
     if (isEmpty(errors)) {
       setSubmitting(true);
+
+      showSuccess.current = false;
 
       const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -58,11 +36,21 @@ const ChangePassword = () => {
 
       await API.get('/user', config)
         .then(() => {
-          setRegisterErrors('');
-          changePassword(password);
-          showSuccess.current = true;
+          return API.put('/user/change/password', { password }, config)
+            .then((response) => {
+              if (response.data.status_code === 400) {
+                setRegisterErrors(response.data.data);
+              } else {
+                showSuccess.current = true;
+                setRegisterErrors('');
+              }
+            })
+            .catch(() => {
+              setRegisterErrors('Um erro inesperado aconteceu.');
+            });
         })
         .catch(() => {
+          showSuccess.current = false;
           setRegisterErrors(
             'Link expirado ou usuário inválido. Não é possivel realizar a recuperação de senha.'
           );
@@ -192,22 +180,21 @@ const ChangePassword = () => {
                     )}
                   </Stack>
                 </Box>
+                {showSuccess.current && (
+                  <>
+                    <ToastAnimated />
+                    {showToast({
+                      type: 'success',
+                      message: 'Senha alterada com sucesso!'
+                    })}
+                    {setTimeout(() => navigate('/login'), 1500)}
+                  </>
+                )}
               </form>
             )}
           </Formik>
         </Container>
       </Box>
-
-      {showSuccess.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Senha alterada com sucesso!'
-          })}
-          {setTimeout(() => navigate('/login'), 1500)}
-        </>
-      )}
     </>
   );
 };
