@@ -181,7 +181,6 @@ const UserCreate = () => {
                         handleChange(event);
                         setShowSuccess(false);
                       }}
-                      required
                       select
                       SelectProps={{ native: true }}
                       value={values.profile}
@@ -225,8 +224,9 @@ const UserCreate = () => {
                     type="submit"
                     onClick={submitForm}
                     disabled={
-                      data &&
-                      data.checkeds.permissions_checked[10][0].checked === 0
+                      data && !data.isAdmin
+                        ? data.checkeds.permissions_checked[10][0].checked === 0
+                        : false
                     }
                   >
                     Salvar

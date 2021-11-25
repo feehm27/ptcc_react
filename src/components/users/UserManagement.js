@@ -55,6 +55,17 @@ const UserManagement = (listUsers) => {
     setShowModal(false);
   };
 
+  const checkedPermission = (positionMenu, positionPermission) => {
+    if (data && !data.isAdmin) {
+      return (
+        data.checkeds.permissions_checked[positionMenu][positionPermission]
+          .checked === 0
+      );
+    } else {
+      return false;
+    }
+  };
+
   /**
    * Envia os dados do advogado
    * @param {*} values
@@ -151,8 +162,7 @@ const UserManagement = (listUsers) => {
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar">
-                      {data &&
-                      data.checkeds.permissions_checked[10][1].checked === 0 ? (
+                      {checkedPermission(10, 1) ? (
                         <Visibility
                           style={{
                             color: '#c0c0c0',
@@ -173,8 +183,7 @@ const UserManagement = (listUsers) => {
                       )}
                     </Tooltip>
                     <Tooltip title="Editar">
-                      {data &&
-                      data.checkeds.permissions_checked[10][2].checked === 0 ? (
+                      {checkedPermission(10, 2) ? (
                         <Edit
                           style={{
                             color: '#c0c0c0',
@@ -197,9 +206,7 @@ const UserManagement = (listUsers) => {
 
                     {user.blocked ? (
                       <Tooltip title="Desbloquear">
-                        {data &&
-                        data.checkeds.permissions_checked[10][3].checked ===
-                          0 ? (
+                        {checkedPermission(10, 3) ? (
                           <LockOpenRounded
                             style={{
                               color: '#c0c0c0',
@@ -220,9 +227,7 @@ const UserManagement = (listUsers) => {
                       </Tooltip>
                     ) : (
                       <Tooltip title="Bloquear">
-                        {data &&
-                        data.checkeds.permissions_checked[10][3].checked ===
-                          0 ? (
+                        {checkedPermission(10, 3) ? (
                           <LockRounded
                             cursor="pointer"
                             style={{

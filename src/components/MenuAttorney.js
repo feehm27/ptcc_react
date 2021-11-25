@@ -28,7 +28,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ActivityIcon,
       title: 'Dashboard',
       disabled: false,
-      allowed: data && data.checkeds.menus_checked[0].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[0].checked === 1
+          : true
     },
     {
       id: 2,
@@ -36,7 +39,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: InfoIcon,
       title: 'Meus Dados',
       disabled: false,
-      allowed: data && data.checkeds.menus_checked[1].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[1].checked === 1
+          : true
     },
     {
       id: 3,
@@ -44,7 +50,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: CameraIcon,
       title: 'Identidade Visual',
       disabled: false,
-      allowed: data && data.checkeds.menus_checked[2].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[2].checked === 1
+          : true
     },
     {
       id: 4,
@@ -52,7 +61,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ArrowRightIcon,
       title: 'Gestão de Clientes',
       disabled: false,
-      allowed: data && data.checkeds.menus_checked[3].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data && data.checkeds.menus_checked[3].checked === 1
+          : true
     },
     {
       id: 5,
@@ -60,7 +72,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ArrowRightIcon,
       title: 'Gestão de Contratos',
       disabled: true,
-      allowed: data && data.checkeds.menus_checked[4].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[4].checked === 1
+          : true
     },
     {
       id: 6,
@@ -68,7 +83,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ArrowRightIcon,
       title: 'Gestão de Processos',
       disabled: true,
-      allowed: data && data.checkeds.menus_checked[5].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[5].checked === 1
+          : true
     },
     {
       id: 7,
@@ -76,7 +94,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: CalendarIcon,
       title: 'Agenda de Reuniões',
       disabled: true,
-      allowed: data && data.checkeds.menus_checked[6].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[6].checked === 1
+          : true
     },
     {
       id: 8,
@@ -84,7 +105,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: MessageIcon,
       title: 'Mensagens',
       disabled: true,
-      allowed: data && data.checkeds.menus_checked[7].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[7].checked === 1
+          : true
     },
     {
       id: 9,
@@ -92,7 +116,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: BellIcon,
       title: 'Lembretes',
       disabled: true,
-      allowed: data && data.checkeds.menus_checked[8].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[8].checked === 1
+          : true
     },
     {
       id: 10,
@@ -100,7 +127,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: FileIcon,
       title: 'Relatórios',
       disabled: true,
-      allowed: data && data.checkeds.menus_checked[9].checked === 1
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[9].checked === 1
+          : true
     },
     {
       id: 11,
@@ -108,17 +138,23 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: UsersIcon,
       title: 'Usuários',
       disabled: false,
-      allowed: data && data.checkeds.menus_checked[10].checked === 1
-    },
-    {
+      allowed:
+        data && !data.isAdmin
+          ? data.checkeds.menus_checked[10].checked === 1
+          : true
+    }
+  ];
+
+  if (data && data.isAdmin) {
+    items.push({
       id: 12,
       href: '/users/profile',
       icon: UserIcon,
       title: 'Perfil de Usuários',
       disabled: false,
       allowed: true
-    }
-  ];
+    });
+  }
 
   useEffect(() => {
     if (openMobile && onMobileClose) {

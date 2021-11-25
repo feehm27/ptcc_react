@@ -749,8 +749,9 @@ const ClientCreate = () => {
                     variant="contained"
                     type="submit"
                     disabled={
-                      data &&
-                      data.checkeds.permissions_checked[3][0].checked === 0
+                      data && !data.isAdmin
+                        ? data.checkeds.permissions_checked[3][0].checked === 0
+                        : false
                     }
                     onClick={submitForm}
                   >
