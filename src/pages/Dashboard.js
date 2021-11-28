@@ -8,51 +8,82 @@ import ContractsByMonth from 'src/components/dashboard/ContractsByMonth';
 import Meetings from 'src/components/dashboard/Meetings';
 import MeetingsPerWeek from 'src/components/dashboard/MeetingsPerWeek';
 import ProcessesByStatus from 'src/components/dashboard/ProcessesByStatus';
+import { UserContext } from 'src/contexts/UserContext';
+import { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 
-const Dashboard = () => (
-  <>
-    <Helmet>
-      <title>Advoguez</title>
-    </Helmet>
-    <Box
-      sx={{
-        backgroundColor: 'background.default',
-        minHeight: '50%',
-        py: 3
-      }}
-    >
-      <Container maxWidth={false}>
-        <Grid container spacing={3}>
-          <Grid item lg={4} sm={6} xl={3} xs={12}>
-            <Meetings />
-          </Grid>
-          <Grid item lg={4} sm={6} xl={3} xs={12}>
-            <Clients />
-          </Grid>
+const Dashboard = () => {
+  const { data } = useContext(UserContext);
+  const navigate = useNavigate();
 
-          <Grid item lg={4} sm={6} xl={3} xs={12}>
-            <ActiveContracts />
-          </Grid>
-          <Grid item lg={4} md={6} xl={3} xs={12}>
-            <ProcessesByStatus sx={{ height: '100%' }} />
-          </Grid>
-          <Grid item lg={4} md={6} xl={3} xs={12}>
-            <ContractsByMonth />
-          </Grid>
+  const checkPermissionDashboard = () => {
+    let isAllowed = true;
 
-          <Grid item lg={4} md={6} xl={3} xs={12}>
-            <MeetingsPerWeek sx={{ height: '100%' }} />
+    if (data && !data.isAdmin) {
+      if (
+        data.checkeds.menus_checked[0].checked === 0 ||
+        data.checkeds.permissions_checked[0][0].checked === 0
+      ) {
+        isAllowed = false;
+      }
+    }
+    return isAllowed;
+  };
+
+  useEffect(() => {
+    console.log('aqui dentro');
+    const isAllowed = checkPermissionDashboard();
+
+    if (!isAllowed) {
+      navigate('/not-allowed');
+    }
+  });
+
+  return (
+    <>
+      <Helmet>
+        <title>Advoguez</title>
+      </Helmet>
+      <Box
+        sx={{
+          backgroundColor: 'background.default',
+          minHeight: '50%',
+          py: 3
+        }}
+      >
+        <Container maxWidth={false}>
+          <Grid container spacing={3}>
+            <Grid item lg={4} sm={6} xl={3} xs={12}>
+              <Meetings />
+            </Grid>
+            <Grid item lg={4} sm={6} xl={3} xs={12}>
+              <Clients />
+            </Grid>
+
+            <Grid item lg={4} sm={6} xl={3} xs={12}>
+              <ActiveContracts />
+            </Grid>
+            <Grid item lg={4} md={6} xl={3} xs={12}>
+              <ProcessesByStatus sx={{ height: '100%' }} />
+            </Grid>
+            <Grid item lg={4} md={6} xl={3} xs={12}>
+              <ContractsByMonth />
+            </Grid>
+
+            <Grid item lg={4} md={6} xl={3} xs={12}>
+              <MeetingsPerWeek sx={{ height: '100%' }} />
+            </Grid>
+            <Grid item lg={8} md={12} xl={9} xs={12}>
+              <AnnualProfit />
+            </Grid>
+            <Grid item lg={4} md={6} xl={3} xs={12}>
+              <ClientsByYear />
+            </Grid>
           </Grid>
-          <Grid item lg={8} md={12} xl={9} xs={12}>
-            <AnnualProfit />
-          </Grid>
-          <Grid item lg={4} md={6} xl={3} xs={12}>
-            <ClientsByYear />
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
-  </>
-);
+        </Container>
+      </Box>
+    </>
+  );
+};
 
 export default Dashboard;
