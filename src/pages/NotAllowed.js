@@ -4,7 +4,7 @@ import { Box, Button, Container, Typography } from '@material-ui/core';
 const NotAllowed = () => (
   <>
     <Helmet>
-      <title>Construção</title>
+      <title>Permissão negada</title>
     </Helmet>
     <Container sx={{ mt: 2 }}>
       <Typography color="primary" variant="h3" align="center">

@@ -21,6 +21,20 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
   const { data } = useContext(UserContext);
   const location = useLocation();
 
+  const checkPermissionDashboard = () => {
+    let isAllowed = true;
+
+    if (data && !data.isAdmin) {
+      if (
+        data.checkeds.menus_checked[0].checked === 0 ||
+        data.checkeds.permissions_checked[0][0].checked === 0
+      ) {
+        isAllowed = false;
+      }
+    }
+    return isAllowed;
+  };
+
   const items = [
     {
       id: 1,
@@ -28,10 +42,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       icon: ActivityIcon,
       title: 'Dashboard',
       disabled: false,
-      allowed:
-        data && !data.isAdmin
-          ? data.checkeds.menus_checked[0].checked === 1
-          : true
+      allowed: checkPermissionDashboard()
     },
     {
       id: 2,
