@@ -20,21 +20,24 @@ import {
 import { Delete, DownloadRounded, Edit, Visibility } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
-import { API } from 'src/services/api';
 import { UserContext } from 'src/contexts/UserContext';
+import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const ClientManagement = (listClients) => {
   const navigate = useNavigate();
+  const showExportSuccess = useRef(false);
   const { data } = useContext(UserContext);
+
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listClients.clients);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [selectedClient, setSelectedClient] = useState([]);
   const [searched, setSearched] = useState('');
 
@@ -60,6 +63,33 @@ const ClientManagement = (listClients) => {
       return false;
     }
   };
+
+  /**
+   * Exporta todos os clientes em PDF
+   * @param {*} values
+   */
+  async function exportClient(clientId) {
+    setSubmitting(true);
+    showExportSuccess.current = false;
+
+    const token = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+
+    await API.post('/advocates/clients/download', { id: clientId }, config)
+      .then((response) => {
+        if (response.data.link) {
+          window.open(response.data.link);
+          showExportSuccess.current = true;
+        }
+      })
+      .catch(() => {
+        showExportSuccess.current = false;
+      });
+
+    setSubmitting(false);
+  }
 
   /**
    * Envia os dados do advogado
@@ -178,24 +208,19 @@ const ClientManagement = (listClients) => {
                             pointerEvents: 'none'
                           }}
                           cursor="pointer"
-                          onClick={() => {
-                            navigate('/clients/edit', {
-                              state: { client, show: false }
-                            });
-                          }}
                         ></Edit>
                       ) : (
                         <Edit
                           cursor="pointer"
                           onClick={() => {
                             navigate('/clients/edit', {
-                              state: { client }
+                              state: { client, show: false }
                             });
                           }}
                         ></Edit>
                       )}
                     </Tooltip>
-                    <Tooltip title="Exportar">
+                    <Tooltip title={submitting ? 'Exportando..' : 'Exportar'}>
                       {checkedPermission(3, 3) ? (
                         <DownloadRounded
                           style={{
@@ -206,7 +231,11 @@ const ClientManagement = (listClients) => {
                           cursor="pointer"
                         ></DownloadRounded>
                       ) : (
-                        <DownloadRounded cursor="pointer"></DownloadRounded>
+                        <DownloadRounded
+                          cursor="pointer"
+                          onClick={() => exportClient(client.id)}
+                          disabled={submitting}
+                        ></DownloadRounded>
                       )}
                     </Tooltip>
                     <Tooltip title="Excluir">
@@ -285,6 +314,15 @@ const ClientManagement = (listClients) => {
             </DialogActions>
           </Dialog>
         </div>
+      )}
+      {showExportSuccess.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Cliente exportado com sucesso!'
+          })}
+        </>
       )}
       {showSuccess && (
         <>
