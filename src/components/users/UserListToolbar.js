@@ -7,7 +7,7 @@ const UserListToolbar = (users) => {
   const navigate = useNavigate();
   const { data } = useContext(UserContext);
 
-  return users.length === 0 ? (
+  return users.users.length === 0 ? (
     <Box>
       <Box
         sx={{
