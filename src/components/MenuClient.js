@@ -49,10 +49,10 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 14,
-      href: '/construction',
+      href: '/contacts',
       icon: MessageIcon,
       title: 'Contato',
-      disabled: true,
+      disabled: false,
       allowed: data && data.checkeds.menus_checked[13].checked === 1
     }
   ];
