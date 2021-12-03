@@ -158,7 +158,7 @@ const UserManagement = (listUsers) => {
                     {user.is_advocate ? 'Advogado' : 'Cliente'}
                   </TableCell>
                   <TableCell>
-                    {moment(user.created_at).format('MM/DD/YYYY')}
+                    {moment(user.created_at).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar">
@@ -320,7 +320,9 @@ const UserManagement = (listUsers) => {
               selectedUser.blocked ? 'desbloqueado' : 'bloqueado'
             } com sucesso!`
           })}
-          {setTimeout(() => window.location.reload(), 1000)}
+          {setTimeout(() => {
+            window.location.reload();
+          }, 500)}
         </>
       )}
     </Card>

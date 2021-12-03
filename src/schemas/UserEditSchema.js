@@ -10,7 +10,14 @@ const UserEditScheam = Yup.object().shape({
     .required('Campo obrigatório')
     .test('isNull', 'Campo obrigatório', (value) => {
       return value !== '0';
-    })
+    }),
+  client: Yup.string().test(
+    'required',
+    'Campo obrigatório',
+    function selectedClient(value) {
+      return value !== '0' || Yup.ref('profile') === 2;
+    }
+  )
 });
 
 export default UserEditScheam;

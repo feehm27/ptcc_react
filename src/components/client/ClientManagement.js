@@ -162,6 +162,7 @@ const ClientManagement = (listClients) => {
                 <TableCell>CPF</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Data de nascimento</TableCell>
+                <TableCell>Data de cadastro</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -176,7 +177,10 @@ const ClientManagement = (listClients) => {
                   <TableCell>{client.cpf}</TableCell>
                   <TableCell>{client.email}</TableCell>
                   <TableCell>
-                    {moment(client.birthday).format('MM/DD/YYYY')}
+                    {moment(client.birthday).format('DD/MM/YYYY')}
+                  </TableCell>
+                  <TableCell>
+                    {moment(client.created_at).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar">

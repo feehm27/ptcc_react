@@ -19,7 +19,7 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
@@ -40,8 +40,10 @@ const ClientCreate = () => {
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [selectedDate, handleDateChange] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [token, setToken] = useState();
+
+  const showSuccess = useRef(false);
+  const showError = useRef(false);
 
   /**
    * Envia os dados do advogado
@@ -49,7 +51,8 @@ const ClientCreate = () => {
    */
   async function sendClient(values) {
     setSubmitting(true);
-    setShowSuccess(false);
+    showSuccess.current = false;
+    showError.current = false;
 
     const config = {
       headers: { Authorization: `Bearer ${token}` }
@@ -69,21 +72,32 @@ const ClientCreate = () => {
         values.state = address.state;
       }
 
-      values.birthday = moment(selectedDate).format('YYYY-MM-DD');
+      const birthday = moment(selectedDate).format('YYYY-MM-DD');
 
-      await API.post('advocates/clients', values, config)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((err) => {
-          setError(err.response.data.errors);
-          setShowSuccess(false);
-        })
-        .finally(() => {
-          setSubmitting(false);
-          setShowSuccess(true);
+      if (birthday === 'Invalid date') {
+        setError({
+          birthday: ['Data inválida']
         });
+      } else {
+        values.birthday = birthday;
+        setError('');
+        await API.post('advocates/clients', values, config)
+          .then(() => {
+            showSuccess.current = true;
+          })
+          .catch((err) => {
+            const allErrors = err.response.data.errors;
+            if (allErrors.email || allErrors.cpf || allErrors.email_user) {
+              setError(err.response.data.errors);
+            } else {
+              setError('');
+              showError.current = true;
+            }
+            showSuccess.current = false;
+          });
+      }
     }
+    setSubmitting(false);
   }
 
   /**
@@ -108,11 +122,10 @@ const ClientCreate = () => {
             district: response.bairro,
             street: response.logradouro
           });
-
-          errors.cep = null;
-          errors.state = null;
-          errors.city = null;
-          errors.district = null;
+          delete errors.cep;
+          delete errors.state;
+          delete errors.city;
+          delete errors.district;
           setLoadingAddress(false);
           setError({ cep: null });
         }
@@ -123,23 +136,23 @@ const ClientCreate = () => {
    * Envia os dados do formulário
    * @param {*} values
    */
-  const handleSubmit = (values, errors, setFieldError) => {
+  const handleSubmit = (values, errors) => {
     if (address && address.street) {
       delete errors.street;
-      setFieldError('street', null);
     }
     if (address && address.district) {
       delete errors.district;
-      setFieldError('district', null);
     }
     if (address && address.city) {
       delete errors.city;
-      setFieldError('city', null);
     }
     if (address && address.state) {
       delete errors.state;
-      setFieldError('state', null);
     }
+    if (values.birthday !== 'Invalid Date') {
+      delete errors.birthday;
+    }
+
     if (isEmpty(errors)) sendClient(values);
   };
 
@@ -179,21 +192,14 @@ const ClientCreate = () => {
       validationSchema={ClientSchema}
       onSubmit={handleSubmit}
     >
-      {({
-        errors,
-        handleBlur,
-        handleChange,
-        values,
-        submitForm,
-        setFieldError,
-        touched
-      }) => (
+      {({ errors, handleBlur, handleChange, values, submitForm }) => (
         <form
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            setShowSuccess(false);
-            handleSubmit(values, errors, setFieldError);
+            showSuccess.current = false;
+            showError.current = false;
+            handleSubmit(values, errors);
           }}
         >
           <Card>
@@ -210,11 +216,13 @@ const ClientCreate = () => {
                     name="name"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     value={values.name}
                     required
@@ -236,11 +244,13 @@ const ClientCreate = () => {
                     name="email"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.email}
@@ -256,7 +266,8 @@ const ClientCreate = () => {
                         error.cpf = null;
                       }
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -286,11 +297,13 @@ const ClientCreate = () => {
                     name="rg"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.rg}
@@ -306,11 +319,13 @@ const ClientCreate = () => {
                     name="issuing_organ"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.issuing_organ}
@@ -320,16 +335,35 @@ const ClientCreate = () => {
                 <Grid item md={6} xs={12}>
                   <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                     <KeyboardDatePicker
-                      error={Boolean(touched.birthday && errors.birthday)}
+                      error={
+                        errors.birthday ||
+                        (error && error.birthday ? error.birthday[0] : '')
+                      }
+                      fullWidth
+                      helperText={
+                        errors.birthday ||
+                        (error && error.birthday ? error.birthday[0] : '')
+                      }
                       disableFuture
-                      helperText={touched.birthday && errors.birthday}
                       openTo="year"
                       format="dd/MM/yyyy"
                       label="Data de nascimento"
                       views={['year', 'month', 'date']}
                       value={selectedDate}
-                      onChange={handleDateChange}
-                      onBlur={handleBlur}
+                      onChange={(e) => {
+                        handleDateChange(e);
+                        if (e !== 'Invalid Date') {
+                          errors.birthday = '';
+                          setError({ birthday: '' });
+                        }
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onBlur={(e) => {
+                        showSuccess.current = false;
+                        showError.current = false;
+                        handleBlur(e);
+                      }}
                       name="birthday"
                       required
                     />
@@ -344,11 +378,13 @@ const ClientCreate = () => {
                     name="nationality"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.nationality}
@@ -364,11 +400,13 @@ const ClientCreate = () => {
                     name="gender"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     select
@@ -392,11 +430,13 @@ const ClientCreate = () => {
                     name="civil_status"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     select
@@ -417,7 +457,8 @@ const ClientCreate = () => {
                     value={values.cellphone}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -439,7 +480,8 @@ const ClientCreate = () => {
                     value={values.telephone}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -467,12 +509,18 @@ const ClientCreate = () => {
                     mask="99.999-999"
                     value={values.cep}
                     onChange={(event) => {
+                      values.street = '';
+                      values.number = '';
+                      values.city = '';
+                      values.state = '';
+                      values.district = '';
                       handleChange(event);
                       const unmask = event.target.value.replace(/[^\d]/g, '');
                       if (unmask.length === 8) {
                         getAddressByZipCode(unmask, errors);
                       }
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -514,12 +562,14 @@ const ClientCreate = () => {
                         name="street"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
                           address.street = null;
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={address.street ? address.street : values.street}
                         variant="outlined"
@@ -535,11 +585,13 @@ const ClientCreate = () => {
                         name="number"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={values.number}
                         variant="outlined"
@@ -555,12 +607,14 @@ const ClientCreate = () => {
                         name="district"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           address.district = null;
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={
                           address.district ? address.district : values.district
@@ -578,11 +632,13 @@ const ClientCreate = () => {
                         name="complement"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={values.complement}
                         variant="outlined"
@@ -597,12 +653,14 @@ const ClientCreate = () => {
                         name="state"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           address.state = null;
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={address.state ? address.state : values.state}
                         variant="outlined"
@@ -618,12 +676,14 @@ const ClientCreate = () => {
                         name="city"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           address.city = null;
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={address.city ? address.city : values.city}
                         variant="outlined"
@@ -651,11 +711,13 @@ const ClientCreate = () => {
                       name="name_user"
                       onBlur={(event) => {
                         handleBlur(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                       onChange={(event) => {
                         handleChange(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                       value={values.name_user}
                       required
@@ -670,18 +732,20 @@ const ClientCreate = () => {
                       }
                       fullWidth
                       helperText={
-                        errors.email ||
+                        errors.email_user ||
                         (error && error.email_user ? error.email_user[0] : '')
                       }
                       label="Email"
                       name="email_user"
                       onBlur={(event) => {
                         handleBlur(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                       onChange={(event) => {
                         handleChange(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                       required
                       value={values.email_user}
@@ -761,12 +825,21 @@ const ClientCreate = () => {
               </Stack>
             </Box>
           </Card>
-          {showSuccess && (
+          {showSuccess.current && (
             <>
               <ToastAnimated />
               {showToast({
                 type: 'success',
                 message: 'Cliente criado com sucesso!'
+              })}
+            </>
+          )}
+          {showError.current && (
+            <>
+              <ToastAnimated />
+              {showToast({
+                type: 'error',
+                message: 'Algo de inesperado aconteceu!'
               })}
             </>
           )}

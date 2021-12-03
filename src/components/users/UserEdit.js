@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import UserEditScheam from 'src/schemas/UserEditSchema';
 import { API } from 'src/services/api';
@@ -26,9 +26,11 @@ const UserEdit = () => {
   const { user, show } = useLocation().state;
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [clients, setClients] = useState([]);
   const [checked, setChecked] = useState(false);
   const [token, setToken] = useState();
+
+  const showSuccess = useRef(false);
 
   /**
    * Envia os dados do advogado
@@ -36,7 +38,7 @@ const UserEdit = () => {
    */
   async function updateUser(values) {
     setSubmitting(true);
-    setShowSuccess(false);
+    showSuccess.current = false;
 
     const config = {
       headers: { Authorization: `Bearer ${token}` }
@@ -46,19 +48,20 @@ const UserEdit = () => {
       name: values.name,
       email: values.email,
       is_advocate: values.profile === '1' ? 1 : 0,
-      is_client: values.profile === '2' ? 1 : 0
+      is_client: values.profile === '2' ? 1 : 0,
+      client_id: values.profile === '2' ? values.client : undefined
     };
 
     await API.put(`advocates/users/${user.id}`, treatedValues, config)
-      .then(() => {})
+      .then(() => {
+        showSuccess.current = true;
+      })
       .catch((err) => {
         setError(err.response.data.errors);
-        setShowSuccess(false);
-      })
-      .finally(() => {
-        setSubmitting(false);
-        setShowSuccess(true);
+        showSuccess.current = false;
       });
+
+    setSubmitting(false);
   }
 
   const handleChangeChecked = (event) => {
@@ -82,10 +85,26 @@ const UserEdit = () => {
   };
 
   /**
+   * Obtém os clientes associados ao advocado
+   */
+  async function getClients() {
+    const tokenUser = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${tokenUser}` }
+    };
+    await API.get('advocates/clients', config)
+      .then((response) => {
+        setClients(response.data.data);
+      })
+      .catch((err) => console.error(err));
+  }
+
+  /**
    * Use Effect
    */
   useEffect(() => {
     setToken(window.localStorage.getItem('token'));
+    getClients();
   }, []);
 
   return (
@@ -95,7 +114,11 @@ const UserEdit = () => {
         email: user.email || '',
         password: user.password || '',
         profile: user.is_advocate ? '1' : '2',
-        confirm_password: user.password || ''
+        confirm_password: user.password || '',
+        client:
+          user.client_user && user.client_user[0]
+            ? user.client_user[0].client_id
+            : '0'
       }}
       validationSchema={UserEditScheam}
       onSubmit={handleSubmit}
@@ -105,7 +128,7 @@ const UserEdit = () => {
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            setShowSuccess(false);
+            showSuccess.current = false;
             handleSubmit(values, errors);
           }}
         >
@@ -125,11 +148,11 @@ const UserEdit = () => {
                         name="name"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
                         }}
                         value={values.name}
                         required
@@ -152,11 +175,11 @@ const UserEdit = () => {
                         name="email"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
                         }}
                         required
                         value={values.email}
@@ -173,7 +196,7 @@ const UserEdit = () => {
                             disabled={show}
                             onChange={(e) => {
                               handleChangeChecked(e);
-                              setShowSuccess(false);
+                              showSuccess.current = false;
                             }}
                           />
                         }
@@ -189,11 +212,12 @@ const UserEdit = () => {
                         name="profile"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          values.client = '0';
+                          showSuccess.current = false;
                         }}
                         required
                         select
@@ -209,6 +233,40 @@ const UserEdit = () => {
                         </option>
                       </TextField>
                     </Grid>
+                    {values.profile === '2' && (
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          disabled={!checked || show}
+                          error={errors.client}
+                          fullWidth
+                          helperText={errors.client}
+                          label="Selecionar cliente"
+                          name="client"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                          }}
+                          onChange={(event) => {
+                            handleChange(event);
+                            showSuccess.current = false;
+                          }}
+                          select
+                          SelectProps={{ native: true }}
+                          value={values.client}
+                          variant="outlined"
+                          required
+                        >
+                          <option key="0" value="0">
+                            Selecione um cliente
+                          </option>
+                          {clients.map((client) => (
+                            <option key={client.id} value={client.id}>
+                              {client.name}
+                            </option>
+                          ))}
+                        </TextField>
+                      </Grid>
+                    )}
                   </Grid>
                 </CardContent>
               </Card>
@@ -247,7 +305,7 @@ const UserEdit = () => {
               </Box>
             </Card>
           </>
-          {showSuccess && (
+          {showSuccess.current && (
             <>
               <ToastAnimated />
               {showToast({
