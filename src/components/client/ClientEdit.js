@@ -19,7 +19,7 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useLocation, useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
@@ -41,8 +41,10 @@ const ClientEdit = () => {
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [selectedDate, handleDateChange] = useState(client.birthday);
   const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [token, setToken] = useState();
+
+  const showSuccess = useRef(false);
+  const showError = useRef(false);
 
   /**
    * Envia os dados do advogado
@@ -50,7 +52,8 @@ const ClientEdit = () => {
    */
   async function updatedClient(values) {
     setSubmitting(true);
-    setShowSuccess(false);
+    showError.current = false;
+    showSuccess.current = false;
 
     const config = {
       headers: { Authorization: `Bearer ${token}` }
@@ -70,18 +73,32 @@ const ClientEdit = () => {
         values.state = address.state;
       }
 
-      values.birthday = moment(selectedDate).format('YYYY-MM-DD');
+      const birthday = moment(selectedDate).format('YYYY-MM-DD');
 
-      await API.put(`advocates/clients/${client.id}`, values, config)
-        .then(() => {})
-        .catch((err) => {
-          setError(err.response.data.errors);
-          setShowSuccess(false);
-        })
-        .finally(() => {
-          setSubmitting(false);
-          setShowSuccess(true);
+      if (birthday === 'Invalid date') {
+        setError({
+          birthday: ['Data inválida']
         });
+      } else {
+        values.birthday = birthday;
+        setError('');
+        await API.put(`advocates/clients/${client.id}`, values, config)
+          .then(() => {
+            showSuccess.current = true;
+          })
+          .catch((err) => {
+            const allErrors = err.response.data.errors;
+            if (allErrors.email || allErrors.cpf || allErrors.email_user) {
+              setError(err.response.data.errors);
+            } else {
+              setError('');
+              showError.current = true;
+            }
+            showSuccess.current = false;
+          });
+      }
+
+      setSubmitting(false);
     }
   }
 
@@ -97,7 +114,7 @@ const ClientEdit = () => {
    * Obtém o endereço pelo cep digitado
    * @param {*} cep
    */
-  async function getAddressByZipCode(cep, errors) {
+  async function getAddressByZipCode(cep, errors, values) {
     setLoadingAddress(true);
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then((res) => res.json())
@@ -109,6 +126,11 @@ const ClientEdit = () => {
           setLoadingAddress(false);
           setAddress([]);
         } else {
+          values.state = response.uf;
+          values.city = response.localidade;
+          values.district = response.bairro;
+          values.street = response.logradouro;
+
           setAddress({
             state: response.uf,
             city: response.localidade,
@@ -120,6 +142,7 @@ const ClientEdit = () => {
           errors.state = null;
           errors.city = null;
           errors.district = null;
+
           setLoadingAddress(false);
           setError({ cep: null });
         }
@@ -130,22 +153,18 @@ const ClientEdit = () => {
    * Envia os dados do formulário
    * @param {*} values
    */
-  const handleSubmit = (values, errors, setFieldError) => {
+  const handleSubmit = (values, errors) => {
     if (address && address.street) {
       delete errors.street;
-      setFieldError('street', null);
     }
     if (address && address.district) {
       delete errors.district;
-      setFieldError('district', null);
     }
     if (address && address.city) {
       delete errors.city;
-      setFieldError('city', null);
     }
     if (address && address.state) {
       delete errors.state;
-      setFieldError('state', null);
     }
 
     if (isEmpty(errors)) updatedClient(values);
@@ -167,7 +186,7 @@ const ClientEdit = () => {
         rg: client.rg || '',
         issuing_organ: client.issuing_organ || '',
         nationality: client.nationality || '',
-        birthday: client.birthday || '',
+        birthday: client.birthday || undefined,
         gender: client.gender || '',
         civil_status: client.civil_status || '',
         telephone: client.telephone || '',
@@ -183,21 +202,14 @@ const ClientEdit = () => {
       validationSchema={ClientEditSchema}
       onSubmit={handleSubmit}
     >
-      {({
-        errors,
-        handleBlur,
-        handleChange,
-        values,
-        submitForm,
-        setFieldError,
-        touched
-      }) => (
+      {({ errors, handleBlur, handleChange, values, submitForm }) => (
         <form
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            setShowSuccess(false);
-            handleSubmit(values, errors, setFieldError);
+            showSuccess.current = false;
+            showError.current = false;
+            handleSubmit(values, errors);
           }}
         >
           <Card>
@@ -214,11 +226,13 @@ const ClientEdit = () => {
                     name="name"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     value={values.name}
                     required
@@ -241,11 +255,13 @@ const ClientEdit = () => {
                     name="email"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.email}
@@ -264,7 +280,8 @@ const ClientEdit = () => {
                           error.cpf = null;
                         }
                         handleChange(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                     >
                       {() => (
@@ -296,7 +313,8 @@ const ClientEdit = () => {
                           error.cpf = null;
                         }
                         handleChange(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                     >
                       {() => (
@@ -329,11 +347,13 @@ const ClientEdit = () => {
                     name="rg"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.rg}
@@ -350,11 +370,13 @@ const ClientEdit = () => {
                     name="issuing_organ"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.issuing_organ}
@@ -365,20 +387,30 @@ const ClientEdit = () => {
                 <Grid item md={6} xs={12}>
                   <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                     <KeyboardDatePicker
-                      error={Boolean(touched.birthday && errors.birthday)}
+                      error={
+                        errors.birthday ||
+                        (error && error.birthday ? error.birthday[0] : '')
+                      }
+                      fullWidth
+                      helperText={
+                        errors.birthday ||
+                        (error && error.birthday ? error.birthday[0] : '')
+                      }
                       disableFuture
-                      helperText={touched.birthday && errors.birthday}
                       openTo="year"
                       format="dd/MM/yyyy"
                       label="Data de nascimento"
                       views={['year', 'month', 'date']}
                       value={selectedDate}
+                      defaultValue={undefined}
                       onChange={(e) => {
                         handleDateChange(e);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                       }}
                       onBlur={(e) => {
-                        setShowSuccess(false);
+                        showSuccess.current = false;
+                        showError.current = false;
                         handleBlur(e);
                       }}
                       name="birthday"
@@ -396,11 +428,13 @@ const ClientEdit = () => {
                     name="nationality"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     value={values.nationality}
@@ -417,11 +451,13 @@ const ClientEdit = () => {
                     name="gender"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     select
@@ -446,11 +482,13 @@ const ClientEdit = () => {
                     name="civil_status"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                     required
                     select
@@ -473,7 +511,8 @@ const ClientEdit = () => {
                     value={values.cellphone}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -497,7 +536,8 @@ const ClientEdit = () => {
                     value={values.telephone}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -527,12 +567,18 @@ const ClientEdit = () => {
                     mask="99.999-999"
                     value={values.cep}
                     onChange={(event) => {
+                      values.street = '';
+                      values.number = '';
+                      values.city = '';
+                      values.state = '';
+                      values.district = '';
                       handleChange(event);
                       const unmask = event.target.value.replace(/[^\d]/g, '');
                       if (unmask.length === 8) {
-                        getAddressByZipCode(unmask, errors);
+                        getAddressByZipCode(unmask, errors, values);
                       }
-                      setShowSuccess(false);
+                      showSuccess.current = false;
+                      showError.current = false;
                     }}
                   >
                     {() => (
@@ -575,12 +621,14 @@ const ClientEdit = () => {
                         name="street"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
                           address.street = null;
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={address.street ? address.street : values.street}
                         variant="outlined"
@@ -597,11 +645,13 @@ const ClientEdit = () => {
                         name="number"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={values.number}
                         variant="outlined"
@@ -618,12 +668,14 @@ const ClientEdit = () => {
                         name="district"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           address.district = null;
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={
                           address.district ? address.district : values.district
@@ -642,11 +694,12 @@ const ClientEdit = () => {
                         name="complement"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = true;
                         }}
                         value={values.complement}
                         variant="outlined"
@@ -662,12 +715,14 @@ const ClientEdit = () => {
                         name="state"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           address.state = null;
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={address.state ? address.state : values.state}
                         variant="outlined"
@@ -684,12 +739,14 @@ const ClientEdit = () => {
                         name="city"
                         onBlur={(event) => {
                           handleBlur(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         onChange={(event) => {
                           address.city = null;
                           handleChange(event);
-                          setShowSuccess(false);
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                         value={address.city ? address.city : values.city}
                         variant="outlined"
@@ -735,12 +792,22 @@ const ClientEdit = () => {
               </Stack>
             </Box>
           </Card>
-          {showSuccess && (
+          {showSuccess.current && (
             <>
               <ToastAnimated />
               {showToast({
                 type: 'success',
                 message: 'Cliente atualizado com sucesso!'
+              })}
+            </>
+          )}
+          {showError.current && (
+            <>
+              <ToastAnimated />
+              {showToast({
+                type: 'error',
+                message:
+                  'Um erro inesperado aconteceu. Não foi possivel atualizar o cliente!'
               })}
             </>
           )}

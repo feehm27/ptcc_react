@@ -2,7 +2,9 @@ import * as Yup from 'yup';
 import { cpf } from 'cpf-cnpj-validator';
 
 const ClientEditSchema = Yup.object().shape({
-  name: Yup.string().required('Campo obrigatório'),
+  name: Yup.string()
+    .max(200, 'Máximo 200 caracteres')
+    .required('Campo obrigatório'),
   email: Yup.string()
     .email('Informe um email válido')
     .max(255)
@@ -16,16 +18,27 @@ const ClientEditSchema = Yup.object().shape({
       }
       return true;
     }),
-  rg: Yup.string().required('Campo obrigatório'),
-  issuing_organ: Yup.string().required('Campo obrigatório'),
-  birthday: Yup.date().nullable().required('Campo obrigatório'),
-  nationality: Yup.string().required('Campo obrigatório'),
+  rg: Yup.string()
+    .max(10, 'Máximo 10 caracteres')
+    .required('Campo obrigatório'),
+  issuing_organ: Yup.string()
+    .max(50, 'Máximo 50 caracteres')
+    .required('Campo obrigatório'),
+  birthday: Yup.date()
+    .nullable()
+    .transform((curr, orig) => (orig === '' ? null : curr))
+    .required('Campo obrigatório'),
+  nationality: Yup.string()
+    .max(200, 'Máximo 200 caracteres')
+    .required('Campo obrigatório'),
   gender: Yup.string()
+    .max(50, 'Máximo 50 caracteres')
     .required('Campo obrigatório')
     .test('isNull', 'Campo obrigatório', (value) => {
       return value !== '0';
     }),
   civil_status: Yup.string()
+    .max(50, 'Máximo 50 caracteres')
     .required('Campo obrigatório')
     .test('isNull', 'Campo obrigatório', (value) => {
       return value !== '0';
@@ -57,12 +70,18 @@ const ClientEditSchema = Yup.object().shape({
       }
       return true;
     }),
-  street: Yup.string().required('Campo obrigatório'),
+  street: Yup.string()
+    .max(200, 'Máximo 200 caracteres')
+    .required('Campo obrigatório'),
   number: Yup.string().required('Campo obrigatório'),
   complement: Yup.string().nullable(),
   district: Yup.string().required('Campo obrigatório'),
-  state: Yup.string().required('Campo obrigatório'),
-  city: Yup.string().required('Campo obrigatório')
+  state: Yup.string()
+    .max(200, 'Máximo 200 caracteres')
+    .required('Campo obrigatório'),
+  city: Yup.string()
+    .max(200, 'Máximo 200 caracteres')
+    .required('Campo obrigatório')
 });
 
 export default ClientEditSchema;
