@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { UserContext } from 'src/contexts/UserContext';
 import UserSchema from 'src/schemas/UserSchema';
@@ -22,8 +22,10 @@ const UserCreate = () => {
   const navigate = useNavigate();
   const { data } = useContext(UserContext);
   const [error, setError] = useState(null);
+  const [clients, setClients] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+
+  const showSuccess = useRef(false);
 
   /**
    * Envia os dados do advogado
@@ -31,7 +33,7 @@ const UserCreate = () => {
    */
   async function sendUser(values) {
     setSubmitting(true);
-    setShowSuccess(false);
+    showSuccess.current = false;
 
     const treatedValues = {
       name: values.name,
@@ -42,16 +44,22 @@ const UserCreate = () => {
       advocate_user_id: data.id
     };
 
+    if (values.profile === '2') {
+      treatedValues.client_id = values.client;
+    }
+
     await API.post('register', treatedValues)
-      .then(() => {})
-      .catch((err) => {
-        setShowSuccess(false);
-        setError(err.response.data.errors);
+      .then((response) => {
+        if (response.data.status_code === 400) {
+          showSuccess.current = false;
+        }
+        showSuccess.current = true;
       })
-      .finally(() => {
-        setSubmitting(false);
-        setShowSuccess(true);
+      .catch((err) => {
+        showSuccess.current = false;
+        setError(err.response.data.errors);
       });
+    setSubmitting(false);
   }
 
   /**
@@ -62,13 +70,36 @@ const UserCreate = () => {
     if (isEmpty(errors)) sendUser(values);
   };
 
+  /**
+   * Obtém as informações do advogado
+   */
+  async function getClients() {
+    const tokenUser = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${tokenUser}` }
+    };
+    await API.get('advocates/clients', config)
+      .then((response) => {
+        setClients(response.data.data);
+      })
+      .catch((err) => console.error(err));
+  }
+
+  /**
+   * Use Effect
+   */
+  useEffect(() => {
+    getClients();
+  }, []);
+
   return (
     <Formik
       initialValues={{
         name: '',
         email: '',
         password: '',
-        profile: '0'
+        profile: '0',
+        client: '0'
       }}
       validationSchema={UserSchema}
       onSubmit={handleSubmit}
@@ -78,7 +109,7 @@ const UserCreate = () => {
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            setShowSuccess(false);
+            showSuccess.current = false;
             handleSubmit(values, errors);
           }}
         >
@@ -97,11 +128,11 @@ const UserCreate = () => {
                       name="name"
                       onBlur={(event) => {
                         handleBlur(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
                       }}
                       onChange={(event) => {
                         handleChange(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
                       }}
                       value={values.name}
                       required
@@ -123,11 +154,12 @@ const UserCreate = () => {
                       name="email"
                       onBlur={(event) => {
                         handleBlur(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
                       }}
                       onChange={(event) => {
                         handleChange(event);
-                        setShowSuccess(false);
+                        setError([]);
+                        showSuccess.current = false;
                       }}
                       required
                       value={values.email}
@@ -175,11 +207,11 @@ const UserCreate = () => {
                       name="profile"
                       onBlur={(event) => {
                         handleBlur(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
                       }}
                       onChange={(event) => {
                         handleChange(event);
-                        setShowSuccess(false);
+                        showSuccess.current = false;
                       }}
                       select
                       SelectProps={{ native: true }}
@@ -194,6 +226,39 @@ const UserCreate = () => {
                       </option>
                     </TextField>
                   </Grid>
+                  {values.profile === '2' && (
+                    <Grid item md={6} xs={12}>
+                      <TextField
+                        error={errors.client}
+                        fullWidth
+                        helperText={errors.client}
+                        label="Selecionar cliente"
+                        name="client"
+                        onBlur={(event) => {
+                          handleBlur(event);
+                          showSuccess.current = false;
+                        }}
+                        onChange={(event) => {
+                          handleChange(event);
+                          showSuccess.current = false;
+                        }}
+                        select
+                        SelectProps={{ native: true }}
+                        value={values.client}
+                        variant="outlined"
+                        required
+                      >
+                        <option key="0" value="0">
+                          Selecione um cliente
+                        </option>
+                        {clients.map((client) => (
+                          <option key={client.id} value={client.id}>
+                            {client.name}
+                          </option>
+                        ))}
+                      </TextField>
+                    </Grid>
+                  )}
                 </Grid>
               </CardContent>
             </Card>
@@ -235,7 +300,7 @@ const UserCreate = () => {
               </Stack>
             </Box>
           </Card>
-          {showSuccess && (
+          {showSuccess.current && (
             <>
               <ToastAnimated />
               {showToast({
