@@ -123,7 +123,7 @@ const ClientContactSent = () => {
                         </TableCell>
                         <TableCell>{message.subject}</TableCell>
                         <TableCell>
-                          {moment(message.created_at).format('MM/DD/YYYY')}
+                          {moment(message.created_at).format('DD/MM/YYYY')}
                         </TableCell>
                         <TableCell>
                           <Tooltip title="Visualizar">

@@ -73,17 +73,15 @@ const ClientCreate = () => {
 
       await API.post('advocates/clients', values, config)
         .then((response) => {
+          setShowSuccess(true);
           console.log(response);
         })
         .catch((err) => {
           setError(err.response.data.errors);
           setShowSuccess(false);
-        })
-        .finally(() => {
-          setSubmitting(false);
-          setShowSuccess(true);
         });
     }
+    setSubmitting(false);
   }
 
   /**

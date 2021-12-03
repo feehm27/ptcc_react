@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { UserContext } from 'src/contexts/UserContext';
 import ClientContactSchema from 'src/schemas/ClientContactSchema';
@@ -23,8 +23,8 @@ const ClientContactCreate = () => {
   const { data } = useContext(UserContext);
 
   const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const showSuccess = useRef(false);
+  const showError = useRef(false);
 
   /**
    * Envia os dados do advogado
@@ -50,11 +50,11 @@ const ClientContactCreate = () => {
 
     await API.post('messages', params, config)
       .then(() => {
-        setShowSuccess(true);
+        showSuccess.current = true;
       })
-      .catch((err) => {
-        setShowError(err.response.data.errors);
-        setShowSuccess(false);
+      .catch(() => {
+        showSuccess.current = false;
+        showError.current = true;
       });
     setSubmitting(false);
   }
@@ -88,7 +88,7 @@ const ClientContactCreate = () => {
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            setShowSuccess(false);
+            showSuccess.current = false;
             handleSubmit(values, errors);
           }}
         >
@@ -126,11 +126,11 @@ const ClientContactCreate = () => {
                     name="subject"
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
                     }}
                     required
                     value={values.subject}
@@ -147,11 +147,11 @@ const ClientContactCreate = () => {
                     rowsMax={Infinity}
                     onBlur={(event) => {
                       handleBlur(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
                     }}
                     onChange={(event) => {
                       handleChange(event);
-                      setShowSuccess(false);
+                      showSuccess.current = false;
                     }}
                     placeholder="Mensagem:"
                     name="message"
@@ -192,7 +192,7 @@ const ClientContactCreate = () => {
               </Stack>
             </Box>
           </Card>
-          {showSuccess && (
+          {showSuccess.current && (
             <>
               <ToastAnimated />
               {showToast({
@@ -201,7 +201,7 @@ const ClientContactCreate = () => {
               })}
             </>
           )}
-          {showError && (
+          {showError.current && (
             <>
               <ToastAnimated />
               {showToast({
