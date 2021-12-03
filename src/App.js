@@ -19,6 +19,7 @@ import UserEdit from './components/users/UserEdit';
 import { UserStorage } from './contexts/UserContext';
 import ProtectedRoute from './helpers/Route/ProtectedRoute';
 import Account from './pages/Account';
+import AdvocateContact from './pages/AdvocateContact';
 import ChangePassword from './pages/ChangePassword';
 import Client from './pages/Client';
 import ClientContact from './pages/ClientContact';
@@ -77,6 +78,7 @@ function App() {
                 <ProtectedRoute path="/identity" element={<Identity />} />
 
                 <ProtectedRoute path="/clients" element={<Client />} />
+
                 <ProtectedRoute path="/clients/edit" element={<ClientEdit />} />
                 <ProtectedRoute
                   path="/clients/create"
@@ -101,6 +103,11 @@ function App() {
                 <ProtectedRoute
                   path="/contacts/sent"
                   element={<ClientContactSent />}
+                />
+
+                <ProtectedRoute
+                  path="/advocate/contacts"
+                  element={<AdvocateContact />}
                 />
 
                 <ProtectedRoute path="/users" element={<User />} />

@@ -18,7 +18,15 @@ const UserSchema = Yup.object().shape({
       function confirmPassword(value) {
         return this.parent.password === value;
       }
-    )
+    ),
+  profile: Yup.string(),
+  client: Yup.string().test(
+    'required',
+    'Campo obrigatório',
+    function selectedClient(value) {
+      return value !== '0' || Yup.ref('profile') === 2;
+    }
+  )
 });
 
 export default UserSchema;

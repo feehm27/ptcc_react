@@ -122,12 +122,10 @@ const ClientCreate = () => {
             district: response.bairro,
             street: response.logradouro
           });
-
-          errors.cep = null;
-          errors.state = null;
-          errors.city = null;
-          errors.district = null;
-
+          delete errors.cep;
+          delete errors.state;
+          delete errors.city;
+          delete errors.district;
           setLoadingAddress(false);
           setError({ cep: null });
         }
