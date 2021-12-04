@@ -24,7 +24,8 @@ const UserSchema = Yup.object().shape({
     'required',
     'Campo obrigatório',
     function selectedClient(value) {
-      return value !== '0' || Yup.ref('profile') === 2;
+      if (this.parent.profile === '2' && value === '0') return false;
+      return true;
     }
   )
 });
