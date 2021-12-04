@@ -214,6 +214,7 @@ const ClientManagement = (listClients) => {
                         <Visibility
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             navigate('/clients/edit', {
                               state: { client, show: true }
@@ -236,6 +237,7 @@ const ClientManagement = (listClients) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             navigate('/clients/edit', {
                               state: { client, show: false }
@@ -275,6 +277,7 @@ const ClientManagement = (listClients) => {
                           }}
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             setSelectedClient(client);
                             setShowModal(true);
@@ -284,6 +287,7 @@ const ClientManagement = (listClients) => {
                         <Delete
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             setSelectedClient(client);
                             setShowModal(true);
