@@ -16,9 +16,12 @@ import { API } from 'src/services/api';
 
 const Register = () => {
   const [registerErrors, setRegisterErrors] = useState([]);
-  const { userLogin, loading } = useContext(UserContext);
+  const { userLogin } = useContext(UserContext);
+  const [submitting, setSubmitting] = useState(false);
 
   async function register(values) {
+    setSubmitting(true);
+
     const data = {
       name: values.name,
       email: values.email,
@@ -31,11 +34,13 @@ const Register = () => {
       .then((response) => {
         const convertResponse = JSON.parse(response.config.data);
         const { email, password } = convertResponse;
+
         userLogin(email, password);
       })
       .catch((err) => {
         setRegisterErrors(err.response.data.errors);
       });
+    setSubmitting(false);
   }
 
   return (
@@ -62,15 +67,13 @@ const Register = () => {
             }}
             validationSchema={RegisterSchema}
           >
-            {({
-              errors,
-              handleBlur,
-              handleChange,
-              handleSubmit,
-              touched,
-              values
-            }) => (
-              <form onSubmit={handleSubmit}>
+            {({ errors, handleBlur, handleChange, touched, values }) => (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  register(values);
+                }}
+              >
                 <Box sx={{ mb: 2, mt: 5 }}>
                   <Typography color="primary" variant="h2" textAlign="center">
                     Cadastre-se
@@ -83,8 +86,12 @@ const Register = () => {
                   label="Nome completo"
                   margin="normal"
                   name="name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
+                  onBlur={(event) => {
+                    handleBlur(event);
+                  }}
+                  onChange={(event) => {
+                    handleChange(event);
+                  }}
                   value={values.name}
                   variant="outlined"
                 />
@@ -99,9 +106,12 @@ const Register = () => {
                   label="Email"
                   margin="normal"
                   name="email"
-                  onBlur={handleBlur}
+                  onBlur={(event) => {
+                    handleBlur(event);
+                  }}
                   onChange={(event) => {
                     handleChange(event);
+
                     setRegisterErrors([]);
                   }}
                   type="email"
@@ -115,25 +125,39 @@ const Register = () => {
                   label="Senha"
                   margin="normal"
                   name="password"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
+                  onBlur={(event) => {
+                    handleBlur(event);
+                  }}
+                  onChange={(event) => {
+                    handleChange(event);
+                  }}
                   type="password"
                   value={values.password}
                   variant="outlined"
                 />
-                <Box sx={{ py: 2 }}>
+                {submitting ? (
                   <Button
                     color="primary"
-                    disabled={loading}
+                    variant="contained"
                     fullWidth
                     size="large"
-                    type="submit"
-                    variant="contained"
-                    onClick={() => register(values)}
+                    disabled
                   >
-                    Cadastrar
+                    Carregando..
                   </Button>
-                </Box>
+                ) : (
+                  <Box sx={{ py: 2 }}>
+                    <Button
+                      color="primary"
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                    >
+                      Cadastrar
+                    </Button>
+                  </Box>
+                )}
                 <Typography color="textSecondary" variant="body1">
                   Já possui uma conta?{' '}
                   <Link component={RouterLink} to="/login" variant="h6">
