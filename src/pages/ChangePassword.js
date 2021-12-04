@@ -59,6 +59,13 @@ const ChangePassword = () => {
     }
   }
 
+  /**
+   * Atualiza a página depois de um tempo
+   */
+  const callTimeOut = () => {
+    setTimeout(() => navigate('/login'), 1500);
+  };
+
   return (
     <>
       <Helmet>
@@ -187,7 +194,7 @@ const ChangePassword = () => {
                       type: 'success',
                       message: 'Senha alterada com sucesso!'
                     })}
-                    {setTimeout(() => navigate('/login'), 1500)}
+                    {callTimeOut()}
                   </>
                 )}
               </form>
