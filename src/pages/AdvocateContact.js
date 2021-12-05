@@ -6,7 +6,7 @@ import AdvocateContactManagement from 'src/components/advocate_contact/AdvocateC
 import { API } from 'src/services/api';
 
 const AdvocateContact = () => {
-  const [messages, setMessages] = useState([]);
+  const [clients, setClients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   /**
@@ -21,7 +21,7 @@ const AdvocateContact = () => {
     };
     await API.get(`messages`, config)
       .then((response) => {
-        setMessages(response.data.data);
+        setClients(response.data.data);
       })
       .catch((err) => console.error(err));
     setIsLoading(false);
@@ -54,8 +54,8 @@ const AdvocateContact = () => {
         }}
       >
         <Container maxWidth="lg">
-          <AdvocateContactList messages={messages} />
-          <AdvocateContactManagement messages={messages} />
+          <AdvocateContactList clients={clients} />
+          <AdvocateContactManagement clients={clients} />
         </Container>
       </Box>
     </>

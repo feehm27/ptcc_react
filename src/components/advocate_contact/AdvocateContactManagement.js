@@ -13,16 +13,15 @@ import {
 } from '@material-ui/core';
 import { Visibility } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
-import moment from 'moment';
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 
-const AdvocateContactManagement = (listMessages) => {
+const AdvocateContactManagement = (listClients) => {
   const navigate = useNavigate();
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [rows, setRows] = useState(listMessages.messages);
+  const [rows, setRows] = useState(listClients.clients);
   const [searched, setSearched] = useState('');
 
   const handleLimitChange = (event) => {
@@ -37,12 +36,12 @@ const AdvocateContactManagement = (listMessages) => {
    * Busca os clientes na tabela
    * @param {} value
    */
-  const searchSubject = (value) => {
+  const searchClient = (value) => {
     if (value === '' || value === undefined) {
-      setRows(listMessages.messages);
+      setRows(listClients.clients);
     } else {
       const filteredRows = rows.filter((row) => {
-        return row.subject.toLowerCase().includes(value.toLowerCase());
+        return row.name.toLowerCase().includes(value.toLowerCase());
       });
       setRows(filteredRows);
     }
@@ -53,10 +52,10 @@ const AdvocateContactManagement = (listMessages) => {
    */
   const cancelSearch = () => {
     setSearched('');
-    searchSubject(searched);
+    searchClient(searched);
   };
 
-  return listMessages.messages.length > 0 ? (
+  return listClients.clients.length > 0 ? (
     <Card sx={{ mt: 3, mb: 4 }}>
       <PerfectScrollbar>
         <Box>
@@ -65,9 +64,9 @@ const AdvocateContactManagement = (listMessages) => {
               <Box>
                 <SearchBar
                   style={{ display: '-webkit-inline-box' }}
-                  placeholder="Buscar por assunto"
+                  placeholder="Buscar por cliente"
                   value={searched}
-                  onChange={(value) => searchSubject(value)}
+                  onChange={(value) => searchClient(value)}
                   onCancelSearch={() => cancelSearch()}
                 ></SearchBar>
               </Box>
@@ -78,31 +77,33 @@ const AdvocateContactManagement = (listMessages) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Nome do cliente</TableCell>
-                <TableCell>Assunto</TableCell>
-                <TableCell>Data de envio</TableCell>
+                <TableCell>Cliente</TableCell>
+                <TableCell>CPF</TableCell>
+                <TableCell>Qtd. Mensagens Enviadas</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.slice(0, limit).map((message) => (
-                <TableRow hover key={message.id}>
+              {rows.slice(0, limit).map((client) => (
+                <TableRow hover key={client.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
-                      {message.recipient_name}
+                      {client.name}
                     </Typography>
                   </TableCell>
-                  <TableCell>{message.subject}</TableCell>
                   <TableCell>
-                    {moment(message.created_at).format('DD/MM/YYYY')}
+                    <Typography color="textPrimary" variant="body1">
+                      {client.cpf}
+                    </Typography>
                   </TableCell>
+                  <TableCell>{`${client.messages.length} mensagens`}</TableCell>
                   <TableCell>
-                    <Tooltip title="Visualizar">
+                    <Tooltip title="Visualizar mensagens">
                       <Visibility
                         cursor="pointer"
                         onClick={() => {
                           navigate('/advocates/contacts/show', {
-                            state: { message, show: true }
+                            state: { messages: client.messages, show: true }
                           });
                         }}
                       ></Visibility>

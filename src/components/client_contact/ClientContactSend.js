@@ -123,7 +123,7 @@ const ClientContactSend = () => {
               >
                 <span>Email do destinatário:&nbsp;</span>
                 <Typography color="text.secondary" variant="h5">
-                  {message.recipient_name}
+                  {message.recipient_email}
                 </Typography>
               </Typography>
             </Grid>

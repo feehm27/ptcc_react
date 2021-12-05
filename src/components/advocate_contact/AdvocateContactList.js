@@ -1,8 +1,9 @@
 import { Card, CardHeader, Divider } from '@material-ui/core';
 
-const AdvocateContactList = (messages) => {
+const AdvocateContactList = (clients) => {
+  console.log(clients);
   return (
-    messages.messages && (
+    clients.clients && (
       <Card>
         <CardHeader title="Lista de mensagens" />
         <Divider />

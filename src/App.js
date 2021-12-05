@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import GlobalStyles from 'src/components/GlobalStyles';
 import 'src/mixins/chartjs';
 import theme from 'src/theme';
+import AdvocateContactShow from './components/advocate_contact/AdvocateContactShow';
 import ClientCreate from './components/client/ClientCreate';
 import ClientEdit from './components/client/ClientEdit';
 import ClientContactCreate from './components/client_contact/ClientContactCreate';
@@ -108,6 +109,11 @@ function App() {
                 <ProtectedRoute
                   path="/advocate/contacts"
                   element={<AdvocateContact />}
+                />
+
+                <ProtectedRoute
+                  path="/advocates/contacts/show"
+                  element={<AdvocateContactShow />}
                 />
 
                 <ProtectedRoute path="/users" element={<User />} />
