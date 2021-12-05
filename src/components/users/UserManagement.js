@@ -25,7 +25,7 @@ import {
 } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 import { API } from 'src/services/api';
@@ -38,10 +38,25 @@ const UserManagement = (listUsers) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [showLockOrUnlock, setShowLockOrUnlock] = useState(false);
   const [rows, setRows] = useState(listUsers.users);
   const [selectedUser, setSelectedUser] = useState([]);
   const [searched, setSearched] = useState('');
+  const showLockOrUnlock = useRef(false);
+
+  /**
+   * Obtém a lista de usuários
+   */
+  async function getUsers() {
+    const tokenUser = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${tokenUser}` }
+    };
+    await API.get('advocates/users', config)
+      .then((response) => {
+        setRows(response.data.data);
+      })
+      .catch((err) => console.error(err));
+  }
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -71,7 +86,8 @@ const UserManagement = (listUsers) => {
    * @param {*} values
    */
   async function lockOrUnlockUser(userId, blocked) {
-    setShowLockOrUnlock(false);
+    showLockOrUnlock.current = false;
+
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
@@ -83,13 +99,13 @@ const UserManagement = (listUsers) => {
     };
 
     await API.put(`advocates/users/block`, values, config)
-      .then(() => {})
+      .then(() => {
+        showLockOrUnlock.current = true;
+        getUsers();
+      })
       .catch((err) => {
         console.log(err);
-        setShowLockOrUnlock(false);
-      })
-      .finally(() => {
-        setShowLockOrUnlock(true);
+        showLockOrUnlock.current = false;
       });
   }
 
@@ -127,7 +143,10 @@ const UserManagement = (listUsers) => {
                   style={{ display: '-webkit-inline-box' }}
                   placeholder="Buscar usuário"
                   value={searched}
-                  onChange={(value) => searchUsers(value)}
+                  onChange={(value) => {
+                    searchUsers(value);
+                    showLockOrUnlock.current = false;
+                  }}
                   onCancelSearch={() => cancelSearch()}
                 ></SearchBar>
               </Box>
@@ -175,6 +194,7 @@ const UserManagement = (listUsers) => {
                         <Visibility
                           cursor="pointer"
                           onClick={() => {
+                            showLockOrUnlock.current = false;
                             navigate('/users/edit', {
                               state: { user, show: true }
                             });
@@ -196,6 +216,7 @@ const UserManagement = (listUsers) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
+                            showLockOrUnlock.current = false;
                             navigate('/users/edit', {
                               state: { user, show: false }
                             });
@@ -203,7 +224,6 @@ const UserManagement = (listUsers) => {
                         ></Edit>
                       )}
                     </Tooltip>
-
                     {user.blocked ? (
                       <Tooltip title="Desbloquear">
                         {checkedPermission(10, 3) ? (
@@ -219,6 +239,7 @@ const UserManagement = (listUsers) => {
                           <LockOpenRounded
                             cursor="pointer"
                             onClick={() => {
+                              showLockOrUnlock.current = false;
                               setSelectedUser(user);
                               setShowModal(true);
                             }}
@@ -240,6 +261,7 @@ const UserManagement = (listUsers) => {
                           <LockRounded
                             cursor="pointer"
                             onClick={() => {
+                              showLockOrUnlock.current = false;
                               setSelectedUser(user);
                               setShowModal(true);
                             }}
@@ -299,6 +321,7 @@ const UserManagement = (listUsers) => {
               </Button>
               <Button
                 onClick={() => {
+                  showLockOrUnlock.current = false;
                   handleClose();
                   lockOrUnlockUser(selectedUser.id, !selectedUser.blocked);
                 }}
@@ -311,7 +334,7 @@ const UserManagement = (listUsers) => {
           </Dialog>
         </div>
       )}
-      {showLockOrUnlock && (
+      {showLockOrUnlock.current && (
         <>
           <ToastAnimated />
           {showToast({
@@ -320,9 +343,6 @@ const UserManagement = (listUsers) => {
               selectedUser.blocked ? 'desbloqueado' : 'bloqueado'
             } com sucesso!`
           })}
-          {setTimeout(() => {
-            window.location.reload();
-          }, 500)}
         </>
       )}
     </Card>

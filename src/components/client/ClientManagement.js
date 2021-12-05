@@ -30,12 +30,12 @@ import ToastAnimated, { showToast } from '../Toast';
 const ClientManagement = (listClients) => {
   const navigate = useNavigate();
   const showExportSuccess = useRef(false);
+  const showSuccess = useRef(false);
   const { data } = useContext(UserContext);
 
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listClients.clients);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedClient, setSelectedClient] = useState([]);
@@ -92,24 +92,42 @@ const ClientManagement = (listClients) => {
   }
 
   /**
+   * Obtém as informações do cliente
+   */
+  async function getClients() {
+    const tokenUser = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${tokenUser}` }
+    };
+    await API.get('advocates/clients', config)
+      .then((response) => {
+        setRows(response.data.data);
+      })
+      .catch((err) => console.error(err));
+  }
+
+  /**
    * Envia os dados do advogado
    * @param {*} values
    */
   async function deleteClient(clientId) {
-    setShowSuccess(false);
+    showSuccess.current = false;
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
 
     await API.delete(`advocates/clients/${clientId}`, config)
-      .then(() => {})
+      .then(() => {
+        showSuccess.current = true;
+        getClients();
+      })
       .catch((err) => {
         console.log(err);
-        setShowSuccess(false);
+        showSuccess.current = false;
       })
       .finally(() => {
-        setShowSuccess(true);
+        showSuccess.current = true;
       });
   }
 
@@ -196,6 +214,8 @@ const ClientManagement = (listClients) => {
                         <Visibility
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
+                            showSuccess.current = false;
                             navigate('/clients/edit', {
                               state: { client, show: true }
                             });
@@ -217,6 +237,8 @@ const ClientManagement = (listClients) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
+                            showSuccess.current = false;
                             navigate('/clients/edit', {
                               state: { client, show: false }
                             });
@@ -237,7 +259,10 @@ const ClientManagement = (listClients) => {
                       ) : (
                         <DownloadRounded
                           cursor="pointer"
-                          onClick={() => exportClient(client.id)}
+                          onClick={() => {
+                            exportClient(client.id);
+                            showSuccess.current = false;
+                          }}
                           disabled={submitting}
                         ></DownloadRounded>
                       )}
@@ -252,6 +277,8 @@ const ClientManagement = (listClients) => {
                           }}
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
+                            showSuccess.current = false;
                             setSelectedClient(client);
                             setShowModal(true);
                           }}
@@ -260,6 +287,8 @@ const ClientManagement = (listClients) => {
                         <Delete
                           cursor="pointer"
                           onClick={() => {
+                            showExportSuccess.current = false;
+                            showSuccess.current = false;
                             setSelectedClient(client);
                             setShowModal(true);
                           }}
@@ -328,14 +357,13 @@ const ClientManagement = (listClients) => {
           })}
         </>
       )}
-      {showSuccess && (
+      {showSuccess.current && (
         <>
           <ToastAnimated />
           {showToast({
             type: 'success',
             message: 'Cliente deletado com sucesso!'
           })}
-          {setTimeout(() => window.location.reload(), 1000)}
         </>
       )}
     </Card>

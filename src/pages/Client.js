@@ -10,7 +10,7 @@ const Client = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Obtém as informações do advogado
+   * Obtém as informações do cliente
    */
   async function getClients() {
     setIsLoading(true);

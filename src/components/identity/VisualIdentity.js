@@ -75,6 +75,13 @@ const VisualIdentity = () => {
   };
 
   /**
+   * Atualiza a página depois de um tempo
+   */
+  const callTimeOut = () => {
+    setTimeout(() => window.location.reload(), 500);
+  };
+
+  /**
    * Use Effect
    */
   useEffect(() => {
@@ -198,7 +205,7 @@ const VisualIdentity = () => {
             type: 'success',
             message: 'Logomarca alterada com sucesso!'
           })}
-          {setTimeout(() => window.location.reload(), 1000)}
+          {callTimeOut()}
         </>
       )}
     </>
