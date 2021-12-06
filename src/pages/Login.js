@@ -110,7 +110,7 @@ const Login = () => {
                   name="email"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  placeholder="teste@teste.com.br"
+                  placeholder="Ex: teste@teste.com.br"
                   type="email"
                   value={values.email}
                   variant="outlined"
@@ -124,7 +124,7 @@ const Login = () => {
                   name="password"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  placeholder="Password123"
+                  placeholder="Ex: Senha@43!5"
                   type="password"
                   value={values.password}
                   variant="outlined"
