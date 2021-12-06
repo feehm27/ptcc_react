@@ -21,6 +21,7 @@ const VisualIdentity = () => {
   const { data, loading } = useContext(UserContext);
   const [submitting, setSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showDefaultLogo, setShowDefaultLogo] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(false);
 
@@ -33,14 +34,20 @@ const VisualIdentity = () => {
     setSubmitting(true);
     showMessage.current = false;
 
-    if (selectedImage) {
+    if (selectedImage || showDefaultLogo) {
       const token = window.localStorage.getItem('token');
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
 
-      const formData = new FormData();
-      formData.append('image', selectedImage);
+      let formData;
+
+      if (showDefaultLogo) {
+        formData = { image: null };
+      } else {
+        formData = new FormData();
+        formData.append('image', selectedImage);
+      }
 
       await API.post('identity/upload', formData, config)
         .then(() => {
@@ -71,6 +78,7 @@ const VisualIdentity = () => {
     if (data && data.logo !== null) {
       return data.logo;
     }
+
     return '/static/logo.png';
   };
 
@@ -120,6 +128,7 @@ const VisualIdentity = () => {
                       type="file"
                       onChange={(e) => {
                         showMessage.current = false;
+                        setShowDefaultLogo(false);
                         setSelectedImage(e.target.files[0]);
                         setError(null);
                       }}
@@ -137,25 +146,58 @@ const VisualIdentity = () => {
                   </Grid>
 
                   <Grid item md={12} xs={12}>
-                    <Typography variant="h5">Pré Visualização</Typography>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
-                    >
-                      <Avatar
-                        variant="rounded"
-                        src={getImage()}
-                        sx={{
-                          bgcolor: 'background.primary',
-                          border: 1,
-                          mt: '15px',
-                          height: '20%',
-                          width: '20%'
+                    <Typography variant="h5">
+                      Pré Visualização -{' '}
+                      <Button
+                        color="primary"
+                        variant="text"
+                        onClick={() => {
+                          setShowDefaultLogo(true);
+                          setSelectedImage(null);
                         }}
-                      />
-                    </Box>
+                      >
+                        Escolher Logo padrão
+                      </Button>
+                    </Typography>
+                    {showDefaultLogo ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <Avatar
+                          variant="rounded"
+                          src="/static/logo.png"
+                          sx={{
+                            bgcolor: 'background.primary',
+                            border: 1,
+                            mt: '15px',
+                            height: '20%',
+                            width: '20%'
+                          }}
+                        />
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <Avatar
+                          variant="rounded"
+                          src={getImage()}
+                          sx={{
+                            bgcolor: 'background.primary',
+                            border: 1,
+                            mt: '15px',
+                            height: '20%',
+                            width: '20%'
+                          }}
+                        />
+                      </Box>
+                    )}
                   </Grid>
                 </Grid>
               </CardContent>
