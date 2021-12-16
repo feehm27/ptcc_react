@@ -15,6 +15,7 @@ import { isEmpty } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useNavigate } from 'react-router';
+import BanksConstants from 'src/constants/BanksConstants';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
 import { UserContext } from 'src/contexts/UserContext';
 import InformationSchema from 'src/schemas/InformationSchema';
@@ -22,45 +23,6 @@ import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const civilStatus = CivilStatusConstants;
-
-const banks = [
-  {
-    value: '0',
-    label: 'Selecione uma opção'
-  },
-  {
-    value: '1',
-    label: 'Banco do Brasil'
-  },
-  {
-    value: '2',
-    label: 'Banco Inter'
-  },
-  {
-    value: '3',
-    label: 'Bradesco'
-  },
-  {
-    value: '4',
-    label: 'Caixa Econômica Federal'
-  },
-  {
-    value: '5',
-    label: 'C6 Bank'
-  },
-  {
-    value: '6',
-    label: 'Itaú'
-  },
-  {
-    value: '7',
-    label: 'Nubank'
-  },
-  {
-    value: '8',
-    label: 'Santander Brasil S.A'
-  }
-];
 
 const InformationDetails = () => {
   const navigate = useNavigate();
@@ -644,7 +606,7 @@ const InformationDetails = () => {
                       value={values.bank}
                       variant="outlined"
                     >
-                      {banks.map((option) => (
+                      {BanksConstants.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>

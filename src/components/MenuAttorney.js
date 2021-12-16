@@ -79,10 +79,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 5,
-      href: '/construction',
+      href: '/contracts',
       icon: ArrowRightIcon,
       title: 'Gestão de Contratos',
-      disabled: true,
+      disabled: false,
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[4].checked === 1

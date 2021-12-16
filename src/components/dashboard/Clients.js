@@ -3,7 +3,7 @@ import { red } from '@material-ui/core/colors';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 
 const Clients = (props) => (
-  <Card sx={{ height: '100%' }} {...props}>
+  <Card {...props}>
     <CardContent>
       <Grid container spacing={3} sx={{ justifyContent: 'space-between' }}>
         <Grid item>
