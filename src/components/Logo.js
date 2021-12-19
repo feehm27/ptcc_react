@@ -14,7 +14,7 @@ const Logo = (props) => {
       {...props}
       style={{
         display: 'block',
-        height: '200px',
+        height: data && data.logo !== null ? '64px' : '200px',
         width: '200px'
       }}
     />
