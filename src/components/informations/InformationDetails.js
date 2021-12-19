@@ -139,11 +139,10 @@ const InformationDetails = () => {
             district: response.bairro,
             street: response.logradouro
           });
-
-          errors.cep = null;
-          errors.state = null;
-          errors.city = null;
-          errors.district = null;
+          delete errors.cep;
+          delete errors.state;
+          delete errors.city;
+          delete errors.district;
           setLoadingAddress(false);
           setError({ cep: null });
         }
@@ -154,22 +153,18 @@ const InformationDetails = () => {
    * Envia os dados do formulário
    * @param {*} values
    */
-  const handleSubmit = (values, errors, setFieldError) => {
+  const handleSubmit = (values, errors) => {
     if (address && address.street) {
       delete errors.street;
-      setFieldError('street', null);
     }
     if (address && address.district) {
       delete errors.district;
-      setFieldError('district', null);
     }
     if (address && address.city) {
       delete errors.city;
-      setFieldError('city', null);
     }
     if (address && address.state) {
       delete errors.state;
-      setFieldError('state', null);
     }
     if (isEmpty(errors)) sendInformations(values);
   };
@@ -227,20 +222,13 @@ const InformationDetails = () => {
       validationSchema={InformationSchema}
       onSubmit={handleSubmit}
     >
-      {({
-        errors,
-        handleBlur,
-        handleChange,
-        values,
-        submitForm,
-        setFieldError
-      }) => (
+      {({ errors, handleBlur, handleChange, values, submitForm }) => (
         <form
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
             setShowSuccess(false);
-            handleSubmit(values, errors, setFieldError);
+            handleSubmit(values, errors);
           }}
         >
           <Card>
