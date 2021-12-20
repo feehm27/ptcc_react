@@ -53,30 +53,32 @@ const Dashboard = () => {
       >
         <Container maxWidth={false}>
           <Grid container spacing={3}>
-            <Grid item lg={4} sm={6} xl={3} xs={12}>
+            <Grid item lg={4} sm={4} xl={3} xs={12}>
               <Meetings />
             </Grid>
-            <Grid item lg={4} sm={6} xl={3} xs={12}>
+            <Grid item lg={4} sm={4} xl={3} xs={12}>
               <Clients />
             </Grid>
-
-            <Grid item lg={4} sm={6} xl={3} xs={12}>
+            <Grid item lg={4} sm={4} xl={3} xs={12}>
               <ActiveContracts />
             </Grid>
-            <Grid item lg={4} md={6} xl={3} xs={12}>
-              <ProcessesByStatus sx={{ height: '100%' }} />
-            </Grid>
-            <Grid item lg={4} md={6} xl={3} xs={12}>
-              <ContractsByMonth />
+
+            <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
+              <Grid item lg={4} md={4} xl={3} xs={12}>
+                <ProcessesByStatus sx={{ height: '100%' }} />
+              </Grid>
+              <Grid item lg={4} md={4} xl={3} xs={12}>
+                <ContractsByMonth />
+              </Grid>
+              <Grid item lg={4} md={4} xl={3} xs={12}>
+                <MeetingsPerWeek sx={{ height: '100%' }} />
+              </Grid>
             </Grid>
 
-            <Grid item lg={4} md={6} xl={3} xs={12}>
-              <MeetingsPerWeek sx={{ height: '100%' }} />
-            </Grid>
-            <Grid item lg={8} md={12} xl={9} xs={12}>
+            <Grid item lg={8} md={8} xl={6} xs={12}>
               <AnnualProfit />
             </Grid>
-            <Grid item lg={4} md={6} xl={3} xs={12}>
+            <Grid item lg={4} md={4} xl={3} xs={12}>
               <ClientsByYear />
             </Grid>
           </Grid>
