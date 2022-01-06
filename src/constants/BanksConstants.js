@@ -4,35 +4,35 @@ export default [
     label: 'Selecione uma opção'
   },
   {
-    value: '1',
+    value: 'Banco do Brasil',
     label: 'Banco do Brasil'
   },
   {
-    value: '2',
+    value: 'Banco Inter',
     label: 'Banco Inter'
   },
   {
-    value: '3',
+    value: 'Bradesco',
     label: 'Bradesco'
   },
   {
-    value: '4',
+    value: 'Caixa Econômica Federal',
     label: 'Caixa Econômica Federal'
   },
   {
-    value: '5',
+    value: 'C6 Bank',
     label: 'C6 Bank'
   },
   {
-    value: '6',
+    value: 'Itaú',
     label: 'Itaú'
   },
   {
-    value: '7',
+    value: 'Nubank',
     label: 'Nubank'
   },
   {
-    value: '8',
+    value: 'Santander Brasil S.A',
     label: 'Santander Brasil S.A'
   }
 ];
