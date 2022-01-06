@@ -11,6 +11,8 @@ import ClientContactCreate from './components/client_contact/ClientContactCreate
 import ClientContactSend from './components/client_contact/ClientContactSend';
 import ClientContactSent from './components/client_contact/ClientContactSent';
 import ClientContactShow from './components/client_contact/ClientContactShow';
+import ContractCreate from './components/contract/ContractCreate';
+import ContractJoin from './components/contract/ContractJoin';
 import MainLayout from './components/MainLayout';
 import PageLayout from './components/PageLayout';
 import Permissions from './components/Permissions';
@@ -25,6 +27,7 @@ import ChangePassword from './pages/ChangePassword';
 import Client from './pages/Client';
 import ClientContact from './pages/ClientContact';
 import Construction from './pages/Construction';
+import Contract from './pages/Contract';
 import CustomerList from './pages/CustomerList';
 import Dashboard from './pages/Dashboard';
 import DashboardClient from './pages/DashboardClient';
@@ -79,6 +82,18 @@ function App() {
                 <ProtectedRoute path="/identity" element={<Identity />} />
 
                 <ProtectedRoute path="/clients" element={<Client />} />
+
+                <ProtectedRoute path="/contracts" element={<Contract />} />
+
+                <ProtectedRoute
+                  path="/contracts/join"
+                  element={<ContractJoin />}
+                />
+
+                <ProtectedRoute
+                  path="/contracts/create"
+                  element={<ContractCreate />}
+                />
 
                 <ProtectedRoute path="/clients/edit" element={<ClientEdit />} />
                 <ProtectedRoute

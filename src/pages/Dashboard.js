@@ -31,7 +31,6 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    console.log('aqui dentro');
     const isAllowed = checkPermissionDashboard();
 
     if (!isAllowed) {
