@@ -92,7 +92,7 @@ const ContractManagement = (listContracts) => {
       setRows(listContracts.contracts);
     } else {
       const filteredRows = rows.filter((row) => {
-        return row.name.toLowerCase().includes(value.toLowerCase());
+        return row.client.name.toLowerCase().includes(value.toLowerCase());
       });
       setRows(filteredRows);
     }
@@ -133,23 +133,35 @@ const ContractManagement = (listContracts) => {
                 <TableCell>Data de inicio</TableCell>
                 <TableCell>Data de fim</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.slice(0, limit).map((contract) => (
-                <TableRow hover key={contract.contract_number}>
+                <TableRow hover key={contract.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
-                      {contract.name_client}
+                      {contract.id}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    {moment(contract.start_date).format('MM/DD/YYYY')}
+                    <Typography color="textPrimary" variant="body1">
+                      {contract.client.name}
+                    </Typography>
                   </TableCell>
                   <TableCell>
-                    {moment(contract.finish_date).format('MM/DD/YYYY')}
+                    {moment(contract.start_date).format('DD/MM/YYYY')}
                   </TableCell>
-                  <TableCell>{contract.status}</TableCell>
+                  <TableCell>
+                    {moment(contract.finish_date).format('DD/MM/YYYY')}
+                  </TableCell>
+                  <TableCell>
+                    {contract.canceled_at !== null ? (
+                      <Typography color="error">Cancelado</Typography>
+                    ) : (
+                      <Typography>Ativo</Typography>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar">
                       {checkedPermission(4, 1) ? (
@@ -165,7 +177,7 @@ const ContractManagement = (listContracts) => {
                           cursor="pointer"
                           onClick={() => {
                             navigate('/contracts/edit', {
-                              state: { contract, show: true }
+                              state: { contract }
                             });
                           }}
                         ></Visibility>
