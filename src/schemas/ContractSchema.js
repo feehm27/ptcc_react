@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const ContractCreateSchema = Yup.object().shape({
+const ContractSchema = Yup.object().shape({
   payment_day: Yup.string()
     .required('Campo obrigatório')
     .test('isNull', 'Campo obrigatório', (value) => {
@@ -17,4 +17,4 @@ const ContractCreateSchema = Yup.object().shape({
     })
 });
 
-export default ContractCreateSchema;
+export default ContractSchema;

@@ -50,19 +50,6 @@ const ContractListToolbar = (contracts) => {
         >
           Novo Contrato
         </Button>
-        <Button
-          sx={{ mx: 1 }}
-          color="primary"
-          variant="contained"
-          disabled={
-            data && !data.isAdmin
-              ? data.checkeds.permissions_checked[4][4].checked === 0
-              : false
-          }
-          onClick={() => navigate('/contracts/create')}
-        >
-          Exportar todos os contratos
-        </Button>
       </Box>
     </Box>
   );

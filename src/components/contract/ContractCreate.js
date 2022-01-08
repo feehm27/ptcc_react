@@ -36,7 +36,7 @@ import BanksConstants from 'src/constants/BanksConstants';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
 import PaymentConstants from 'src/constants/PaymentConstants';
 import ContractAdvocateSchema from 'src/schemas/ContractAdvocateSchema';
-import ContractCreateSchema from 'src/schemas/ContractCreateSchema';
+import ContractSchema from 'src/schemas/ContractSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
@@ -1024,7 +1024,7 @@ const ContractCreate = () => {
           start_date: '',
           finish_date: ''
         }}
-        validationSchema={ContractCreateSchema}
+        validationSchema={ContractSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, values, handleBlur, handleChange, submitForm }) => (
