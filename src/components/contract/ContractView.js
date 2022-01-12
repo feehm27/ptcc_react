@@ -9,15 +9,16 @@ import {
 } from '@material-ui/core';
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { useLocation } from 'react-router';
 
 const ContractView = () => {
+  const { contract } = useLocation().state;
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-  const url =
-    'https://cors-anywhere.herokuapp.com/https://advoguez-images.s3.sa-east-1.amazonaws.com/H93QRT6R.pdf';
+  const url = `https://ancient-dawn-76058.herokuapp.com/${contract.link_contract}`;
 
   document.addEventListener('contextmenu', (event) => {
     event.preventDefault();
