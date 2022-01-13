@@ -9,12 +9,13 @@ import {
 } from '@material-ui/core';
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 const ContractView = () => {
   const { contract } = useLocation().state;
-  const [numPages, setNumPages] = useState(null);
+  const [pages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const navigate = useNavigate();
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -24,8 +25,8 @@ const ContractView = () => {
     event.preventDefault();
   });
 
-  function onDocumentLoadSuccess({ pages }) {
-    setNumPages(pages);
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
     setPageNumber(1);
   }
 
@@ -52,7 +53,7 @@ const ContractView = () => {
       <CardContent sx={{}}>
         <div style={{ textAlign: 'center' }}>
           <div className="pagec">
-            Página {pageNumber || (numPages ? 1 : '--')} de {numPages || '--'}
+            Página {pageNumber || (pages ? 1 : '--')} de {pages || '--'}
           </div>
         </div>
         <Box
@@ -74,7 +75,7 @@ const ContractView = () => {
             </Button>
             <Button
               type="button"
-              disabled={pageNumber >= numPages}
+              disabled={pageNumber >= pages}
               onClick={() => nextPage()}
               variant="contained"
             >
@@ -92,6 +93,23 @@ const ContractView = () => {
           </Document>
         </div>
       </CardContent>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          p: 2
+        }}
+      >
+        <Stack direction="row" spacing={2}>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => navigate('/contracts')}
+          >
+            Voltar
+          </Button>
+        </Stack>
+      </Box>
     </Card>
   );
 };
