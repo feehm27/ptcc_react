@@ -4,7 +4,6 @@ import { useContext, useEffect } from 'react';
 import {
   Activity as ActivityIcon,
   ArrowRightCircle as ArrowRightIcon,
-  Bell as BellIcon,
   Calendar as CalendarIcon,
   Camera as CameraIcon,
   FileText as FileIcon,
@@ -119,17 +118,6 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[7].checked === 1
-          : true
-    },
-    {
-      id: 9,
-      href: '/construction',
-      icon: BellIcon,
-      title: 'Lembretes',
-      disabled: true,
-      allowed:
-        data && !data.isAdmin
-          ? data.checkeds.menus_checked[8].checked === 1
           : true
     },
     {

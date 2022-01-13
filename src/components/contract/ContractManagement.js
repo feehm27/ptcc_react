@@ -238,7 +238,14 @@ const ContractManagement = (listContracts) => {
                           cursor="pointer"
                         ></DownloadForOfflineRounded>
                       ) : (
-                        <DownloadForOfflineRounded cursor="pointer"></DownloadForOfflineRounded>
+                        <a
+                          style={{ color: 'inherit' }}
+                          target="webapp-tab"
+                          href={contract.link_contract}
+                          download={contract.link_contract}
+                        >
+                          <DownloadForOfflineRounded cursor="pointer"></DownloadForOfflineRounded>
+                        </a>
                       )}
                     </Tooltip>
                     <Tooltip title="Excluir">
