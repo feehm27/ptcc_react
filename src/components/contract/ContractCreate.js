@@ -260,6 +260,12 @@ const ContractCreate = () => {
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
+    if (values.start_date !== 'Invalid Date') {
+      delete errors.start_date;
+    }
+    if (values.end_date !== 'Invalid Date') {
+      delete errors.end_date;
+    }
     if (isEmpty(errors)) sendContract(values);
   };
 
@@ -830,7 +836,7 @@ const ContractCreate = () => {
                                 </Grid>
                                 <Grid item md={6} xs={12}>
                                   <ReactInputMask
-                                    mask="99999999-9"
+                                    mask="99999-9"
                                     value={values.account}
                                     onChange={(event) => {
                                       showSuccessAdvocate.current = false;

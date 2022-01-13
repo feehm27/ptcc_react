@@ -137,6 +137,12 @@ const ContractEdit = () => {
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
+    if (values.start_date !== 'Invalid Date') {
+      delete errors.start_date;
+    }
+    if (values.end_date !== 'Invalid Date') {
+      delete errors.end_date;
+    }
     if (isEmpty(errors)) updateContract(values);
   };
 
@@ -643,7 +649,7 @@ const ContractEdit = () => {
                   </Grid>
                   <Grid item md={6} xs={12}>
                     <ReactInputMask
-                      mask="99999999-9"
+                      mask="99999-9"
                       value={
                         checked &&
                         contract.advocate &&

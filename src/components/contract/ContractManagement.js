@@ -136,7 +136,7 @@ const ContractManagement = (listContracts) => {
               <Box>
                 <SearchBar
                   style={{ display: '-webkit-inline-box' }}
-                  placeholder="Buscar contrato"
+                  placeholder="Buscar pelo cliente"
                   value={searched}
                   onChange={(value) => searchContracts(value)}
                   onCancelSearch={() => cancelSearch()}
@@ -154,6 +154,7 @@ const ContractManagement = (listContracts) => {
                 <TableCell>Data de inicio</TableCell>
                 <TableCell>Data de fim</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Data de cancelamento</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -182,6 +183,11 @@ const ContractManagement = (listContracts) => {
                     ) : (
                       <Typography>Ativo</Typography>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    {contract.canceled_at !== null
+                      ? moment(contract.finish_date).format('DD/MM/YYYY')
+                      : '-'}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar">
