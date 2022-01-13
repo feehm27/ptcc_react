@@ -49,10 +49,10 @@ const InformationSchema = Yup.object().shape({
     }),
   account: Yup.string()
     .nullable()
-    .test('len', 'Informe no mínimo 9 caracteres', (value) => {
+    .test('len', 'Informe no mínimo 6 caracteres', (value) => {
       if (value) {
         const lengthValue = value.replace(/[^\d]/g, '').length;
-        return lengthValue === 9 || lengthValue === 0;
+        return lengthValue === 6 || lengthValue === 0;
       }
       return true;
     }),
