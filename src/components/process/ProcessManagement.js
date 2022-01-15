@@ -32,14 +32,14 @@ import { API } from 'src/services/api';
 import { UserContext } from 'src/contexts/UserContext';
 import ToastAnimated, { showToast } from '../Toast';
 
-const ContractManagement = (listContracts) => {
+const ProcessManagement = (listProcesses) => {
   const navigate = useNavigate();
   const { data } = useContext(UserContext);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [rows, setRows] = useState(listContracts.contracts);
+  const [rows, setRows] = useState(listProcesses.processes);
   const [showModal, setShowModal] = useState(false);
-  const [selectedContract, setSelectedContract] = useState([]);
+  const [selectedProcess, setSelectedProcess] = useState([]);
   const [searched, setSearched] = useState('');
 
   const showSuccess = useRef(false);
@@ -68,14 +68,14 @@ const ContractManagement = (listContracts) => {
   };
 
   /**
-   * Obtém as informações do cliente
+   * Obtém os dados do processo
    */
-  async function getContracts() {
+  async function getProcesses() {
     const tokenUser = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${tokenUser}` }
     };
-    await API.get('advocates/contracts', config)
+    await API.get('advocates/processes', config)
       .then((response) => {
         setRows(response.data.data);
       })
@@ -86,17 +86,17 @@ const ContractManagement = (listContracts) => {
    * Envia os dados do advogado
    * @param {*} values
    */
-  async function deleteContract(contractId) {
+  async function deleteProcess(processId) {
     showSuccess.current = false;
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
 
-    await API.delete(`advocates/contracts/${contractId}`, config)
+    await API.delete(`advocates/processes/${processId}`, config)
       .then(() => {
         showSuccess.current = true;
-        getContracts();
+        getProcesses();
       })
       .catch((err) => {
         console.log(err);
@@ -108,9 +108,9 @@ const ContractManagement = (listContracts) => {
    * Busca os clientes na tabela
    * @param {} value
    */
-  const searchContracts = (value) => {
+  const searchProcesses = (value) => {
     if (value === '' || value === undefined) {
-      setRows(listContracts.contracts);
+      setRows(listProcesses.processes);
     } else {
       const filteredRows = rows.filter((row) => {
         return row.client.name.toLowerCase().includes(value.toLowerCase());
@@ -124,10 +124,10 @@ const ContractManagement = (listContracts) => {
    */
   const cancelSearch = () => {
     setSearched('');
-    searchContracts(searched);
+    searchProcesses(searched);
   };
 
-  return listContracts.contracts.length > 0 ? (
+  return listProcesses.processes.length > 0 ? (
     <Card sx={{ mt: 3, mb: 4 }}>
       <PerfectScrollbar>
         <Box>
@@ -138,7 +138,7 @@ const ContractManagement = (listContracts) => {
                   style={{ display: '-webkit-inline-box' }}
                   placeholder="Buscar pelo cliente"
                   value={searched}
-                  onChange={(value) => searchContracts(value)}
+                  onChange={(value) => searchProcesses(value)}
                   onCancelSearch={() => cancelSearch()}
                 ></SearchBar>
               </Box>
@@ -149,49 +149,33 @@ const ContractManagement = (listContracts) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>ID Contrato</TableCell>
+                <TableCell>Número do processo</TableCell>
                 <TableCell>Nome do cliente</TableCell>
-                <TableCell>Data de inicio</TableCell>
-                <TableCell>Data de fim</TableCell>
+                <TableCell>Data de início</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Data de cancelamento</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.slice(0, limit).map((contract) => (
-                <TableRow hover key={contract.id}>
+              {rows.slice(0, limit).map((process) => (
+                <TableRow hover key={process.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
-                      {contract.id}
+                      {process.number}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
-                      {contract.client.name}
+                      {process.client.name}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    {moment(contract.start_date).format('DD/MM/YYYY')}
+                    {moment(process.start_date).format('DD/MM/YYYY')}
                   </TableCell>
+                  <TableCell>{process.status}</TableCell>
                   <TableCell>
-                    {moment(contract.finish_date).format('DD/MM/YYYY')}
-                  </TableCell>
-                  <TableCell>
-                    {contract.canceled_at !== null ? (
-                      <Typography color="error">Cancelado</Typography>
-                    ) : (
-                      <Typography>Ativo</Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {contract.canceled_at !== null
-                      ? moment(contract.finish_date).format('DD/MM/YYYY')
-                      : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title="Visualizar">
-                      {checkedPermission(4, 1) ? (
+                    <Tooltip title="Adicionar modificações">
+                      {checkedPermission(5, 1) ? (
                         <Visibility
                           style={{
                             color: '#c0c0c0',
@@ -205,14 +189,14 @@ const ContractManagement = (listContracts) => {
                           onClick={() => {
                             showSuccess.current = false;
                             navigate('/contracts/view', {
-                              state: { contract }
+                              state: { contract: process }
                             });
                           }}
                         ></Visibility>
                       )}
                     </Tooltip>
                     <Tooltip title="Editar">
-                      {checkedPermission(4, 2) ? (
+                      {checkedPermission(5, 2) ? (
                         <Edit
                           style={{
                             color: '#c0c0c0',
@@ -227,14 +211,14 @@ const ContractManagement = (listContracts) => {
                           onClick={() => {
                             showSuccess.current = false;
                             navigate('/contracts/edit', {
-                              state: { contract, show: false }
+                              state: { contract: process, show: false }
                             });
                           }}
                         ></Edit>
                       )}
                     </Tooltip>
                     <Tooltip title="Download">
-                      {checkedPermission(4, 3) ? (
+                      {checkedPermission(5, 3) ? (
                         <DownloadForOfflineRounded
                           style={{
                             color: '#c0c0c0',
@@ -247,15 +231,15 @@ const ContractManagement = (listContracts) => {
                         <a
                           style={{ color: 'inherit' }}
                           target="webapp-tab"
-                          href={contract.link_contract}
-                          download={contract.link_contract}
+                          href={process.link_contract}
+                          download={process.link_contract}
                         >
                           <DownloadForOfflineRounded cursor="pointer"></DownloadForOfflineRounded>
                         </a>
                       )}
                     </Tooltip>
                     <Tooltip title="Excluir">
-                      {checkedPermission(4, 4) ? (
+                      {checkedPermission(5, 4) ? (
                         <Delete
                           style={{
                             color: '#c0c0c0',
@@ -264,7 +248,7 @@ const ContractManagement = (listContracts) => {
                           }}
                           cursor="pointer"
                           onClick={() => {
-                            setSelectedContract(contract);
+                            setSelectedProcess(process);
                             setShowModal(true);
                           }}
                         ></Delete>
@@ -272,7 +256,7 @@ const ContractManagement = (listContracts) => {
                         <Delete
                           cursor="pointer"
                           onClick={() => {
-                            setSelectedContract(contract);
+                            setSelectedProcess(process);
                             setShowModal(true);
                           }}
                         ></Delete>
@@ -309,8 +293,8 @@ const ContractManagement = (listContracts) => {
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Todos os vinculos relacionados ao contrato também serão
-                deletados.
+                Todos os vinculos relacionados ao processo, incluindo os
+                históricos também serão deletados. Essa ação é irreversivel.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -320,7 +304,7 @@ const ContractManagement = (listContracts) => {
               <Button
                 onClick={() => {
                   handleClose();
-                  deleteContract(selectedContract.id);
+                  deleteProcess(selectedProcess.id);
                 }}
                 autoFocuscolor="primary"
                 variant="contained"
@@ -336,7 +320,7 @@ const ContractManagement = (listContracts) => {
           <ToastAnimated />
           {showToast({
             type: 'success',
-            message: 'Contrato deletado com sucesso!'
+            message: 'Processo deletado com sucesso!'
           })}
         </>
       )}
@@ -351,7 +335,7 @@ const ContractManagement = (listContracts) => {
           <TableBody>
             <TableCell>
               <Typography color="textSecondary" variant="body1">
-                Não existem contratos cadastrados.
+                Não existem processos cadastrados.
               </Typography>
             </TableCell>
           </TableBody>
@@ -361,4 +345,4 @@ const ContractManagement = (listContracts) => {
   );
 };
 
-export default ContractManagement;
+export default ProcessManagement;

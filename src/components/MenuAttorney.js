@@ -89,10 +89,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 6,
-      href: '/construction',
+      href: '/processes',
       icon: ArrowRightIcon,
       title: 'Gestão de Processos',
-      disabled: true,
+      disabled: false,
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[5].checked === 1

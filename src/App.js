@@ -44,6 +44,9 @@ import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
+import Process from './pages/Process';
+import ProcessJoin from './components/process/ProcessJoin';
+import ProcessCreate from './components/process/ProcessCreate';
 
 function App() {
   return (
@@ -107,7 +110,20 @@ function App() {
                   element={<ContractCreate />}
                 />
 
+                <ProtectedRoute path="/processes" element={<Process />} />
+
+                <ProtectedRoute
+                  path="/processes/join"
+                  element={<ProcessJoin />}
+                />
+
+                <ProtectedRoute
+                  path="/processes/create"
+                  element={<ProcessCreate />}
+                />
+
                 <ProtectedRoute path="/clients/edit" element={<ClientEdit />} />
+
                 <ProtectedRoute
                   path="/clients/create"
                   element={<ClientCreate />}
