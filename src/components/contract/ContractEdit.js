@@ -26,7 +26,7 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useLocation, useNavigate } from 'react-router';
 import BanksConstants from 'src/constants/BanksConstants';
@@ -54,6 +54,19 @@ const ContractEdit = () => {
 
   const showSuccessCancellation = useRef(false);
   const showErrorCancellation = useRef(false);
+
+  /**
+   * Use Effect
+   */
+  useEffect(() => {
+    const startDate = new Date(contract.start_date);
+    startDate.setDate(startDate.getDate() + 1);
+    handleStartDateChange(startDate);
+
+    const finishDate = new Date(contract.finish_date);
+    finishDate.setDate(finishDate.getDate() + 1);
+    handleEndDateChange(finishDate);
+  }, []);
 
   const handleChangeChecked = (event, errors) => {
     setChecked(event.target.checked);
