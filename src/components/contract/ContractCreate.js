@@ -256,10 +256,31 @@ const ContractCreate = () => {
   }
 
   /**
+   * Mascara em reais
+   * @param {*} value
+   * @returns
+   */
+  const maskReais = (value) => {
+    if (value !== undefined) {
+      return (Number(value.replace(/\D/g, '')) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+    return value;
+  };
+
+  /**
    * Envia os dados do formulário
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
+    if (values.start_date !== 'Invalid Date') {
+      delete errors.start_date;
+    }
+    if (values.end_date !== 'Invalid Date') {
+      delete errors.end_date;
+    }
     if (isEmpty(errors)) sendContract(values);
   };
 
@@ -830,7 +851,7 @@ const ContractCreate = () => {
                                 </Grid>
                                 <Grid item md={6} xs={12}>
                                   <ReactInputMask
-                                    mask="99999999-9"
+                                    mask="99999-9"
                                     value={values.account}
                                     onChange={(event) => {
                                       showSuccessAdvocate.current = false;
@@ -1161,54 +1182,66 @@ const ContractCreate = () => {
                     </TextField>
                   </Grid>
                   <Grid item md={6} xs={12}>
-                    <ReactInputMask
-                      mask="9999999"
+                    <TextField
                       value={values.contract_price}
+                      error={errors.contract_price}
+                      fullWidth
+                      helperText={errors.contract_price}
+                      label="Valor do contrato"
+                      name="contract_price"
+                      variant="outlined"
+                      inputProps={{ maxLength: 15 }}
+                      onBlur={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
+                        showSuccessContract.current = false;
+                        showErrorContract.current = false;
+                        showSuccessAdvocate.current = false;
+                        showErrorAdvocate.current = false;
+                        handleBlur(event);
+                      }}
                       onChange={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
                         showSuccessContract.current = false;
                         showErrorContract.current = false;
                         showSuccessAdvocate.current = false;
                         showErrorAdvocate.current = false;
                         handleChange(event);
                       }}
-                    >
-                      {() => (
-                        <TextField
-                          error={errors.contract_price}
-                          fullWidth
-                          helperText={errors.contract_price}
-                          label="Valor do contrato"
-                          name="contract_price"
-                          variant="outlined"
-                          required
-                        />
-                      )}
-                    </ReactInputMask>
+                      required
+                    />
                   </Grid>
                   <Grid item md={6} xs={12}>
-                    <ReactInputMask
-                      mask="9999999"
+                    <TextField
                       value={values.fine_price}
+                      error={errors.fine_price}
+                      fullWidth
+                      helperText={errors.fine_price}
+                      label="Valor da multa"
+                      name="fine_price"
+                      variant="outlined"
+                      inputProps={{ maxLength: 15 }}
+                      onBlur={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
+                        showSuccessContract.current = false;
+                        showErrorContract.current = false;
+                        showSuccessAdvocate.current = false;
+                        showErrorAdvocate.current = false;
+                        handleBlur(event);
+                      }}
                       onChange={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
                         showSuccessContract.current = false;
                         showErrorContract.current = false;
                         showSuccessAdvocate.current = false;
                         showErrorAdvocate.current = false;
                         handleChange(event);
                       }}
-                    >
-                      {() => (
-                        <TextField
-                          error={errors.fine_price}
-                          fullWidth
-                          helperText={errors.fine_price}
-                          label="Valor da multa"
-                          name="fine_price"
-                          variant="outlined"
-                          required
-                        />
-                      )}
-                    </ReactInputMask>
+                      required
+                    />
                   </Grid>
                   <Grid item md={12} xs={12}>
                     <FormControlLabel
@@ -1279,7 +1312,7 @@ const ContractCreate = () => {
                   </Grid>
                   <Grid item md={6} xs={12}>
                     <ReactInputMask
-                      mask="99999999-9"
+                      mask="99999-9"
                       value={
                         checked &&
                         advocateFound &&

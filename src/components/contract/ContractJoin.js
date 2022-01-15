@@ -10,7 +10,7 @@ import {
   Typography
 } from '@material-ui/core';
 import { Formik } from 'formik';
-import { first } from 'lodash';
+import { find } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { NavLink } from 'react-router-dom';
@@ -61,9 +61,10 @@ const ContractJoin = () => {
       }}
       validationSchema={ContractJoinSchema}
       onSubmit={() => {
-        const findClient = first(clients, function findClient(client) {
-          return client.id === selectedClientId;
+        const findClient = find(clients, function findClient(client) {
+          return client.id === Number(selectedClientId);
         });
+
         navigate('/contracts/create', {
           state: { client: findClient }
         });
@@ -105,11 +106,11 @@ const ContractJoin = () => {
                           name="clients"
                           onBlur={(event) => {
                             handleBlur(event);
-                            setSelectedClientId(event);
+                            setSelectedClientId(event.target.value);
                           }}
                           onChange={(event) => {
                             handleChange(event);
-                            setSelectedClientId(event.value);
+                            setSelectedClientId(event.target.value);
                           }}
                           required
                           select

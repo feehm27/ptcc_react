@@ -17,10 +17,15 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Delete, DownloadRounded, Edit, Visibility } from '@material-ui/icons';
+import {
+  Delete,
+  DownloadForOfflineRounded,
+  Edit,
+  Visibility
+} from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 import { API } from 'src/services/api';
@@ -33,10 +38,11 @@ const ContractManagement = (listContracts) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listContracts.contracts);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedContract, setSelectedContract] = useState([]);
   const [searched, setSearched] = useState('');
+
+  const showSuccess = useRef(false);
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -62,24 +68,39 @@ const ContractManagement = (listContracts) => {
   };
 
   /**
+   * Obtém as informações do cliente
+   */
+  async function getContracts() {
+    const tokenUser = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${tokenUser}` }
+    };
+    await API.get('advocates/contracts', config)
+      .then((response) => {
+        setRows(response.data.data);
+      })
+      .catch((err) => console.error(err));
+  }
+
+  /**
    * Envia os dados do advogado
    * @param {*} values
    */
   async function deleteContract(contractId) {
-    setShowSuccess(false);
+    showSuccess.current = false;
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
 
     await API.delete(`advocates/contracts/${contractId}`, config)
-      .then(() => {})
+      .then(() => {
+        showSuccess.current = true;
+        getContracts();
+      })
       .catch((err) => {
         console.log(err);
-        setShowSuccess(false);
-      })
-      .finally(() => {
-        setShowSuccess(true);
+        showSuccess.current = false;
       });
   }
 
@@ -115,7 +136,7 @@ const ContractManagement = (listContracts) => {
               <Box>
                 <SearchBar
                   style={{ display: '-webkit-inline-box' }}
-                  placeholder="Buscar contrato"
+                  placeholder="Buscar pelo cliente"
                   value={searched}
                   onChange={(value) => searchContracts(value)}
                   onCancelSearch={() => cancelSearch()}
@@ -133,6 +154,7 @@ const ContractManagement = (listContracts) => {
                 <TableCell>Data de inicio</TableCell>
                 <TableCell>Data de fim</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Data de cancelamento</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -163,6 +185,11 @@ const ContractManagement = (listContracts) => {
                     )}
                   </TableCell>
                   <TableCell>
+                    {contract.canceled_at !== null
+                      ? moment(contract.finish_date).format('DD/MM/YYYY')
+                      : '-'}
+                  </TableCell>
+                  <TableCell>
                     <Tooltip title="Visualizar">
                       {checkedPermission(4, 1) ? (
                         <Visibility
@@ -176,7 +203,8 @@ const ContractManagement = (listContracts) => {
                         <Visibility
                           cursor="pointer"
                           onClick={() => {
-                            navigate('/contracts/edit', {
+                            showSuccess.current = false;
+                            navigate('/contracts/view', {
                               state: { contract }
                             });
                           }}
@@ -197,6 +225,7 @@ const ContractManagement = (listContracts) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
+                            showSuccess.current = false;
                             navigate('/contracts/edit', {
                               state: { contract, show: false }
                             });
@@ -204,18 +233,25 @@ const ContractManagement = (listContracts) => {
                         ></Edit>
                       )}
                     </Tooltip>
-                    <Tooltip title="Exportar">
+                    <Tooltip title="Download">
                       {checkedPermission(4, 3) ? (
-                        <DownloadRounded
+                        <DownloadForOfflineRounded
                           style={{
                             color: '#c0c0c0',
                             cursor: 'not-allowed',
                             pointerEvents: 'none'
                           }}
                           cursor="pointer"
-                        ></DownloadRounded>
+                        ></DownloadForOfflineRounded>
                       ) : (
-                        <DownloadRounded cursor="pointer"></DownloadRounded>
+                        <a
+                          style={{ color: 'inherit' }}
+                          target="webapp-tab"
+                          href={contract.link_contract}
+                          download={contract.link_contract}
+                        >
+                          <DownloadForOfflineRounded cursor="pointer"></DownloadForOfflineRounded>
+                        </a>
                       )}
                     </Tooltip>
                     <Tooltip title="Excluir">
@@ -295,14 +331,13 @@ const ContractManagement = (listContracts) => {
           </Dialog>
         </div>
       )}
-      {showSuccess && (
+      {showSuccess.current && (
         <>
           <ToastAnimated />
           {showToast({
             type: 'success',
             message: 'Contrato deletado com sucesso!'
           })}
-          {setTimeout(() => window.location.reload(), 1000)}
         </>
       )}
     </Card>

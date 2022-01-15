@@ -133,10 +133,31 @@ const ContractEdit = () => {
   }
 
   /**
+   * Mascara em reais
+   * @param {*} value
+   * @returns
+   */
+  const maskReais = (value) => {
+    if (value !== undefined) {
+      return (Number(value.replace(/\D/g, '')) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+    return value;
+  };
+
+  /**
    * Envia os dados do formulário
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
+    if (values.start_date !== 'Invalid Date') {
+      delete errors.start_date;
+    }
+    if (values.end_date !== 'Invalid Date') {
+      delete errors.end_date;
+    }
     if (isEmpty(errors)) updateContract(values);
   };
 
@@ -395,8 +416,8 @@ const ContractEdit = () => {
       <Formik
         initialValues={{
           payment_day: contract.payment_day || 0,
-          contract_price: contract.contract_price || '',
-          fine_price: contract.fine_price || '',
+          contract_price: maskReais(contract.contract_price) || '',
+          fine_price: maskReais(contract.fine_price) || '',
           agency: contract.agency || '',
           account: contract.account || '',
           bank: contract.bank || '',
@@ -544,12 +565,17 @@ const ContractEdit = () => {
                       name="contract_price"
                       variant="outlined"
                       value={values.contract_price}
+                      inputProps={{ maxLength: 15 }}
                       onBlur={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
                         showSuccess.current = false;
                         showError.current = false;
                         handleBlur(event);
                       }}
                       onChange={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
                         showSuccess.current = false;
                         showError.current = false;
                         handleChange(event);
@@ -567,13 +593,18 @@ const ContractEdit = () => {
                       name="fine_price"
                       variant="outlined"
                       required
+                      inputProps={{ maxLength: 15 }}
                       value={values.fine_price}
                       onBlur={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
                         showSuccess.current = false;
                         showError.current = false;
                         handleBlur(event);
                       }}
                       onChange={(event) => {
+                        const maskValue = maskReais(event.target.value);
+                        event.target.value = maskValue;
                         showSuccess.current = false;
                         showError.current = false;
                         handleChange(event);
@@ -643,7 +674,7 @@ const ContractEdit = () => {
                   </Grid>
                   <Grid item md={6} xs={12}>
                     <ReactInputMask
-                      mask="99999999-9"
+                      mask="99999-9"
                       value={
                         checked &&
                         contract.advocate &&

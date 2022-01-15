@@ -555,7 +555,7 @@ const InformationDetails = () => {
                   </Grid>
                   <Grid item md={6} xs={12}>
                     <ReactInputMask
-                      mask="99999999-9"
+                      mask="99999-9"
                       value={values.account}
                       onChange={(event) => {
                         handleChange(event);

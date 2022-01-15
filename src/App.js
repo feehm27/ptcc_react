@@ -13,6 +13,7 @@ import ClientContactSent from './components/client_contact/ClientContactSent';
 import ClientContactShow from './components/client_contact/ClientContactShow';
 import ContractCreate from './components/contract/ContractCreate';
 import ContractEdit from './components/contract/ContractEdit';
+import ContractView from './components/contract/ContractView';
 import ContractJoin from './components/contract/ContractJoin';
 import MainLayout from './components/MainLayout';
 import PageLayout from './components/PageLayout';
@@ -89,6 +90,11 @@ function App() {
                 <ProtectedRoute
                   path="/contracts/edit"
                   element={<ContractEdit />}
+                />
+
+                <ProtectedRoute
+                  path="/contracts/view"
+                  element={<ContractView />}
                 />
 
                 <ProtectedRoute
