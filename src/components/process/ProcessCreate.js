@@ -207,12 +207,8 @@ const ProcessCreate = () => {
                     <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                       <KeyboardDatePicker
                         fullWidth
-                        invalidDateMessage={
-                          errors.start_date === 'Invalid Date'
-                            ? 'Data inválida'
-                            : errors.start_date
-                        }
                         openTo="year"
+                        invalidDateMessage="Data inválida"
                         format="dd/MM/yyyy"
                         label="Data de inicio"
                         views={['year', 'month', 'date']}
@@ -237,11 +233,7 @@ const ProcessCreate = () => {
                     <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                       <KeyboardDatePicker
                         fullWidth
-                        invalidDateMessage={
-                          errors.end_date === 'Invalid Date'
-                            ? 'Data inválida'
-                            : errors.end_date
-                        }
+                        invalidDateMessage="Data inválida"
                         openTo="year"
                         format="dd/MM/yyyy"
                         label="Data de encerramento"

@@ -25,14 +25,14 @@ const ProcessSchema = Yup.object().shape({
     .nullable()
     .required('Campo obrigatório')
     .test(
-      'upload_file',
-      'Tamanho máximo permitido é de 20MB',
-      (value) => !value || (value && value.size <= 20000)
-    )
-    .test(
       'upload_format',
       'Formato do arquivo inválido. Formato válido: PDF',
-      (value) => !value || (value && value.type !== 'application/pdf')
+      (value) => !value || (value && value.type === 'application/pdf')
+    )
+    .test(
+      'upload_size',
+      'Tamanho máximo permitido é de 20MB',
+      (value) => !value || (value && value.size <= 2000000)
     ),
   start_date: Yup.date().nullable().required('Campo obrigatório'),
   end_date: Yup.date().nullable(),
