@@ -19,8 +19,10 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import { useRef, useState } from 'react';
+import ReactInputMask from 'react-input-mask';
 import { useLocation, useNavigate } from 'react-router';
 import ProcessConstantes from 'src/constants/ProcessConstantes';
+import ProcessSchema from 'src/schemas/ProcessSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
@@ -34,6 +36,7 @@ const ProcessCreate = () => {
   const showError = useRef(false);
 
   const [selectedDate, handleDateChange] = useState(null);
+  const [selectedEndDate, handleEndDateChange] = useState(null);
 
   /**
    * Envia os dados do advogado
@@ -65,6 +68,9 @@ const ProcessCreate = () => {
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
+    if (values.start_date !== 'Invalid Date') {
+      delete errors.start_date;
+    }
     if (isEmpty(errors)) sendProcess(values);
   };
 
@@ -78,11 +84,10 @@ const ProcessCreate = () => {
           status: '',
           file: '',
           start_date: '',
+          end_date: '',
           observations: ''
         }}
-        validationSchema={() => {
-          console.log('sem validação');
-        }}
+        validationSchema={ProcessSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, values, handleBlur, handleChange, submitForm }) => (
@@ -101,26 +106,28 @@ const ProcessCreate = () => {
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid item md={6} xs={12}>
-                    <TextField
-                      error={errors.number}
-                      fullWidth
-                      helperText={errors.number}
-                      label="Número do processo"
-                      name="number"
-                      onBlur={(event) => {
-                        handleBlur(event);
-                        showSuccess.current = false;
-                        showError.current = false;
-                      }}
+                    <ReactInputMask
+                      mask="9999999-99.9999.9.99.9999"
+                      value={values.number}
                       onChange={(event) => {
                         handleChange(event);
                         showSuccess.current = false;
                         showError.current = false;
                       }}
-                      value={values.number}
-                      required
-                      variant="outlined"
-                    />
+                    >
+                      {() => (
+                        <TextField
+                          error={errors.number}
+                          fullWidth
+                          helperText={errors.number}
+                          label="Número do processo"
+                          name="number"
+                          required
+                          variant="outlined"
+                          maxLength="25"
+                        />
+                      )}
+                    </ReactInputMask>
                   </Grid>
                   <Grid item md={6} xs={12}>
                     <TextField
@@ -200,13 +207,16 @@ const ProcessCreate = () => {
                     <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                       <KeyboardDatePicker
                         fullWidth
-                        invalidDateMessage={errors.start_date}
+                        invalidDateMessage={
+                          errors.start_date === 'Invalid Date'
+                            ? 'Data inválida'
+                            : errors.start_date
+                        }
                         openTo="year"
                         format="dd/MM/yyyy"
                         label="Data de inicio"
                         views={['year', 'month', 'date']}
                         value={selectedDate}
-                        disablePast={true}
                         inputVariant="outlined"
                         onChange={(e) => {
                           showSuccess.current = false;
@@ -224,17 +234,64 @@ const ProcessCreate = () => {
                     </MuiPickersUtilsProvider>
                   </Grid>
                   <Grid item md={6} xs={12}>
+                    <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
+                      <KeyboardDatePicker
+                        fullWidth
+                        invalidDateMessage={
+                          errors.end_date === 'Invalid Date'
+                            ? 'Data inválida'
+                            : errors.end_date
+                        }
+                        openTo="year"
+                        format="dd/MM/yyyy"
+                        label="Data de encerramento"
+                        minDateMessage="Data não pode ser menor que a data de inicio"
+                        views={['year', 'month', 'date']}
+                        value={selectedEndDate}
+                        inputVariant="outlined"
+                        onChange={(e) => {
+                          showSuccess.current = false;
+                          showError.current = false;
+                          handleEndDateChange(e);
+                        }}
+                        onBlur={(e) => {
+                          showSuccess.current = false;
+                          showError.current = false;
+                          handleBlur(e);
+                        }}
+                        name="end_date"
+                      />
+                    </MuiPickersUtilsProvider>
+                  </Grid>
+                  <Grid item md={6} xs={12}>
                     <Typography variant="h5">Anexar processo *</Typography>
                     <input
-                      accept="image/png, image/jpeg, image/jpg"
+                      required
+                      accept="application/pdf"
                       id="icon-button-file"
                       type="file"
-                      onChange={() => {
+                      onChange={(e) => {
                         showSuccess.current = false;
                         showError.current = false;
+                        const file = e.target.files[0];
+                        values.file = file;
+                        handleChange(e);
                       }}
                       style={{ marginTop: '15px' }}
                     />
+                    {errors && errors.file && (
+                      <Typography
+                        variant="h6"
+                        style={{
+                          marginTop: '15px',
+                          fontWeight: 400,
+                          fontSize: '0.75rem'
+                        }}
+                        color="#f44336"
+                      >
+                        {errors.file}
+                      </Typography>
+                    )}
                   </Grid>
                   <Grid item md={12} xs={12}>
                     <TextField
@@ -252,7 +309,6 @@ const ProcessCreate = () => {
                         handleChange(event);
                       }}
                       name="observations"
-                      required
                     />
                   </Grid>
                   <Grid item md={6} xs={12}>
