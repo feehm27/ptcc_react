@@ -1,3 +1,4 @@
+import DateFnsUtils from '@date-io/date-fns';
 import {
   Box,
   Button,
@@ -8,12 +9,15 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Grid,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Tooltip,
   Typography
 } from '@material-ui/core';
@@ -23,13 +27,20 @@ import {
   DownloadForOfflineRounded,
   Edit
 } from '@material-ui/icons';
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider
+} from '@material-ui/pickers';
+import { ptBR } from 'date-fns/locale';
+import { Formik } from 'formik';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useContext, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
-import { API } from 'src/services/api';
+import ProcessConstantes from 'src/constants/ProcessConstantes';
 import { UserContext } from 'src/contexts/UserContext';
+import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const ProcessManagement = (listProcesses) => {
@@ -39,8 +50,10 @@ const ProcessManagement = (listProcesses) => {
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listProcesses.processes);
   const [showModal, setShowModal] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
   const [selectedProcess, setSelectedProcess] = useState([]);
   const [searched, setSearched] = useState('');
+  const [selectedDate, handleDateChange] = useState(null);
 
   const showSuccess = useRef(false);
 
@@ -75,6 +88,10 @@ const ProcessManagement = (listProcesses) => {
     setShowModal(false);
   };
 
+  const handleCloseAdd = () => {
+    setShowAdd(false);
+  };
+
   const checkedPermission = (positionMenu, positionPermission) => {
     if (data && !data.isAdmin) {
       return (
@@ -100,6 +117,15 @@ const ProcessManagement = (listProcesses) => {
       })
       .catch((err) => console.error(err));
   }
+
+  /**
+   * Envia os dados do formulário
+   * @param {*} values
+   */
+  const handleSubmit = (values, errors) => {
+    console.log('values', values);
+    console.log('errors', errors);
+  };
 
   /**
    * Envia os dados do advogado
@@ -170,7 +196,7 @@ const ProcessManagement = (listProcesses) => {
               <TableRow>
                 <TableCell>Número do processo</TableCell>
                 <TableCell>Nome do cliente</TableCell>
-                <TableCell>Data de início</TableCell>
+                <TableCell>Data de inicio</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
@@ -207,9 +233,7 @@ const ProcessManagement = (listProcesses) => {
                           cursor="pointer"
                           onClick={() => {
                             showSuccess.current = false;
-                            navigate('/processes/add', {
-                              state: { process }
-                            });
+                            setShowAdd(true);
                           }}
                         ></Add>
                       )}
@@ -297,6 +321,135 @@ const ProcessManagement = (listProcesses) => {
         rowsPerPage={limit}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      {showAdd && (
+        <div>
+          <Dialog
+            fullWidth
+            open={showAdd}
+            onClose={handleCloseAdd}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              <Typography color="primary" variant="h5" textAlign="center">
+                Adicionar Modificações
+              </Typography>
+            </DialogTitle>
+            <DialogContent>
+              <Formik
+                initialValues={{
+                  modification_date: '',
+                  status_process: '',
+                  modification_description: ''
+                }}
+                onSubmit={handleSubmit}
+              >
+                {({ errors, values, handleBlur, handleChange, submitForm }) => (
+                  <form
+                    autoComplete="off"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+
+                      handleSubmit(values, errors);
+                    }}
+                  >
+                    <Card>
+                      <Divider />
+                      <CardContent>
+                        <Grid container spacing={3}>
+                          <Grid item md={6} xs={12}>
+                            <MuiPickersUtilsProvider
+                              locale={ptBR}
+                              utils={DateFnsUtils}
+                            >
+                              <KeyboardDatePicker
+                                fullWidth
+                                openTo="year"
+                                invalidDateMessage="Data inválida"
+                                format="dd/MM/yyyy"
+                                label="Data de modificação"
+                                views={['year', 'month', 'date']}
+                                value={selectedDate}
+                                inputVariant="outlined"
+                                onChange={(e) => {
+                                  handleDateChange(e);
+                                }}
+                                onBlur={(e) => {
+                                  handleBlur(e);
+                                }}
+                                name="modification_date"
+                                required
+                              />
+                            </MuiPickersUtilsProvider>
+                          </Grid>
+                          <Grid item md={6} xs={12}>
+                            <TextField
+                              error={errors.status_process}
+                              fullWidth
+                              helperText={errors.status_process}
+                              label="Etapa do processo"
+                              name="status_process"
+                              onBlur={(event) => {
+                                handleBlur(event);
+                              }}
+                              onChange={(event) => {
+                                handleChange(event);
+                              }}
+                              required
+                              select
+                              SelectProps={{ native: true }}
+                              value={values.status_process}
+                              variant="outlined"
+                            >
+                              {ProcessConstantes.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </TextField>
+                          </Grid>
+                          <Grid item md={12} xs={12}>
+                            <TextField
+                              error={errors.modification_description}
+                              fullWidth
+                              helperText={errors.modification_description}
+                              label="Descrição da modificação"
+                              rows="6"
+                              multiline
+                              rowsMax={Infinity}
+                              onBlur={(event) => {
+                                handleBlur(event);
+                              }}
+                              onChange={(event) => {
+                                handleChange(event);
+                              }}
+                              name="modification_description"
+                              required
+                            />
+                          </Grid>
+                          <DialogActions>
+                            <Button onClick={handleCloseAdd} color="primary">
+                              Cancelar
+                            </Button>
+                            <Button
+                              type="submit"
+                              onClick={submitForm}
+                              autoFocuscolor="primary"
+                              variant="contained"
+                            >
+                              Adicionar
+                            </Button>
+                          </DialogActions>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </form>
+                )}
+              </Formik>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
       {showModal && (
         <div>
           <Dialog
