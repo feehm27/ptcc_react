@@ -18,10 +18,10 @@ import {
   Typography
 } from '@material-ui/core';
 import {
+  Add,
   Delete,
   DownloadForOfflineRounded,
-  Edit,
-  Visibility
+  Edit
 } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
@@ -43,6 +43,25 @@ const ProcessManagement = (listProcesses) => {
   const [searched, setSearched] = useState('');
 
   const showSuccess = useRef(false);
+
+  function maskProcessNumber(str) {
+    const characteres = ['-', '.'];
+    const newStr = str;
+
+    return (
+      newStr.substring(0, 7) +
+      characteres[0] +
+      newStr.substring(7, 9) +
+      characteres[1] +
+      newStr.substring(10, 14) +
+      characteres[1] +
+      newStr.substring(15, 16) +
+      characteres[1] +
+      newStr.substring(17, 19) +
+      characteres[1] +
+      str.substring(16)
+    );
+  }
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -161,7 +180,7 @@ const ProcessManagement = (listProcesses) => {
                 <TableRow hover key={process.id}>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
-                      {process.number}
+                      {maskProcessNumber(process.number)}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -176,23 +195,23 @@ const ProcessManagement = (listProcesses) => {
                   <TableCell>
                     <Tooltip title="Adicionar modificações">
                       {checkedPermission(5, 1) ? (
-                        <Visibility
+                        <Add
                           style={{
                             color: '#c0c0c0',
                             cursor: 'not-allowed',
                             pointerEvents: 'none'
                           }}
-                        ></Visibility>
+                        ></Add>
                       ) : (
-                        <Visibility
+                        <Add
                           cursor="pointer"
                           onClick={() => {
                             showSuccess.current = false;
-                            navigate('/contracts/view', {
-                              state: { contract: process }
+                            navigate('/processes/add', {
+                              state: { process }
                             });
                           }}
-                        ></Visibility>
+                        ></Add>
                       )}
                     </Tooltip>
                     <Tooltip title="Editar">
@@ -210,8 +229,8 @@ const ProcessManagement = (listProcesses) => {
                           cursor="pointer"
                           onClick={() => {
                             showSuccess.current = false;
-                            navigate('/contracts/edit', {
-                              state: { contract: process, show: false }
+                            navigate('/processes/edit', {
+                              state: { process, show: false }
                             });
                           }}
                         ></Edit>
@@ -231,8 +250,8 @@ const ProcessManagement = (listProcesses) => {
                         <a
                           style={{ color: 'inherit' }}
                           target="webapp-tab"
-                          href={process.link_contract}
-                          download={process.link_contract}
+                          href={process.file}
+                          download={process.file}
                         >
                           <DownloadForOfflineRounded cursor="pointer"></DownloadForOfflineRounded>
                         </a>

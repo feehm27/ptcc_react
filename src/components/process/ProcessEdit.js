@@ -5,12 +5,16 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   Divider,
+  FormControlLabel,
   Grid,
   Stack,
   TextField,
+  Tooltip,
   Typography
 } from '@material-ui/core';
+import { Link } from '@material-ui/icons';
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider
@@ -19,19 +23,21 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useLocation, useNavigate } from 'react-router';
 import ProcessConstantes from 'src/constants/ProcessConstantes';
-import ProcessSchema from 'src/schemas/ProcessSchema';
+import ProcessEditSchema from 'src/schemas/ProcessEditSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const ProcessCreate = () => {
-  const { client } = useLocation().state;
+  const { process } = useLocation().state;
   const navigate = useNavigate();
 
+  const [checked, setChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showAttachment, setShowAttachment] = useState(false);
 
   const showSuccess = useRef(false);
   const showError = useRef(false);
@@ -39,11 +45,14 @@ const ProcessCreate = () => {
   const [selectedDate, handleDateChange] = useState(null);
   const [selectedEndDate, handleEndDateChange] = useState(null);
 
+  const handleChangeChecked = (event) => {
+    setChecked(event.target.checked);
+  };
   /**
    * Envia os dados do advogado
    * @param {*} values
    */
-  async function sendProcess(values) {
+  async function updateProcess(values) {
     setSubmitting(true);
 
     const config = {
@@ -53,7 +62,7 @@ const ProcessCreate = () => {
     };
 
     values.start_date = moment(selectedDate).format('YYYY-MM-DD');
-    values.client_id = client.id;
+    values.client_id = process.client.id;
 
     if (selectedEndDate === null) {
       delete values.end_date;
@@ -62,13 +71,16 @@ const ProcessCreate = () => {
     }
 
     const formData = new FormData();
-    formData.append('file', values.file);
 
+    if (values.file && checked) {
+      formData.append('file', values.file);
+    }
     delete values.file;
+
     const newValues = JSON.stringify(values);
     formData.append('values', newValues);
 
-    await API.post('advocates/processes', formData, config)
+    await API.post(`advocates/processes/${process.id}`, formData, config)
       .then(() => {
         showSuccess.current = true;
       })
@@ -85,29 +97,49 @@ const ProcessCreate = () => {
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
+    if (!checked) {
+      delete errors.file;
+    }
     if (values.start_date !== 'Invalid Date') {
       delete errors.start_date;
     }
     if (values.end_date !== 'Invalid Date') {
       delete errors.end_date;
     }
-    if (isEmpty(errors)) sendProcess(values);
+
+    console.log('errors', errors);
+    console.log('values', values);
+
+    if (isEmpty(errors)) updateProcess(values);
   };
+
+  /**
+   * Use Effect
+   */
+  useEffect(() => {
+    const startDate = new Date(process.start_date);
+    startDate.setDate(startDate.getDate() + 1);
+    handleDateChange(startDate);
+
+    const endDate = new Date(process.end_date);
+    endDate.setDate(endDate.getDate() + 1);
+    handleEndDateChange(endDate);
+  }, []);
 
   return (
     <>
       <Formik
         initialValues={{
-          number: '',
-          labor_stick: '',
-          petition: '',
-          status: '',
-          file: '',
+          number: process.number || '',
+          labor_stick: process.labor_stick || '',
+          petition: process.petition || '',
+          status: process.status || '',
+          file: process.file || '',
           start_date: '',
           end_date: '',
-          observations: ''
+          observations: process.observations || ''
         }}
-        validationSchema={ProcessSchema}
+        validationSchema={ProcessEditSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, values, handleBlur, handleChange, submitForm }) => (
@@ -134,6 +166,7 @@ const ProcessCreate = () => {
                         showSuccess.current = false;
                         showError.current = false;
                       }}
+                      disabled
                     >
                       {() => (
                         <TextField
@@ -145,6 +178,7 @@ const ProcessCreate = () => {
                           required
                           variant="outlined"
                           maxLength="25"
+                          disabled
                         />
                       )}
                     </ReactInputMask>
@@ -275,36 +309,58 @@ const ProcessCreate = () => {
                       />
                     </MuiPickersUtilsProvider>
                   </Grid>
-                  <Grid item md={6} xs={12}>
-                    <Typography variant="h5">Anexar processo *</Typography>
-                    <input
-                      required
-                      accept="application/pdf"
-                      id="icon-button-file"
-                      type="file"
-                      onChange={(e) => {
-                        showSuccess.current = false;
-                        showError.current = false;
-                        const file = e.target.files[0];
-                        values.file = file;
-                        handleChange(e);
-                      }}
-                      style={{ marginTop: '15px' }}
+
+                  <Grid item md={6} xs={6}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={checked}
+                          name="alter_file"
+                          color="primary"
+                          onChange={(e) => {
+                            showSuccess.current = false;
+                            showError.current = false;
+                            setShowAttachment(!showAttachment);
+                            handleChangeChecked(e);
+                          }}
+                        />
+                      }
+                      label="Alterar processo anexado"
                     />
-                    {errors && errors.file && (
-                      <Typography
-                        variant="h6"
-                        style={{
-                          marginTop: '15px',
-                          fontWeight: 400,
-                          fontSize: '0.75rem'
-                        }}
-                        color="#f44336"
-                      >
-                        {errors.file}
-                      </Typography>
-                    )}
                   </Grid>
+                  {showAttachment && (
+                    <Grid item md={6} xs={6}>
+                      <Typography variant="h5">Anexar processo *</Typography>
+                      <input
+                        required
+                        accept="application/pdf"
+                        id="icon-button-file"
+                        type="file"
+                        onChange={(e) => {
+                          showSuccess.current = false;
+                          showError.current = false;
+                          const file = e.target.files[0];
+                          values.file = file;
+                          handleChange(e);
+                        }}
+                        style={{ marginTop: '15px' }}
+                      />
+                      {errors && errors.file && (
+                        <Typography
+                          variant="h6"
+                          style={{
+                            marginTop: '15px',
+                            fontWeight: 400,
+                            fontSize: '0.75rem'
+                          }}
+                          color="#f44336"
+                        >
+                          {errors.file}
+                        </Typography>
+                      )}
+                    </Grid>
+                  )}
+
                   <Grid item md={12} xs={12}>
                     <TextField
                       error={errors.observations}
@@ -318,6 +374,8 @@ const ProcessCreate = () => {
                         handleBlur(event);
                       }}
                       onChange={(event) => {
+                        showSuccess.current = false;
+                        showError.current = false;
                         handleChange(event);
                       }}
                       name="observations"
@@ -325,8 +383,32 @@ const ProcessCreate = () => {
                   </Grid>
                   <Grid item md={6} xs={12}>
                     <Typography variant="h5">
-                      Cliente vinculado: {client.name}
+                      Cliente vinculado: {process.client.name}
                     </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    md={12}
+                    xs={12}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'left',
+                      justifyContent: 'left'
+                    }}
+                  >
+                    <Typography variant="h5">
+                      Baixar Processo Cadastrado: &nbsp;
+                    </Typography>
+                    <Tooltip title="Baixar Processo">
+                      <a
+                        target="webapp-tab"
+                        href={process.file}
+                        download={process.file}
+                        cursor="pointer"
+                      >
+                        <Link></Link>
+                      </a>
+                    </Tooltip>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -367,7 +449,7 @@ const ProcessCreate = () => {
                 <ToastAnimated />
                 {showToast({
                   type: 'success',
-                  message: 'Processo criado com sucesso!'
+                  message: 'Processo alterado com sucesso!'
                 })}
               </>
             )}
