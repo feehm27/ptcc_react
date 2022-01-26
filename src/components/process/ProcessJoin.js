@@ -18,7 +18,7 @@ import ClientJoinSchema from 'src/schemas/ClientJoinSchema';
 
 import { API } from 'src/services/api';
 
-const ContractJoin = () => {
+const ProcessJoin = () => {
   const navigate = useNavigate();
 
   const [clients, setClients] = useState([]);
@@ -65,7 +65,7 @@ const ContractJoin = () => {
           return client.id === Number(selectedClientId);
         });
 
-        navigate('/contracts/create', {
+        navigate('/processes/create', {
           state: { client: findClient }
         });
       }}
@@ -191,7 +191,7 @@ const ContractJoin = () => {
                     <DialogActions>
                       <Button
                         onClick={() => {
-                          navigate('/contracts');
+                          navigate('/processes');
                         }}
                         color="primary"
                       >
@@ -208,4 +208,4 @@ const ContractJoin = () => {
   );
 };
 
-export default ContractJoin;
+export default ProcessJoin;

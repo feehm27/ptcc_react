@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const ContractJoinSchema = Yup.object().shape({
+const ClientJoinSchema = Yup.object().shape({
   clients: Yup.string()
     .required('Campo obrigatório')
     .test('isNull', 'Campo obrigatório', (value) => {
@@ -8,4 +8,4 @@ const ContractJoinSchema = Yup.object().shape({
     })
 });
 
-export default ContractJoinSchema;
+export default ClientJoinSchema;
