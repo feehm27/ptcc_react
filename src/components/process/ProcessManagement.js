@@ -25,7 +25,8 @@ import {
   Add,
   Delete,
   DownloadForOfflineRounded,
-  Edit
+  Edit,
+  List
 } from '@material-ui/icons';
 import {
   KeyboardDatePicker,
@@ -33,6 +34,7 @@ import {
 } from '@material-ui/pickers';
 import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
+import { isEmpty } from 'lodash';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useContext, useRef, useState } from 'react';
@@ -40,6 +42,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 import ProcessConstantes from 'src/constants/ProcessConstantes';
 import { UserContext } from 'src/contexts/UserContext';
+import ProcessAddSchema from 'src/schemas/ProcessAddSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
@@ -54,8 +57,13 @@ const ProcessManagement = (listProcesses) => {
   const [selectedProcess, setSelectedProcess] = useState([]);
   const [searched, setSearched] = useState('');
   const [selectedDate, handleDateChange] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedProcessId, setSelectedProcessId] = useState();
 
   const showSuccess = useRef(false);
+
+  const showSuccessHistory = useRef(false);
+  const showErrorHistory = useRef(false);
 
   function maskProcessNumber(str) {
     const characteres = ['-', '.'];
@@ -119,12 +127,43 @@ const ProcessManagement = (listProcesses) => {
   }
 
   /**
+   * Envia os dados do advogado
+   * @param {*} values
+   */
+  async function sendProcessHistory(values) {
+    setSubmitting(true);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+
+    values.modification_date = moment(selectedDate).format('YYYY-MM-DD');
+    values.process_id = selectedProcessId;
+
+    await API.post('advocates/processes/history', values, config)
+      .then(() => {
+        showSuccessHistory.current = true;
+      })
+      .catch((err) => {
+        showErrorHistory.current = true;
+        console.error(err);
+      });
+
+    setSubmitting(false);
+  }
+
+  /**
    * Envia os dados do formulário
    * @param {*} values
    */
   const handleSubmit = (values, errors) => {
-    console.log('values', values);
-    console.log('errors', errors);
+    if (values.modification_date !== 'Invalid Date') {
+      delete errors.modification_date;
+    }
+
+    if (isEmpty(errors)) sendProcessHistory(values);
   };
 
   /**
@@ -183,7 +222,11 @@ const ProcessManagement = (listProcesses) => {
                   style={{ display: '-webkit-inline-box' }}
                   placeholder="Buscar pelo cliente"
                   value={searched}
-                  onChange={(value) => searchProcesses(value)}
+                  onChange={(value) => {
+                    showSuccessHistory.current = false;
+                    showErrorHistory.current = false;
+                    searchProcesses(value);
+                  }}
                   onCancelSearch={() => cancelSearch()}
                 ></SearchBar>
               </Box>
@@ -219,6 +262,26 @@ const ProcessManagement = (listProcesses) => {
                   </TableCell>
                   <TableCell>{process.status}</TableCell>
                   <TableCell>
+                    <Tooltip title="Gerenciar modificações">
+                      {checkedPermission(5, 1) ? (
+                        <List
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                        ></List>
+                      ) : (
+                        <List
+                          cursor="pointer"
+                          onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
+                            showSuccess.current = false;
+                          }}
+                        ></List>
+                      )}
+                    </Tooltip>
                     <Tooltip title="Adicionar modificações">
                       {checkedPermission(5, 1) ? (
                         <Add
@@ -232,7 +295,10 @@ const ProcessManagement = (listProcesses) => {
                         <Add
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             showSuccess.current = false;
+                            setSelectedProcessId(process.id);
                             setShowAdd(true);
                           }}
                         ></Add>
@@ -252,6 +318,8 @@ const ProcessManagement = (listProcesses) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             showSuccess.current = false;
                             navigate('/processes/edit', {
                               state: { process, show: false }
@@ -291,6 +359,8 @@ const ProcessManagement = (listProcesses) => {
                           }}
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             setSelectedProcess(process);
                             setShowModal(true);
                           }}
@@ -299,6 +369,8 @@ const ProcessManagement = (listProcesses) => {
                         <Delete
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             setSelectedProcess(process);
                             setShowModal(true);
                           }}
@@ -342,6 +414,7 @@ const ProcessManagement = (listProcesses) => {
                   status_process: '',
                   modification_description: ''
                 }}
+                validationSchema={ProcessAddSchema}
                 onSubmit={handleSubmit}
               >
                 {({ errors, values, handleBlur, handleChange, submitForm }) => (
@@ -349,7 +422,8 @@ const ProcessManagement = (listProcesses) => {
                     autoComplete="off"
                     onSubmit={(e) => {
                       e.preventDefault();
-
+                      showSuccessHistory.current = false;
+                      showErrorHistory.current = false;
                       handleSubmit(values, errors);
                     }}
                   >
@@ -372,6 +446,8 @@ const ProcessManagement = (listProcesses) => {
                                 value={selectedDate}
                                 inputVariant="outlined"
                                 onChange={(e) => {
+                                  showSuccessHistory.current = false;
+                                  showErrorHistory.current = false;
                                   handleDateChange(e);
                                 }}
                                 onBlur={(e) => {
@@ -393,6 +469,8 @@ const ProcessManagement = (listProcesses) => {
                                 handleBlur(event);
                               }}
                               onChange={(event) => {
+                                showSuccessHistory.current = false;
+                                showErrorHistory.current = false;
                                 handleChange(event);
                               }}
                               required
@@ -421,6 +499,8 @@ const ProcessManagement = (listProcesses) => {
                                 handleBlur(event);
                               }}
                               onChange={(event) => {
+                                showSuccessHistory.current = false;
+                                showErrorHistory.current = false;
                                 handleChange(event);
                               }}
                               name="modification_description"
@@ -428,17 +508,34 @@ const ProcessManagement = (listProcesses) => {
                             />
                           </Grid>
                           <DialogActions>
-                            <Button onClick={handleCloseAdd} color="primary">
+                            <Button
+                              onClick={() => {
+                                handleCloseAdd();
+                                showSuccessHistory.current = false;
+                                showErrorHistory.current = false;
+                              }}
+                              color="primary"
+                            >
                               Cancelar
                             </Button>
-                            <Button
-                              type="submit"
-                              onClick={submitForm}
-                              autoFocuscolor="primary"
-                              variant="contained"
-                            >
-                              Adicionar
-                            </Button>
+                            {submitting ? (
+                              <Button
+                                color="primary"
+                                variant="contained"
+                                disabled
+                              >
+                                Carregando..
+                              </Button>
+                            ) : (
+                              <Button
+                                type="submit"
+                                onClick={submitForm}
+                                autoFocuscolor="primary"
+                                variant="contained"
+                              >
+                                Adicionar
+                              </Button>
+                            )}
                           </DialogActions>
                         </Grid>
                       </CardContent>
@@ -475,6 +572,8 @@ const ProcessManagement = (listProcesses) => {
               </Button>
               <Button
                 onClick={() => {
+                  showSuccessHistory.current = false;
+                  showErrorHistory.current = false;
                   handleClose();
                   deleteProcess(selectedProcess.id);
                 }}
@@ -486,6 +585,24 @@ const ProcessManagement = (listProcesses) => {
             </DialogActions>
           </Dialog>
         </div>
+      )}
+      {showSuccessHistory.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Histórico adicionado com sucesso!'
+          })}
+        </>
+      )}
+      {showErrorHistory.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'error',
+            message: 'Ocorreu um erro inesperado ao adicionar o histórico!'
+          })}
+        </>
       )}
       {showSuccess.current && (
         <>
