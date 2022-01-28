@@ -42,6 +42,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
 import ProcessConstantes from 'src/constants/ProcessConstantes';
 import { UserContext } from 'src/contexts/UserContext';
+import { maskProcessNumber } from 'src/helpers/Helpers';
 import ProcessAddSchema from 'src/schemas/ProcessAddSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
@@ -64,25 +65,6 @@ const ProcessManagement = (listProcesses) => {
 
   const showSuccessHistory = useRef(false);
   const showErrorHistory = useRef(false);
-
-  function maskProcessNumber(str) {
-    const characteres = ['-', '.'];
-    const newStr = str;
-
-    return (
-      newStr.substring(0, 7) +
-      characteres[0] +
-      newStr.substring(7, 9) +
-      characteres[1] +
-      newStr.substring(10, 14) +
-      characteres[1] +
-      newStr.substring(15, 16) +
-      characteres[1] +
-      newStr.substring(17, 19) +
-      characteres[1] +
-      str.substring(16)
-    );
-  }
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -130,7 +112,7 @@ const ProcessManagement = (listProcesses) => {
    * Envia os dados do advogado
    * @param {*} values
    */
-  async function sendProcessHistory(values) {
+  async function sendProcessHistoric(values) {
     setSubmitting(true);
 
     const config = {
@@ -142,7 +124,7 @@ const ProcessManagement = (listProcesses) => {
     values.modification_date = moment(selectedDate).format('YYYY-MM-DD');
     values.process_id = selectedProcessId;
 
-    await API.post('advocates/processes/history', values, config)
+    await API.post('advocates/processes/historic', values, config)
       .then(() => {
         showSuccessHistory.current = true;
       })
@@ -163,7 +145,7 @@ const ProcessManagement = (listProcesses) => {
       delete errors.modification_date;
     }
 
-    if (isEmpty(errors)) sendProcessHistory(values);
+    if (isEmpty(errors)) sendProcessHistoric(values);
   };
 
   /**
@@ -278,6 +260,9 @@ const ProcessManagement = (listProcesses) => {
                             showSuccessHistory.current = false;
                             showErrorHistory.current = false;
                             showSuccess.current = false;
+                            navigate('/processes/historic', {
+                              state: { process, historics: process.historics }
+                            });
                           }}
                         ></List>
                       )}

@@ -58,6 +58,7 @@
     "react/jsx-closing-tag-location": "off",
     "function-paren-newline": "off",
     "array-callback-return": "off",
-    "eslint linebreak-style": "off"
+    "eslint linebreak-style": "off",
+    "import/prefer-default-export": "off"
   }
 }
