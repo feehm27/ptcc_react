@@ -62,7 +62,6 @@ const ProcessManagement = (listProcesses) => {
   const [selectedProcessId, setSelectedProcessId] = useState();
 
   const showSuccess = useRef(false);
-
   const showSuccessHistory = useRef(false);
   const showErrorHistory = useRef(false);
 
@@ -114,6 +113,7 @@ const ProcessManagement = (listProcesses) => {
    */
   async function sendProcessHistoric(values) {
     setSubmitting(true);
+    showSuccessHistory.current = false;
 
     const config = {
       headers: {
@@ -127,8 +127,10 @@ const ProcessManagement = (listProcesses) => {
     await API.post('advocates/processes/historic', values, config)
       .then(() => {
         showSuccessHistory.current = true;
+        getProcesses();
       })
       .catch((err) => {
+        showSuccessHistory.current = false;
         showErrorHistory.current = true;
         console.error(err);
       });
@@ -145,7 +147,10 @@ const ProcessManagement = (listProcesses) => {
       delete errors.modification_date;
     }
 
-    if (isEmpty(errors)) sendProcessHistoric(values);
+    if (isEmpty(errors)) {
+      handleCloseAdd();
+      sendProcessHistoric(values);
+    }
   };
 
   /**
@@ -193,7 +198,7 @@ const ProcessManagement = (listProcesses) => {
     searchProcesses(searched);
   };
 
-  return listProcesses.processes.length > 0 ? (
+  return rows.length > 0 ? (
     <Card sx={{ mt: 3, mb: 4 }}>
       <PerfectScrollbar>
         <Box>
@@ -244,6 +249,28 @@ const ProcessManagement = (listProcesses) => {
                   </TableCell>
                   <TableCell>{process.status}</TableCell>
                   <TableCell>
+                    <Tooltip title="Adicionar modificações">
+                      {checkedPermission(5, 1) ? (
+                        <Add
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                        ></Add>
+                      ) : (
+                        <Add
+                          cursor="pointer"
+                          onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
+                            showSuccess.current = false;
+                            setSelectedProcessId(process.id);
+                            setShowAdd(true);
+                          }}
+                        ></Add>
+                      )}
+                    </Tooltip>
                     <Tooltip title="Gerenciar modificações">
                       {checkedPermission(5, 1) ? (
                         <List
@@ -265,28 +292,6 @@ const ProcessManagement = (listProcesses) => {
                             });
                           }}
                         ></List>
-                      )}
-                    </Tooltip>
-                    <Tooltip title="Adicionar modificações">
-                      {checkedPermission(5, 1) ? (
-                        <Add
-                          style={{
-                            color: '#c0c0c0',
-                            cursor: 'not-allowed',
-                            pointerEvents: 'none'
-                          }}
-                        ></Add>
-                      ) : (
-                        <Add
-                          cursor="pointer"
-                          onClick={() => {
-                            showSuccessHistory.current = false;
-                            showErrorHistory.current = false;
-                            showSuccess.current = false;
-                            setSelectedProcessId(process.id);
-                            setShowAdd(true);
-                          }}
-                        ></Add>
                       )}
                     </Tooltip>
                     <Tooltip title="Editar">
@@ -492,7 +497,7 @@ const ProcessManagement = (listProcesses) => {
                               required
                             />
                           </Grid>
-                          <DialogActions>
+                          <DialogActions sx={{ ml: 1 }}>
                             <Button
                               onClick={() => {
                                 handleCloseAdd();
