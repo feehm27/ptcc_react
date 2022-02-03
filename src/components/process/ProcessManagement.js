@@ -576,24 +576,6 @@ const ProcessManagement = (listProcesses) => {
           </Dialog>
         </div>
       )}
-      {showSuccessHistory.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Histórico adicionado com sucesso!'
-          })}
-        </>
-      )}
-      {showErrorHistory.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'error',
-            message: 'Ocorreu um erro inesperado ao adicionar o histórico!'
-          })}
-        </>
-      )}
       {showSuccess.current && (
         <>
           <ToastAnimated />
