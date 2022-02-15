@@ -18,10 +18,6 @@ import { useLocation } from 'react-router';
 const Permissions = () => {
   const { permissions } = useLocation().state;
   const { menuName } = useLocation().state;
-
-  console.log(permissions);
-  console.log(menuName);
-
   const [selectedMenuIds, setSelectedMenuIds] = useState([]);
 
   const handleSelectAll = (event) => {

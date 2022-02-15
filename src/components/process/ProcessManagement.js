@@ -1,3 +1,4 @@
+import DateFnsUtils from '@date-io/date-fns';
 import {
   Box,
   Button,
@@ -8,12 +9,15 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Grid,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Tooltip,
   Typography
 } from '@material-ui/core';
@@ -21,15 +25,26 @@ import {
   Add,
   Delete,
   DownloadForOfflineRounded,
-  Edit
+  Edit,
+  List
 } from '@material-ui/icons';
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider
+} from '@material-ui/pickers';
+import { ptBR } from 'date-fns/locale';
+import { Formik } from 'formik';
+import { isEmpty } from 'lodash';
 import SearchBar from 'material-ui-search-bar';
 import moment from 'moment';
 import { useContext, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
-import { API } from 'src/services/api';
+import ProcessConstantes from 'src/constants/ProcessConstantes';
 import { UserContext } from 'src/contexts/UserContext';
+import { maskProcessNumber } from 'src/helpers/Helpers';
+import ProcessAddSchema from 'src/schemas/ProcessAddSchema';
+import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const ProcessManagement = (listProcesses) => {
@@ -39,29 +54,16 @@ const ProcessManagement = (listProcesses) => {
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listProcesses.processes);
   const [showModal, setShowModal] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
   const [selectedProcess, setSelectedProcess] = useState([]);
   const [searched, setSearched] = useState('');
+  const [selectedDate, handleDateChange] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedProcessId, setSelectedProcessId] = useState();
 
   const showSuccess = useRef(false);
-
-  function maskProcessNumber(str) {
-    const characteres = ['-', '.'];
-    const newStr = str;
-
-    return (
-      newStr.substring(0, 7) +
-      characteres[0] +
-      newStr.substring(7, 9) +
-      characteres[1] +
-      newStr.substring(10, 14) +
-      characteres[1] +
-      newStr.substring(15, 16) +
-      characteres[1] +
-      newStr.substring(17, 19) +
-      characteres[1] +
-      str.substring(16)
-    );
-  }
+  const showSuccessHistory = useRef(false);
+  const showErrorHistory = useRef(false);
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -73,6 +75,10 @@ const ProcessManagement = (listProcesses) => {
 
   const handleClose = () => {
     setShowModal(false);
+  };
+
+  const handleCloseAdd = () => {
+    setShowAdd(false);
   };
 
   const checkedPermission = (positionMenu, positionPermission) => {
@@ -100,6 +106,52 @@ const ProcessManagement = (listProcesses) => {
       })
       .catch((err) => console.error(err));
   }
+
+  /**
+   * Envia os dados do advogado
+   * @param {*} values
+   */
+  async function sendProcessHistoric(values) {
+    setSubmitting(true);
+    showSuccessHistory.current = false;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+
+    values.modification_date = moment(selectedDate).format('YYYY-MM-DD');
+    values.process_id = selectedProcessId;
+
+    await API.post('advocates/processes/historic', values, config)
+      .then(() => {
+        showSuccessHistory.current = true;
+        getProcesses();
+      })
+      .catch((err) => {
+        showSuccessHistory.current = false;
+        showErrorHistory.current = true;
+        console.error(err);
+      });
+
+    setSubmitting(false);
+  }
+
+  /**
+   * Envia os dados do formulário
+   * @param {*} values
+   */
+  const handleSubmit = (values, errors) => {
+    if (values.modification_date !== 'Invalid Date') {
+      delete errors.modification_date;
+    }
+
+    if (isEmpty(errors)) {
+      handleCloseAdd();
+      sendProcessHistoric(values);
+    }
+  };
 
   /**
    * Envia os dados do advogado
@@ -146,7 +198,7 @@ const ProcessManagement = (listProcesses) => {
     searchProcesses(searched);
   };
 
-  return listProcesses.processes.length > 0 ? (
+  return rows.length > 0 ? (
     <Card sx={{ mt: 3, mb: 4 }}>
       <PerfectScrollbar>
         <Box>
@@ -157,7 +209,11 @@ const ProcessManagement = (listProcesses) => {
                   style={{ display: '-webkit-inline-box' }}
                   placeholder="Buscar pelo cliente"
                   value={searched}
-                  onChange={(value) => searchProcesses(value)}
+                  onChange={(value) => {
+                    showSuccessHistory.current = false;
+                    showErrorHistory.current = false;
+                    searchProcesses(value);
+                  }}
                   onCancelSearch={() => cancelSearch()}
                 ></SearchBar>
               </Box>
@@ -170,7 +226,7 @@ const ProcessManagement = (listProcesses) => {
               <TableRow>
                 <TableCell>Número do processo</TableCell>
                 <TableCell>Nome do cliente</TableCell>
-                <TableCell>Data de início</TableCell>
+                <TableCell>Data de inicio</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
@@ -206,12 +262,36 @@ const ProcessManagement = (listProcesses) => {
                         <Add
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             showSuccess.current = false;
-                            navigate('/processes/add', {
-                              state: { process }
-                            });
+                            setSelectedProcessId(process.id);
+                            setShowAdd(true);
                           }}
                         ></Add>
+                      )}
+                    </Tooltip>
+                    <Tooltip title="Gerenciar modificações">
+                      {checkedPermission(5, 1) ? (
+                        <List
+                          style={{
+                            color: '#c0c0c0',
+                            cursor: 'not-allowed',
+                            pointerEvents: 'none'
+                          }}
+                        ></List>
+                      ) : (
+                        <List
+                          cursor="pointer"
+                          onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
+                            showSuccess.current = false;
+                            navigate('/processes/historic', {
+                              state: { process, historics: process.historics }
+                            });
+                          }}
+                        ></List>
                       )}
                     </Tooltip>
                     <Tooltip title="Editar">
@@ -228,6 +308,8 @@ const ProcessManagement = (listProcesses) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             showSuccess.current = false;
                             navigate('/processes/edit', {
                               state: { process, show: false }
@@ -267,6 +349,8 @@ const ProcessManagement = (listProcesses) => {
                           }}
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             setSelectedProcess(process);
                             setShowModal(true);
                           }}
@@ -275,6 +359,8 @@ const ProcessManagement = (listProcesses) => {
                         <Delete
                           cursor="pointer"
                           onClick={() => {
+                            showSuccessHistory.current = false;
+                            showErrorHistory.current = false;
                             setSelectedProcess(process);
                             setShowModal(true);
                           }}
@@ -297,6 +383,160 @@ const ProcessManagement = (listProcesses) => {
         rowsPerPage={limit}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      {showAdd && (
+        <div>
+          <Dialog
+            fullWidth
+            open={showAdd}
+            onClose={handleCloseAdd}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              <Typography color="primary" variant="h5" textAlign="center">
+                Adicionar Modificações
+              </Typography>
+            </DialogTitle>
+            <DialogContent>
+              <Formik
+                initialValues={{
+                  modification_date: '',
+                  status_process: '',
+                  modification_description: ''
+                }}
+                validationSchema={ProcessAddSchema}
+                onSubmit={handleSubmit}
+              >
+                {({ errors, values, handleBlur, handleChange, submitForm }) => (
+                  <form
+                    autoComplete="off"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      showSuccessHistory.current = false;
+                      showErrorHistory.current = false;
+                      handleSubmit(values, errors);
+                    }}
+                  >
+                    <Card>
+                      <Divider />
+                      <CardContent>
+                        <Grid container spacing={3}>
+                          <Grid item md={6} xs={12}>
+                            <MuiPickersUtilsProvider
+                              locale={ptBR}
+                              utils={DateFnsUtils}
+                            >
+                              <KeyboardDatePicker
+                                fullWidth
+                                openTo="year"
+                                invalidDateMessage="Data inválida"
+                                format="dd/MM/yyyy"
+                                label="Data de modificação"
+                                views={['year', 'month', 'date']}
+                                value={selectedDate}
+                                inputVariant="outlined"
+                                onChange={(e) => {
+                                  showSuccessHistory.current = false;
+                                  showErrorHistory.current = false;
+                                  handleDateChange(e);
+                                }}
+                                onBlur={(e) => {
+                                  handleBlur(e);
+                                }}
+                                name="modification_date"
+                                required
+                              />
+                            </MuiPickersUtilsProvider>
+                          </Grid>
+                          <Grid item md={6} xs={12}>
+                            <TextField
+                              error={errors.status_process}
+                              fullWidth
+                              helperText={errors.status_process}
+                              label="Etapa do processo"
+                              name="status_process"
+                              onBlur={(event) => {
+                                handleBlur(event);
+                              }}
+                              onChange={(event) => {
+                                showSuccessHistory.current = false;
+                                showErrorHistory.current = false;
+                                handleChange(event);
+                              }}
+                              required
+                              select
+                              SelectProps={{ native: true }}
+                              value={values.status_process}
+                              variant="outlined"
+                            >
+                              {ProcessConstantes.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </TextField>
+                          </Grid>
+                          <Grid item md={12} xs={12}>
+                            <TextField
+                              error={errors.modification_description}
+                              fullWidth
+                              helperText={errors.modification_description}
+                              label="Descrição da modificação"
+                              rows="6"
+                              multiline
+                              rowsMax={Infinity}
+                              onBlur={(event) => {
+                                handleBlur(event);
+                              }}
+                              onChange={(event) => {
+                                showSuccessHistory.current = false;
+                                showErrorHistory.current = false;
+                                handleChange(event);
+                              }}
+                              name="modification_description"
+                              required
+                            />
+                          </Grid>
+                          <DialogActions sx={{ ml: 1 }}>
+                            <Button
+                              onClick={() => {
+                                handleCloseAdd();
+                                showSuccessHistory.current = false;
+                                showErrorHistory.current = false;
+                              }}
+                              color="primary"
+                            >
+                              Cancelar
+                            </Button>
+                            {submitting ? (
+                              <Button
+                                color="primary"
+                                variant="contained"
+                                disabled
+                              >
+                                Carregando..
+                              </Button>
+                            ) : (
+                              <Button
+                                type="submit"
+                                onClick={submitForm}
+                                autoFocuscolor="primary"
+                                variant="contained"
+                              >
+                                Adicionar
+                              </Button>
+                            )}
+                          </DialogActions>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </form>
+                )}
+              </Formik>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
       {showModal && (
         <div>
           <Dialog
@@ -322,6 +562,8 @@ const ProcessManagement = (listProcesses) => {
               </Button>
               <Button
                 onClick={() => {
+                  showSuccessHistory.current = false;
+                  showErrorHistory.current = false;
                   handleClose();
                   deleteProcess(selectedProcess.id);
                 }}

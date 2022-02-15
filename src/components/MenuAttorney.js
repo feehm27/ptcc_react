@@ -100,10 +100,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 7,
-      href: '/construction',
+      href: '/meetings',
       icon: CalendarIcon,
       title: 'Agenda de Reuniões',
-      disabled: true,
+      disabled: false,
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[6].checked === 1

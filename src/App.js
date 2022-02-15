@@ -48,6 +48,9 @@ import Process from './pages/Process';
 import ProcessJoin from './components/process/ProcessJoin';
 import ProcessCreate from './components/process/ProcessCreate';
 import ProcessEdit from './components/process/ProcessEdit';
+import ProcessHistoric from './components/process/ProcessHistoric';
+import Meeting from './pages/Meeting';
+import MettingSchedules from './components/meeting/MeetingSchedules';
 
 function App() {
   return (
@@ -126,6 +129,18 @@ function App() {
                 <ProtectedRoute
                   path="/processes/edit"
                   element={<ProcessEdit />}
+                />
+
+                <ProtectedRoute
+                  path="/processes/historic"
+                  element={<ProcessHistoric />}
+                />
+
+                <ProtectedRoute path="/meetings" element={<Meeting />} />
+
+                <ProtectedRoute
+                  path="/meetings/schedules"
+                  element={<MettingSchedules />}
                 />
 
                 <ProtectedRoute path="/clients/edit" element={<ClientEdit />} />
