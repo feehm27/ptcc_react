@@ -1,17 +1,15 @@
-import { Doughnut } from 'react-chartjs-2';
 import {
   Box,
   Card,
   CardContent,
   CardHeader,
+  colors,
   Divider,
   Typography,
-  colors,
   useTheme
 } from '@material-ui/core';
-import ThumbsUpDownIcon from '@material-ui/icons/ThumbsUpDown';
-import GavelIcon from '@material-ui/icons/Gavel';
-import CallMadeIcon from '@material-ui/icons/CallMade';
+import { Brightness1 } from '@material-ui/icons';
+import { Doughnut } from 'react-chartjs-2';
 
 const ProcessesByStatus = (props) => {
   const theme = useTheme();
@@ -19,18 +17,18 @@ const ProcessesByStatus = (props) => {
   const data = {
     datasets: [
       {
-        data: [63, 15, 22],
-        backgroundColor: [
-          colors.indigo[500],
-          colors.red[600],
-          colors.orange[600]
-        ],
+        data: props.processes.length === 0 ? [0] : props.processes.data,
+        backgroundColor:
+          props.processes.length === 0
+            ? ['white']
+            : props.processes.backgrounds,
         borderWidth: 8,
         borderColor: colors.common.white,
         hoverBorderColor: colors.common.white
       }
     ],
-    labels: ['Inicial', 'Conciliação', 'Julgamento']
+    labels:
+      props.processes.length === 0 ? ['Sem processos'] : props.processes.labels
   };
 
   const options = {
@@ -55,65 +53,58 @@ const ProcessesByStatus = (props) => {
     }
   };
 
-  const devices = [
-    {
-      title: 'Inicial',
-      value: 63,
-      icon: CallMadeIcon,
-      color: colors.indigo[500]
-    },
-    {
-      title: 'Conciliação',
-      value: 15,
-      icon: ThumbsUpDownIcon,
-      color: colors.red[600]
-    },
-    {
-      title: 'Julgamento',
-      value: 23,
-      icon: GavelIcon,
-      color: colors.orange[600]
-    }
-  ];
-
   return (
     <Card {...props}>
       <CardHeader title="Processos por status" />
       <Divider />
       <CardContent>
-        <Box
-          sx={{
-            height: 300,
-            position: 'relative'
-          }}
-        >
-          <Doughnut data={data} options={options} />
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            pt: 2
-          }}
-        >
-          {devices.map(({ color, icon: Icon, title, value }) => (
+        {props.processes.length === 0 || props.processes.data.length === 0 ? (
+          <Box>
+            <Typography color="textSecondary" gutterBottom variant="h6">
+              Nenhum processo encontrado.
+            </Typography>
+          </Box>
+        ) : (
+          <>
             <Box
-              key={title}
               sx={{
-                p: 1,
-                textAlign: 'center'
+                height: 300,
+                position: 'relative'
               }}
             >
-              <Icon color="action" />
-              <Typography color="textPrimary" variant="body1">
-                {title}
-              </Typography>
-              <Typography style={{ color }} variant="h2">
-                {value}%
-              </Typography>
+              <Doughnut data={data} options={options} />
             </Box>
-          ))}
-        </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                pt: 2
+              }}
+            >
+              {props.processes.devices.map((process) => (
+                <Box
+                  key={process.title}
+                  sx={{
+                    p: 1,
+                    textAlign: 'center'
+                  }}
+                >
+                  <Brightness1 style={{ color: `${process.color}` }} />
+                  <Typography color="textPrimary" variant="body1">
+                    {process.title}
+                  </Typography>
+
+                  <Typography
+                    style={{ color: `${process.color}` }}
+                    variant="h2"
+                  >
+                    {process.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </>
+        )}
       </CardContent>
     </Card>
   );

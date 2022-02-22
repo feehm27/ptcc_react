@@ -2,8 +2,8 @@ import { Avatar, Card, CardContent, Grid, Typography } from '@material-ui/core';
 import MoneyIcon from '@material-ui/icons/Money';
 import { green } from '@material-ui/core/colors';
 
-const ActiveContracts = (props) => (
-  <Card {...props}>
+const ActiveContracts = (contracts) => (
+  <Card>
     <CardContent>
       <Grid container spacing={3} sx={{ justifyContent: 'space-between' }}>
         <Grid item>
@@ -11,7 +11,7 @@ const ActiveContracts = (props) => (
             Contratos ativos
           </Typography>
           <Typography color="textPrimary" variant="h3">
-            5
+            {contracts.contractsCount}
           </Typography>
         </Grid>
         <Grid item>
