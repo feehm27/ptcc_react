@@ -7,7 +7,7 @@ import {
   Grid,
   Typography
 } from '@material-ui/core';
-import { Gavel } from '@material-ui/icons';
+import { Book } from '@material-ui/icons';
 import moment from 'moment';
 
 const ProcessStatusClient = (props) => (
@@ -57,7 +57,7 @@ const ProcessStatusClient = (props) => (
               width: 56
             }}
           >
-            <Gavel />
+            <Book />
           </Avatar>
         </Grid>
       </Grid>

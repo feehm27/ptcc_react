@@ -26,10 +26,10 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
       allowed: data && data.checkeds.menus_checked[11].checked === 1
     },
     {
-      href: '/construction',
+      href: '/contracts/client',
       icon: FileIcon,
       title: 'Contrato',
-      disabled: true,
+      disabled: false,
       allowed: true
     },
     {

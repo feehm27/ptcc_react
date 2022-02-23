@@ -2,26 +2,32 @@ import {
   Box,
   Button,
   Card,
-  CardHeader,
   CardContent,
+  CardHeader,
   Divider,
   Stack,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core';
-import { CloudDownload } from '@material-ui/icons';
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
+import { CloudDownload } from '@material-ui/icons';
 
-const ContractView = () => {
-  const { contract } = useLocation().state;
+const ContractClientView = (props) => {
+  const navigate = useNavigate();
   const [pages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const navigate = useNavigate();
+
+  console.log('props', props);
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-  const url = `https://ancient-dawn-76058.herokuapp.com/${contract.link_contract}`;
+  let url = '';
+
+  if (props.contract !== null) {
+    url = `https://ancient-dawn-76058.herokuapp.com/${props.contract.link_contract}`;
+  }
 
   document.addEventListener('contextmenu', (event) => {
     event.preventDefault();
@@ -44,10 +50,20 @@ const ContractView = () => {
     changePage(1);
   }
 
-  return (
+  return props.contract === null ? (
+    <Card>
+      <CardHeader title="Visualização do Contrato" />
+      <Divider />
+      <CardContent>
+        <Typography color="textSecondary" variant="body1">
+          Não existe contrato vinculado ao seu usuário para visualização.
+        </Typography>
+      </CardContent>
+    </Card>
+  ) : (
     <Card
       sx={{
-        m: '30px'
+        m: '10px'
       }}
     >
       <span
@@ -61,8 +77,8 @@ const ContractView = () => {
           <a
             style={{ color: 'inherit' }}
             target="webapp-tab"
-            href={contract.link_contract}
-            download={contract.link_contract}
+            href={props.contract.link_contract}
+            download={props.contract.link_contract}
           >
             <CloudDownload
               style={{ marginTop: '4px' }}
@@ -72,7 +88,7 @@ const ContractView = () => {
         </Tooltip>
       </span>
       <Divider />
-      <CardContent sx={{}}>
+      <CardContent>
         <div style={{ textAlign: 'center' }}>
           <div className="pagec">
             Página {pageNumber || (pages ? 1 : '--')} de {pages || '--'}
@@ -126,7 +142,7 @@ const ContractView = () => {
           <Button
             color="primary"
             variant="outlined"
-            onClick={() => navigate('/contracts')}
+            onClick={() => navigate('/dashboard-client')}
           >
             Voltar
           </Button>
@@ -136,4 +152,4 @@ const ContractView = () => {
   );
 };
 
-export default ContractView;
+export default ContractClientView;
