@@ -16,11 +16,11 @@ const ClientsByYear = (props) => {
     datasets: [
       {
         backgroundColor: colors.grey[500],
-        data: [1, 6],
+        data: props.clients.length === 0 ? [0, 0] : props.clients.data,
         label: ''
       }
     ],
-    labels: ['Dezembro/2020', 'Dezembro/2021']
+    labels: props.clients.labels
   };
 
   const options = {
@@ -80,7 +80,7 @@ const ClientsByYear = (props) => {
 
   return (
     <Card {...props}>
-      <CardHeader title="Clientes anuais" />
+      <CardHeader title="Clientes Cadastrados - Ano passado x Ano atual" />
       <Divider />
       <CardContent>
         <Box
