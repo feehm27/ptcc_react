@@ -80,7 +80,7 @@ const ClientsByYear = (props) => {
 
   return (
     <Card {...props}>
-      <CardHeader title="Clientes Cadastrados - Ano passado x Ano atual" />
+      <CardHeader title="Clientes - Ano passado x Ano atual" />
       <Divider />
       <CardContent>
         <Box

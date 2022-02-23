@@ -228,8 +228,8 @@ const DashboardAdvocate = () => {
             </Skeleton>
           </Grid>
         ) : (
-          <Grid container spacing={6} sx={{ mt: 1, paddingLeft: '24px' }}>
-            <Grid item lg={6} md={6} xl={6} xs={12}>
+          <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
+            <Grid item lg={4} md={4} xl={3} xs={12}>
               <ProcessesByStatus
                 sx={{ height: '100%' }}
                 processes={processes}
@@ -245,13 +245,27 @@ const DashboardAdvocate = () => {
                 <div style={{ paddingTop: '57%' }} />
               </Skeleton>
             ) : (
-              <Grid item lg={6} md={6} xl={6} xs={12}>
+              <Grid item lg={4} md={4} xl={3} xs={12}>
                 <ContractsByMonth contracts={contracts} />
               </Grid>
             )}
-            <Grid item lg={6} md={6} xl={6} xs={12}>
+            <Grid item lg={4} md={4} xl={3} xs={12}>
               <MeetingsPerWeek sx={{ height: '100%' }} />
             </Grid>
+            {loadingAnnualProfit ? (
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                width="210"
+                height="118"
+              >
+                <div style={{ paddingTop: '57%' }} />
+              </Skeleton>
+            ) : (
+              <Grid item lg={8} md={8} xl={6} xs={12}>
+                <AnnualProfit profit={annualProfit} />
+              </Grid>
+            )}
             {loadingClients ? (
               <Skeleton
                 variant="rectangular"
@@ -262,24 +276,10 @@ const DashboardAdvocate = () => {
                 <div style={{ paddingTop: '57%' }} />
               </Skeleton>
             ) : (
-              <Grid item lg={6} md={6} xl={6} xs={12}>
+              <Grid item lg={4} md={4} xl={3} xs={12}>
                 <ClientsByYear clients={clients} />
               </Grid>
             )}
-          </Grid>
-        )}
-        {loadingAnnualProfit ? (
-          <Skeleton
-            variant="rectangular"
-            animation="wave"
-            width="210"
-            height="118"
-          >
-            <div style={{ paddingTop: '57%' }} />
-          </Skeleton>
-        ) : (
-          <Grid item lg={12} md={12} xl={12} xs={12}>
-            <AnnualProfit profit={annualProfit} />
           </Grid>
         )}
       </Grid>
