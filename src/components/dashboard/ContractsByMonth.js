@@ -5,8 +5,10 @@ import {
   CardHeader,
   colors,
   Divider,
+  Tooltip,
   useTheme
 } from '@material-ui/core';
+import { Info } from '@material-ui/icons';
 import { Bar } from 'react-chartjs-2';
 
 const ContractsByMonth = (props) => {
@@ -16,12 +18,18 @@ const ContractsByMonth = (props) => {
     datasets: [
       {
         backgroundColor: colors.indigo[500],
-        data: [1, 5, 19, 27, 29, 19, 20, 1, 2, 3, 4, 12],
+        data:
+          props.contracts.length === 0
+            ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            : props.contracts.contracts_actives,
         label: 'Ativos'
       },
       {
         backgroundColor: colors.red[200],
-        data: [11, 20, 12, 29, 30, 25, 13],
+        data:
+          props.contracts.length === 0
+            ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            : props.contracts.contracts_inactives,
         label: 'Encerrados'
       }
     ],
@@ -98,7 +106,18 @@ const ContractsByMonth = (props) => {
 
   return (
     <Card {...props}>
-      <CardHeader title="Contratos ativos e encerrados" />
+      <span
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          fontSize: '14px'
+        }}
+      >
+        <CardHeader title="Contratos ativos e encerrados" />
+        <Tooltip title="Dados exibidos com base na data de inicio e final do contrato">
+          <Info></Info>
+        </Tooltip>
+      </span>
       <Divider />
       <CardContent>
         <Box

@@ -77,6 +77,7 @@ function App() {
                 <Route path="not-allowed" element={<NotAllowed />} />
 
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+
                 <ProtectedRoute
                   path="/dashboard-client"
                   element={<DashboardClient />}

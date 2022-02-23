@@ -16,11 +16,11 @@ const AnnualProfit = (props) => {
     datasets: [
       {
         backgroundColor: colors.indigo[500],
-        data: [
-          100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000,
-          900000, 100000, 100000, 100000
-        ],
-        label: 'Este ano'
+        data:
+          props.profit.length === 0
+            ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            : props.profit.data,
+        label: 'Lucro'
       }
     ],
     labels: [
@@ -87,7 +87,7 @@ const AnnualProfit = (props) => {
 
   return (
     <Card {...props}>
-      <CardHeader title="Lucro anual" />
+      <CardHeader title="Lucro anual - Valores em reais (R$)" />
       <Divider />
       <CardContent>
         <Box
