@@ -142,7 +142,7 @@ const ContractClientView = (props) => {
           <Button
             color="primary"
             variant="outlined"
-            onClick={() => navigate('/dashboard-client')}
+            onClick={() => navigate('/dashboard/client')}
           >
             Voltar
           </Button>

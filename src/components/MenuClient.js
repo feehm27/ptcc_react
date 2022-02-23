@@ -19,7 +19,7 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
   const items = [
     {
       id: 10,
-      href: '/dashboard-client',
+      href: '/dashboard/client',
       icon: ActivityIcon,
       title: 'Página Inicial',
       disabled: false,

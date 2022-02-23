@@ -81,7 +81,7 @@ function App() {
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
 
                 <ProtectedRoute
-                  path="/dashboard-client"
+                  path="/dashboard/client"
                   element={<DashboardClient />}
                 />
 

@@ -32,7 +32,7 @@ export const UserStorage = ({ children }) => {
       setLogin(true);
       response.data.is_advocate === 1
         ? navigate('dashboard')
-        : navigate('dashboard-client');
+        : navigate('dashboard/client');
     });
   }
 
