@@ -24,6 +24,7 @@ import ProcessCreate from './components/process/ProcessCreate';
 import ProcessEdit from './components/process/ProcessEdit';
 import ProcessHistoric from './components/process/ProcessHistoric';
 import ProcessJoin from './components/process/ProcessJoin';
+import ProcessClientView from './components/process_client/ProcessClientView';
 import ProfileTypes from './components/ProfileTypes';
 import UserCreate from './components/users/UserCreate';
 import UserEdit from './components/users/UserEdit';
@@ -47,6 +48,7 @@ import MyInformation from './pages/MyInformation';
 import NotAllowed from './pages/NotAllowed';
 import NotFound from './pages/NotFound';
 import Process from './pages/Process';
+import ProcessClient from './pages/ProcessClient';
 import ProductList from './pages/ProductList';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
@@ -147,6 +149,16 @@ function App() {
                 <ProtectedRoute
                   path="/processes/historic"
                   element={<ProcessHistoric />}
+                />
+
+                <ProtectedRoute
+                  path="/processes/client"
+                  element={<ProcessClient />}
+                />
+
+                <ProtectedRoute
+                  path="/processes/client/view"
+                  element={<ProcessClientView />}
                 />
 
                 <ProtectedRoute path="/meetings" element={<Meeting />} />

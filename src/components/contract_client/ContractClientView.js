@@ -19,8 +19,6 @@ const ContractClientView = (props) => {
   const [pages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
-  console.log('props', props);
-
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
   let url = '';

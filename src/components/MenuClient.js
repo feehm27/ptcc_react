@@ -33,10 +33,10 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
       allowed: true
     },
     {
-      href: '/construction',
+      href: '/processes/client',
       icon: BookIcon,
       title: 'Acompanhar Processo',
-      disabled: true,
+      disabled: false,
       allowed: true
     },
     {

@@ -1,17 +1,17 @@
 import { Box, Container, Skeleton } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import ContractClientView from 'src/components/contract_client/ContractClientView';
+import ProcessClientView from 'src/components/process_client/ProcessClientView';
 import { API } from 'src/services/api';
 
-const ContractClient = () => {
-  const [contract, setContract] = useState([]);
+const ProcessClient = () => {
+  const [processHistory, setProcessHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Obtém o contrato do cliente
+   * Obtém o processo do cliente
    */
-  async function getContractByClient() {
+  async function getProcessByClient() {
     setIsLoading(true);
 
     const config = {
@@ -20,9 +20,9 @@ const ContractClient = () => {
       }
     };
 
-    await API.get('clients/contracts', config)
+    await API.get('clients/processes', config)
       .then((response) => {
-        setContract(response.data.data);
+        setProcessHistory(response.data.data);
       })
       .catch((err) => console.error(err));
 
@@ -33,7 +33,7 @@ const ContractClient = () => {
    * Use Effect
    */
   useEffect(() => {
-    getContractByClient();
+    getProcessByClient();
   }, []);
 
   return isLoading ? (
@@ -41,13 +41,7 @@ const ContractClient = () => {
       <Helmet>
         <title>Advoguez</title>
       </Helmet>
-      <Skeleton
-        variant="rectangular"
-        animation="wave"
-        width="50%"
-        height="50%"
-        style={{ margin: '15px', padding: '100%' }}
-      ></Skeleton>
+      <Skeleton />
     </>
   ) : (
     <>
@@ -62,11 +56,11 @@ const ContractClient = () => {
         }}
       >
         <Container maxWidth="lg">
-          <ContractClientView contract={contract} />
+          <ProcessClientView process={processHistory} />
         </Container>
       </Box>
     </>
   );
 };
 
-export default ContractClient;
+export default ProcessClient;
