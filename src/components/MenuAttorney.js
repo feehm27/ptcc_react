@@ -122,10 +122,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 10,
-      href: '/construction',
+      href: '/reports',
       icon: FileIcon,
       title: 'Relatórios',
-      disabled: true,
+      disabled: false,
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[9].checked === 1

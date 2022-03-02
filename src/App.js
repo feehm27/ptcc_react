@@ -55,6 +55,8 @@ import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
+import Report from './pages/Report';
+import ReportCreate from './components/report/ReportCreate';
 
 function App() {
   return (
@@ -203,6 +205,13 @@ function App() {
                 <ProtectedRoute
                   path="/advocates/contacts/show"
                   element={<AdvocateContactShow />}
+                />
+
+                <ProtectedRoute path="/reports" element={<Report />} />
+
+                <ProtectedRoute
+                  path="/reports/create"
+                  element={<ReportCreate />}
                 />
 
                 <ProtectedRoute path="/users" element={<User />} />
