@@ -57,6 +57,7 @@ import User from './pages/User';
 import UserProfile from './pages/UserProfile';
 import Report from './pages/Report';
 import ReportCreate from './components/report/ReportCreate';
+import ReportEdit from './components/report/ReportEdit';
 
 function App() {
   return (
@@ -213,6 +214,8 @@ function App() {
                   path="/reports/create"
                   element={<ReportCreate />}
                 />
+
+                <ProtectedRoute path="/reports/edit" element={<ReportEdit />} />
 
                 <ProtectedRoute path="/users" element={<User />} />
                 <ProtectedRoute path="/users/create" element={<UserCreate />} />

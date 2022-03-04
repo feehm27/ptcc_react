@@ -16,3 +16,9 @@ export function maskProcessNumber(str) {
     newStr.substring(16, 20)
   );
 }
+
+export function formattedDate(date) {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + 1);
+  return newDate;
+}

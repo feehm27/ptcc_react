@@ -18,30 +18,57 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import moment from 'moment';
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import CivilStatusConstants from 'src/constants/CivilStatusConstants';
 import ExportFormatsConstants from 'src/constants/ExportFormatsConstants';
 import GenderConstants from 'src/constants/GenderConstants';
 import PaymentConstants from 'src/constants/PaymentConstants';
 import ProcessConstantes from 'src/constants/ProcessConstantes';
 import ReportTypesConstants from 'src/constants/ReportTypesConstants';
+import { formattedDate } from 'src/helpers/Helpers';
 import ReportSchema from 'src/schemas/ReportSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
-const ReportCreate = () => {
+const ReportEdit = () => {
   const navigate = useNavigate();
+  const { report, show } = useLocation().state;
 
-  const [reportTypeSelected, setReportTypeSelected] = useState();
-  const [birthdayDate, handleBirthdayChange] = useState(null);
-  const [registrationDate, handleRegistrationChange] = useState(null);
+  const [birthdayDate, handleBirthdayChange] = useState(
+    report.filters.birthday ? formattedDate(report.filters.birthday) : null
+  );
+  const [registrationDate, handleRegistrationChange] = useState(
+    report.filters.registration_date
+      ? formattedDate(report.filters.registration_date)
+      : null
+  );
 
-  const [contractStartDate, handleContractStartChange] = useState(null);
-  const [contractEndDate, handleContractEndChange] = useState(null);
-  const [contractCancellationDate, handleCancellationChange] = useState(null);
+  const [contractStartDate, handleContractStartChange] = useState(
+    report.type === 'Contratos' && report.filters.start_date
+      ? formattedDate(report.filters.start_date)
+      : null
+  );
+  const [contractEndDate, handleContractEndChange] = useState(
+    report.type === 'Contratos' && report.filters.finish_date
+      ? formattedDate(report.filters.finish_date)
+      : null
+  );
+  const [contractCancellationDate, handleCancellationChange] = useState(
+    report.type === 'Contratos' && report.filters.canceled_at
+      ? formattedDate(report.filters.canceled_at)
+      : null
+  );
 
-  const [processStartDate, handleProcessStartChange] = useState(null);
-  const [processEndDate, handleProcessEndChange] = useState(null);
+  const [processStartDate, handleProcessStartChange] = useState(
+    report.type === 'Processos' && report.filters.start_date
+      ? formattedDate(report.filters.start_date)
+      : null
+  );
+  const [processEndDate, handleProcessEndChange] = useState(
+    report.type === 'Processos' && report.filters.end_date
+      ? formattedDate(report.filters.end_date)
+      : null
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -50,20 +77,11 @@ const ReportCreate = () => {
   const showError = useRef(false);
 
   /**
-   * Retorna para a página anterior
-   */
-  const callTimeOut = () => {
-    setTimeout(() => {
-      navigate('/reports');
-    }, 1500);
-  };
-
-  /**
-   * Salva o relatório
+   * Atualiza o relatório
    * @param {*} values
    * @returns
    */
-  async function sendReport(values) {
+  async function updateReport(values) {
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -77,7 +95,7 @@ const ReportCreate = () => {
     };
 
     return new Promise((resolve, reject) => {
-      API.post('advocates/reports', params, config)
+      API.put(`advocates/reports/${report.id}`, params, config)
         .then((response) => {
           resolve(response);
         })
@@ -99,6 +117,8 @@ const ReportCreate = () => {
       }
     };
 
+    params.id = report.filters.id;
+
     await API.post(`advocates/reports/${type}`, params, config)
       .then((response) => {
         if (response.data.data.link_report) {
@@ -116,7 +136,6 @@ const ReportCreate = () => {
             link.download = fileName;
             link.click();
           };
-
           req.send();
           showSuccess.current = true;
         }
@@ -133,10 +152,10 @@ const ReportCreate = () => {
    * @param {*} values
    * @param {*} reportId
    */
-  const assembleReport = (values, reportId) => {
+  const assembleReport = (values) => {
     const params = {};
 
-    params.report_id = reportId;
+    params.report_id = report.id;
 
     switch (values.report_type) {
       case 'Clientes':
@@ -272,7 +291,7 @@ const ReportCreate = () => {
   const handleSubmit = (values, errors) => {
     setSubmitting(true);
 
-    sendReport(values).then((response) => {
+    updateReport(values).then((response) => {
       assembleReport(values, response.data.data.id);
     });
 
@@ -282,21 +301,32 @@ const ReportCreate = () => {
   return (
     <Formik
       initialValues={{
-        report_type: '0',
-        name: '',
-        export_format: 'Paisagem',
+        report_type: report.type || '',
+        name: report.name || '',
+        export_format: report.export_format || '',
         birthday: null,
-        registration_date: '',
-        gender: '0',
-        civil_status: '0',
+        registration_date: null,
+        gender: report.filters.gender ? report.filters.gender : '0',
+        civil_status: report.filters.civil_status
+          ? report.filters.civil_status
+          : '0',
         contract_start_date: null,
         contract_end_date: null,
         contract_cancellation_date: null,
-        status: '0',
-        payday: '0',
+        status:
+          report.type === 'Contratos' && report.filters.status
+            ? report.filters.status
+            : '0',
+        payday:
+          report.type === 'Contratos' && report.filters.payment_day
+            ? report.filters.payment_day
+            : '0',
         process_start_date: null,
         process_end_date: null,
-        stage: '0'
+        stage:
+          report.type === 'Processos' && report.filters.stage
+            ? report.filters.stage
+            : '0'
       }}
       validationSchema={ReportSchema}
       onSubmit={handleSubmit}
@@ -316,22 +346,10 @@ const ReportCreate = () => {
               <Grid container spacing={3}>
                 <Grid item md={6} xs={6}>
                   <TextField
-                    error={errors.report_type}
                     fullWidth
-                    helperText={errors.report_type}
                     label="Selecione o tipo de relatório"
                     name="report_type"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      setReportTypeSelected(event.target.value);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
+                    disabled={show}
                     required
                     select
                     SelectProps={{ native: true }}
@@ -400,7 +418,7 @@ const ReportCreate = () => {
               </Grid>
             </CardContent>
           </Card>
-          {reportTypeSelected === 'Clientes' && (
+          {report.type === 'Clientes' && (
             <Card sx={{ m: 3 }}>
               <CardHeader title="Filtros (Opcionais)" />
               <Divider />
@@ -544,7 +562,7 @@ const ReportCreate = () => {
               </CardContent>
             </Card>
           )}
-          {reportTypeSelected === 'Contratos' && (
+          {report.type === 'Contratos' && (
             <Card sx={{ m: 3 }}>
               <CardHeader title="Filtros (Opcionais)" />
               <Divider />
@@ -730,7 +748,7 @@ const ReportCreate = () => {
               </CardContent>
             </Card>
           )}
-          {reportTypeSelected === 'Processos' && (
+          {report.type === 'Processos' && (
             <Card sx={{ m: 3 }}>
               <CardHeader title="Filtros (Opcionais)" />
               <Divider />
@@ -843,8 +861,7 @@ const ReportCreate = () => {
               </CardContent>
             </Card>
           )}
-
-          {reportTypeSelected !== undefined && reportTypeSelected !== '0' && (
+          {report.type !== undefined && report.type !== '0' && (
             <Box
               sx={{
                 display: 'flex',
@@ -884,7 +901,6 @@ const ReportCreate = () => {
                 type: 'success',
                 message: 'Relatório exportado com sucesso!'
               })}
-              {callTimeOut()}
             </>
           )}
           {showError.current && (
@@ -903,4 +919,4 @@ const ReportCreate = () => {
   );
 };
 
-export default ReportCreate;
+export default ReportEdit;

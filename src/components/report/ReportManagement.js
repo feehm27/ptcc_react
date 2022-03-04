@@ -215,13 +215,15 @@ const ReportManagement = (listReports) => {
                             showExportSuccess.current = false;
                             showSuccess.current = false;
                             navigate('/reports/edit', {
-                              state: { report, show: false }
+                              state: { report, show: true }
                             });
                           }}
                         ></Edit>
                       )}
                     </Tooltip>
-                    <Tooltip title={submitting ? 'Exportando..' : 'Exportar'}>
+                    <Tooltip
+                      title={submitting ? 'Fazendo download..' : 'Download'}
+                    >
                       {checkedPermission(9, 1) ? (
                         <DownloadRounded
                           style={{
@@ -323,7 +325,6 @@ const ReportManagement = (listReports) => {
           </Dialog>
         </div>
       )}
-
       {showExportSuccess.current && (
         <>
           <ToastAnimated />
