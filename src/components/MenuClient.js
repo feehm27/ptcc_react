@@ -19,24 +19,24 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
   const items = [
     {
       id: 10,
-      href: '/dashboard-client',
+      href: '/dashboard/client',
       icon: ActivityIcon,
       title: 'Página Inicial',
       disabled: false,
       allowed: data && data.checkeds.menus_checked[11].checked === 1
     },
     {
-      href: '/construction',
+      href: '/contracts/client',
       icon: FileIcon,
       title: 'Contrato',
-      disabled: true,
+      disabled: false,
       allowed: true
     },
     {
-      href: '/construction',
+      href: '/processes/client',
       icon: BookIcon,
       title: 'Acompanhar Processo',
-      disabled: true,
+      disabled: false,
       allowed: true
     },
     {

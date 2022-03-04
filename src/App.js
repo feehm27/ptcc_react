@@ -13,11 +13,18 @@ import ClientContactSent from './components/client_contact/ClientContactSent';
 import ClientContactShow from './components/client_contact/ClientContactShow';
 import ContractCreate from './components/contract/ContractCreate';
 import ContractEdit from './components/contract/ContractEdit';
-import ContractView from './components/contract/ContractView';
 import ContractJoin from './components/contract/ContractJoin';
+import ContractView from './components/contract/ContractView';
+import ContractClientView from './components/contract_client/ContractClientView';
 import MainLayout from './components/MainLayout';
+import MettingSchedules from './components/meeting/MeetingSchedules';
 import PageLayout from './components/PageLayout';
 import Permissions from './components/Permissions';
+import ProcessCreate from './components/process/ProcessCreate';
+import ProcessEdit from './components/process/ProcessEdit';
+import ProcessHistoric from './components/process/ProcessHistoric';
+import ProcessJoin from './components/process/ProcessJoin';
+import ProcessClientView from './components/process_client/ProcessClientView';
 import ProfileTypes from './components/ProfileTypes';
 import UserCreate from './components/users/UserCreate';
 import UserEdit from './components/users/UserEdit';
@@ -30,27 +37,27 @@ import Client from './pages/Client';
 import ClientContact from './pages/ClientContact';
 import Construction from './pages/Construction';
 import Contract from './pages/Contract';
+import ContractClient from './pages/ContractClient';
 import CustomerList from './pages/CustomerList';
 import Dashboard from './pages/Dashboard';
 import DashboardClient from './pages/DashboardClient';
 import Identity from './pages/Identity';
 import Login from './pages/Login';
+import Meeting from './pages/Meeting';
 import MyInformation from './pages/MyInformation';
 import NotAllowed from './pages/NotAllowed';
 import NotFound from './pages/NotFound';
+import Process from './pages/Process';
+import ProcessClient from './pages/ProcessClient';
 import ProductList from './pages/ProductList';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
-import Process from './pages/Process';
-import ProcessJoin from './components/process/ProcessJoin';
-import ProcessCreate from './components/process/ProcessCreate';
-import ProcessEdit from './components/process/ProcessEdit';
-import ProcessHistoric from './components/process/ProcessHistoric';
-import Meeting from './pages/Meeting';
-import MettingSchedules from './components/meeting/MeetingSchedules';
+import Report from './pages/Report';
+import ReportCreate from './components/report/ReportCreate';
+import ReportEdit from './components/report/ReportEdit';
 
 function App() {
   return (
@@ -79,7 +86,7 @@ function App() {
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
 
                 <ProtectedRoute
-                  path="/dashboard-client"
+                  path="/dashboard/client"
                   element={<DashboardClient />}
                 />
 
@@ -115,6 +122,16 @@ function App() {
                   element={<ContractCreate />}
                 />
 
+                <ProtectedRoute
+                  path="/contracts/client"
+                  element={<ContractClient />}
+                />
+
+                <ProtectedRoute
+                  path="/contracts/client/view"
+                  element={<ContractClientView />}
+                />
+
                 <ProtectedRoute path="/processes" element={<Process />} />
 
                 <ProtectedRoute
@@ -135,6 +152,16 @@ function App() {
                 <ProtectedRoute
                   path="/processes/historic"
                   element={<ProcessHistoric />}
+                />
+
+                <ProtectedRoute
+                  path="/processes/client"
+                  element={<ProcessClient />}
+                />
+
+                <ProtectedRoute
+                  path="/processes/client/view"
+                  element={<ProcessClientView />}
                 />
 
                 <ProtectedRoute path="/meetings" element={<Meeting />} />
@@ -180,6 +207,15 @@ function App() {
                   path="/advocates/contacts/show"
                   element={<AdvocateContactShow />}
                 />
+
+                <ProtectedRoute path="/reports" element={<Report />} />
+
+                <ProtectedRoute
+                  path="/reports/create"
+                  element={<ReportCreate />}
+                />
+
+                <ProtectedRoute path="/reports/edit" element={<ReportEdit />} />
 
                 <ProtectedRoute path="/users" element={<User />} />
                 <ProtectedRoute path="/users/create" element={<UserCreate />} />
