@@ -139,7 +139,7 @@ const ReportCreate = () => {
     params.report_id = reportId;
 
     switch (values.report_type) {
-      case 'Clientes':
+      case 'Clientes': {
         let hasErrorClient = false;
 
         if (registrationDate !== null) {
@@ -175,8 +175,9 @@ const ReportCreate = () => {
         if (!hasErrorClient) sendReportFilters(params, 'clients', values.name);
 
         break;
+      }
 
-      case 'Contratos':
+      case 'Contratos': {
         let hasErrorContract = false;
 
         if (contractStartDate !== null) {
@@ -228,8 +229,9 @@ const ReportCreate = () => {
         }
 
         break;
+      }
 
-      case 'Processos':
+      case 'Processos': {
         let hasErrorProcess = false;
 
         if (processStartDate !== null) {
@@ -263,9 +265,11 @@ const ReportCreate = () => {
         }
 
         break;
+      }
 
-      default:
+      default: {
         break;
+      }
     }
   };
 
