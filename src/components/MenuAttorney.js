@@ -111,10 +111,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 8,
-      href: '/construction',
+      href: '/advocate/contacts',
       icon: MessageIcon,
       title: 'Mensagens',
-      disabled: true,
+      disabled: false,
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[7].checked === 1

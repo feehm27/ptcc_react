@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Visibility } from '@material-ui/icons';
+import { Delete, Visibility } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -77,9 +77,10 @@ const AdvocateContactManagement = (listClients) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Cliente</TableCell>
+                <TableCell>Nome do Cliente</TableCell>
+                <TableCell>Email</TableCell>
                 <TableCell>CPF</TableCell>
-                <TableCell>Qtd. Mensagens Enviadas</TableCell>
+                <TableCell>Qtd. Mensagens</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -93,20 +94,37 @@ const AdvocateContactManagement = (listClients) => {
                   </TableCell>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
+                      {client.email}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography color="textPrimary" variant="body1">
                       {client.cpf}
                     </Typography>
                   </TableCell>
-                  <TableCell>{`${client.messages.length} mensagens`}</TableCell>
+                  <TableCell>{`${client.messages.length}`}</TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar mensagens">
                       <Visibility
                         cursor="pointer"
                         onClick={() => {
                           navigate('/advocates/contacts/show', {
-                            state: { messages: client.messages, show: true }
+                            state: {
+                              client,
+                              messages: client.messages,
+                              show: true
+                            }
                           });
                         }}
                       ></Visibility>
+                    </Tooltip>
+                    <Tooltip title="Excluir todas as mensagens">
+                      <Delete
+                        cursor="pointer"
+                        onClick={() => {
+                          console.log('aqui');
+                        }}
+                      ></Delete>
                     </Tooltip>
                   </TableCell>
                 </TableRow>

@@ -19,7 +19,7 @@ const AdvocateContact = () => {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
       }
     };
-    await API.get(`messages`, config)
+    await API.get(`advocates/messages/received`, config)
       .then((response) => {
         setClients(response.data.data);
       })

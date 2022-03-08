@@ -39,16 +39,13 @@ const ClientContactCreate = () => {
     };
 
     const params = {
-      sender_name: values.name,
       subject: values.subject,
       message: values.message,
-      read: 0,
-      client_sent: true,
-      advocate_sent: false,
-      user_id: data.id
+      client_id: data.client.id,
+      advocate_user_id: data.client.advocate_user_id
     };
 
-    await API.post('messages', params, config)
+    await API.post('advocates/messages/received', params, config)
       .then(() => {
         showSuccess.current = true;
       })
@@ -75,7 +72,7 @@ const ClientContactCreate = () => {
   return (
     <Formik
       initialValues={{
-        name: data && data.name ? data.name : '',
+        name: data.client && data.client.name ? data.client.name : '',
         email: data && data.email ? data.email : '',
         subject: '',
         message: ''
@@ -100,7 +97,7 @@ const ClientContactCreate = () => {
                 <Grid item md={12} xs={12}>
                   <TextField
                     fullWidth
-                    label="Nome completo"
+                    label="Nome do remetente"
                     name="name"
                     value={values.name}
                     disabled
@@ -110,7 +107,7 @@ const ClientContactCreate = () => {
                 <Grid item md={12} xs={12}>
                   <TextField
                     fullWidth
-                    label="Email"
+                    label="Email do remetente"
                     name="email"
                     disabled
                     value={values.email}
