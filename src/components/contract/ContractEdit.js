@@ -810,6 +810,8 @@ const ContractEdit = () => {
                     variant="contained"
                     disabled={disabled || contract.canceled_at !== null}
                     onClick={() => {
+                      showSuccess.current = false;
+                      showError.current = false;
                       setShowCanceledModal(true);
                     }}
                   >
