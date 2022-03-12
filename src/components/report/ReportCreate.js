@@ -50,15 +50,6 @@ const ReportCreate = () => {
   const showError = useRef(false);
 
   /**
-   * Retorna para a página anterior
-   */
-  const callTimeOut = () => {
-    setTimeout(() => {
-      navigate('/reports');
-    }, 1500);
-  };
-
-  /**
    * Salva o relatório
    * @param {*} values
    * @returns
@@ -888,7 +879,6 @@ const ReportCreate = () => {
                 type: 'success',
                 message: 'Relatório exportado com sucesso!'
               })}
-              {callTimeOut()}
             </>
           )}
           {showError.current && (
