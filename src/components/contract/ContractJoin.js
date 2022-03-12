@@ -36,7 +36,7 @@ const ContractJoin = () => {
       }
     };
 
-    await API.get('advocates/clients', config)
+    await API.get(`advocates/clients?check_contract=1`, config)
       .then((response) => {
         setClients(response.data.data);
         setShowSelectedClients(true);
@@ -173,19 +173,21 @@ const ContractJoin = () => {
                     <DialogContent>
                       <DialogContentText
                         id="alert-dialog-description"
-                        textAlign="center"
+                        textAlign="justify"
                       >
-                        Você não possui clientes cadastrados para vínculo.
-                        <p>
-                          <NavLink
-                            to={{
-                              pathname: '/clients'
-                            }}
-                          >
-                            Clique aqui
-                          </NavLink>{' '}
-                          para cadastrar um novo cliente.
-                        </p>
+                        <b>
+                          Você não possui clientes cadastrados para vínculo ou
+                          todos os seus clientes já estão vinculados a um
+                          contrato.
+                        </b>
+                        <NavLink
+                          to={{
+                            pathname: '/clients'
+                          }}
+                        >
+                          &nbsp;Clique aqui
+                        </NavLink>{' '}
+                        <b>para cadastrar um novo cliente.</b>
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -194,6 +196,7 @@ const ContractJoin = () => {
                           navigate('/contracts');
                         }}
                         color="primary"
+                        variant="outlined"
                       >
                         Voltar
                       </Button>
