@@ -15,7 +15,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import ClientJoinSchema from 'src/schemas/ClientJoinSchema';
-
 import { API } from 'src/services/api';
 
 const ProcessJoin = () => {
@@ -197,6 +196,7 @@ const ProcessJoin = () => {
                         }}
                         color="primary"
                         variant="outlined"
+                        style={{ margin: '0 auto', display: 'block' }}
                       >
                         Voltar
                       </Button>

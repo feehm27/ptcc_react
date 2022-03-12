@@ -197,6 +197,7 @@ const ContractJoin = () => {
                         }}
                         color="primary"
                         variant="outlined"
+                        style={{ margin: '0 auto', display: 'block' }}
                       >
                         Voltar
                       </Button>

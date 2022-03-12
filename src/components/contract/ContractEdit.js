@@ -14,10 +14,12 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  IconButton,
   Stack,
   TextField,
   Typography
 } from '@material-ui/core';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider
@@ -26,7 +28,7 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactInputMask from 'react-input-mask';
 import { useLocation, useNavigate } from 'react-router';
 import BanksConstants from 'src/constants/BanksConstants';
@@ -48,6 +50,9 @@ const ContractEdit = () => {
   );
   const [selectedEndDate, handleEndDateChange] = useState(contract.finish_date);
   const [disabled, setDisabled] = useState(false);
+
+  const [clickedClient, setClickedClient] = useState(false);
+  const [clickedAdvocate, setClickedAdvocate] = useState(false);
 
   const showSuccess = useRef(false);
   const showError = useRef(false);
@@ -175,11 +180,41 @@ const ContractEdit = () => {
   };
 
   return (
-    <>
-      <Card>
-        <CardHeader title="Dados do cliente" />
-        <Divider />
-        <CardContent>
+    <div style={{ marginLeft: '14px', marginTop: '14px' }}>
+      <Card style={{ marginTop: 8 }}>
+        <CardHeader
+          onClick={() => {
+            clickedClient ? setClickedClient(false) : setClickedClient(true);
+          }}
+          style={{ cursor: 'pointer' }}
+          title="Dados do cliente"
+          action={
+            <div>
+              <IconButton aria-label="settings">
+                {clickedClient ? (
+                  <KeyboardArrowUp
+                    onClick={() => {
+                      setClickedClient(false);
+                    }}
+                  />
+                ) : (
+                  <KeyboardArrowDown
+                    onClick={() => {
+                      setClickedClient(true);
+                    }}
+                  />
+                )}
+              </IconButton>
+            </div>
+          }
+        />
+        <CardContent
+          style={{
+            marginTop: '20px',
+            paddingTop: '0px',
+            display: clickedClient ? 'block' : 'none'
+          }}
+        >
           <Grid container spacing={3}>
             <Grid item md={6} xs={12}>
               <TextField
@@ -317,10 +352,43 @@ const ContractEdit = () => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader title="Dados do advogado" />
-        <Divider />
-        <CardContent>
+      <Card style={{ marginTop: 8 }}>
+        <CardHeader
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            clickedAdvocate
+              ? setClickedAdvocate(false)
+              : setClickedAdvocate(true);
+          }}
+          title="Dados do advogado"
+          action={
+            <div>
+              <IconButton aria-label="settings">
+                {clickedAdvocate ? (
+                  <KeyboardArrowUp
+                    onClick={() => {
+                      setClickedAdvocate(false);
+                    }}
+                  />
+                ) : (
+                  <KeyboardArrowDown
+                    onClick={() => {
+                      setClickedAdvocate(true);
+                    }}
+                  />
+                )}
+              </IconButton>
+            </div>
+          }
+        />
+
+        <CardContent
+          style={{
+            marginTop: '20px',
+            paddingTop: '0px',
+            display: clickedAdvocate ? 'block' : 'none'
+          }}
+        >
           <Grid container spacing={3}>
             <Grid item md={6} xs={12}>
               <TextField
@@ -450,9 +518,8 @@ const ContractEdit = () => {
               handleSubmit(values, errors);
             }}
           >
-            <Card>
-              <CardHeader title="Dados do contrato" />
-              <Divider />
+            <Card style={{ marginTop: 8 }}>
+              <CardHeader title="CONTRATO" />
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid item md={6} xs={12}>
@@ -896,7 +963,7 @@ const ContractEdit = () => {
           </form>
         )}
       </Formik>
-    </>
+    </div>
   );
 };
 
