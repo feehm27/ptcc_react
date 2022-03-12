@@ -227,8 +227,8 @@ const ProcessManagement = (listProcesses) => {
                 <TableCell>Número do processo</TableCell>
                 <TableCell>Nome do cliente</TableCell>
                 <TableCell>Data de inicio</TableCell>
-                <TableCell>Status Inicial</TableCell>
-                <TableCell>Status Atual</TableCell>
+                <TableCell>Etapa Inicial</TableCell>
+                <TableCell>Etapa Atual</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>

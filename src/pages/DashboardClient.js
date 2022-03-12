@@ -71,28 +71,28 @@ const DashboardClient = () => {
         <Container maxWidth={false}>
           <Grid container spacing={3}>
             {loadingProcess ? (
-              <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
+              <Grid item lg={6} sm={6} xl={3} xs={12}>
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton animation={false} />
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton animation={false} />
+              </Grid>
             ) : (
               <Grid item lg={6} sm={6} xl={3} xs={12}>
                 <ProcessStatusClient process={process} />
               </Grid>
             )}
             {loadingContract ? (
-              <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
+              <Grid item lg={6} sm={6} xl={3} xs={12}>
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton animation={false} />
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton animation={false} />
+              </Grid>
             ) : (
               <Grid item lg={6} sm={6} xl={3} xs={12}>
                 <ContractEndDateClient contract={contract} />

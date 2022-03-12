@@ -189,99 +189,91 @@ const DashboardAdvocate = () => {
           <Meetings />
         </Grid>
         {loadingCountClients ? (
-          <Skeleton
-            variant="rectangular"
-            animation="wave"
-            width="210"
-            height="118"
-          >
-            <div style={{ paddingTop: '57%' }} />
-          </Skeleton>
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Skeleton />
+            <Skeleton animation="wave" />
+            <Skeleton animation={false} />
+            <Skeleton />
+            <Skeleton />
+          </Grid>
         ) : (
           <Grid item lg={4} sm={4} xl={3} xs={12}>
             <Clients clientsCount={clientsCount} />
           </Grid>
         )}
         {loadingCountContracts ? (
-          <Skeleton
-            variant="rectangular"
-            animation="wave"
-            width="210"
-            height="118"
-          >
-            <div style={{ paddingTop: '57%' }} />
-          </Skeleton>
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Skeleton />
+            <Skeleton animation="wave" />
+            <Skeleton animation={false} />
+            <Skeleton />
+            <Skeleton />
+          </Grid>
         ) : (
           <Grid item lg={4} sm={4} xl={3} xs={12}>
             <ActiveContracts contractsCount={contractsCount} />
           </Grid>
         )}
-        {loadingProcesses ? (
-          <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width="210"
-              height="118"
-            >
-              <div style={{ paddingTop: '57%' }} />
-            </Skeleton>
-          </Grid>
-        ) : (
-          <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
+        <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
+          {loadingProcesses ? (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
             <Grid item lg={4} md={4} xl={3} xs={12}>
               <ProcessesByStatus
                 sx={{ height: '100%' }}
                 processes={processes}
               />
             </Grid>
-            {loadingContracts ? (
-              <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
-            ) : (
-              <Grid item lg={4} md={4} xl={3} xs={12}>
-                <ContractsByMonth contracts={contracts} />
-              </Grid>
-            )}
+          )}
+          {loadingContracts ? (
             <Grid item lg={4} md={4} xl={3} xs={12}>
-              <MeetingsPerWeek sx={{ height: '100%' }} />
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
             </Grid>
-            {loadingAnnualProfit ? (
-              <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
-            ) : (
-              <Grid item lg={8} md={8} xl={6} xs={12}>
-                <AnnualProfit profit={annualProfit} />
-              </Grid>
-            )}
-            {loadingClients ? (
-              <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
-            ) : (
-              <Grid item lg={4} md={4} xl={3} xs={12}>
-                <ClientsByYear clients={clients} />
-              </Grid>
-            )}
+          ) : (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <ContractsByMonth contracts={contracts} />
+            </Grid>
+          )}
+          <Grid item lg={4} md={4} xl={3} xs={12}>
+            <MeetingsPerWeek sx={{ height: '100%' }} />
           </Grid>
-        )}
+          {loadingAnnualProfit ? (
+            <Grid item lg={8} md={8} xl={6} xs={12}>
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
+            <Grid item lg={8} md={8} xl={6} xs={12}>
+              <AnnualProfit profit={annualProfit} />
+            </Grid>
+          )}
+          {loadingClients ? (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <ClientsByYear clients={clients} />
+            </Grid>
+          )}
+        </Grid>
       </Grid>
     </Container>
   );
