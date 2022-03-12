@@ -79,7 +79,7 @@ const ProcessClientView = (props) => {
       <Divider />
       <CardContent>
         <Typography variant="body1">
-          Não existem processos vinculados ao seu usuário para visualização.
+          Não existe processo vinculado ao seu usuário para visualização.
         </Typography>
       </CardContent>
     </Card>
