@@ -98,7 +98,7 @@ const DashboardClient = () => {
                 <ContractEndDateClient contract={contract} />
               </Grid>
             )}
-            <Grid item lg={12} md={12} xl={12} xs={12}>
+            <Grid item lg={6} md={6} xl={3} xs={12}>
               <ScheduledMettingClient sx={{ height: '100%' }} />
             </Grid>
           </Grid>

@@ -1,8 +1,10 @@
 import DateFnsUtils from '@date-io/date-fns';
 import {
+  Box,
   Button,
   Card,
   CardContent,
+  Container,
   Divider,
   FormControlLabel,
   Grid,
@@ -266,14 +268,21 @@ const MeetingManagement = () => {
             </CardContent>
           </Card>
           {loading ? (
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width="210"
-              height="118"
+            <Box
+              sx={{
+                backgroundColor: 'background.default',
+                minHeight: '100%',
+                py: 3
+              }}
             >
-              <div style={{ paddingTop: '57%' }} />
-            </Skeleton>
+              <Container maxWidth="lg">
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton animation={false} />
+                <Skeleton />
+                <Skeleton />
+              </Container>
+            </Box>
           ) : (
             checkShowCalendar()
           )}
