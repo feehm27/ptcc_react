@@ -105,15 +105,19 @@ const ContractView = () => {
             </Button>
           </Stack>
         </Box>
-        <div
-          style={{
-            marginLeft: '22%'
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            p: 2
           }}
         >
-          <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
-            <Page pageNumber={pageNumber} />
-          </Document>
-        </div>
+          <div>
+            <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
+              <Page pageNumber={pageNumber} />
+            </Document>
+          </div>
+        </Box>
       </CardContent>
       <Box
         sx={{
