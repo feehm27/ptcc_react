@@ -196,6 +196,25 @@ const AdvocateContactManagement = (listClients) => {
             </TableBody>
           </Table>
         </Box>
+        {console.log(showSuccess.current)}
+        {showSuccess.current && (
+          <>
+            <ToastAnimated />
+            {showToast({
+              type: 'success',
+              message: 'Mensagens deletadas com sucesso!'
+            })}
+          </>
+        )}
+        {showError.current && (
+          <>
+            <ToastAnimated />
+            {showToast({
+              type: 'error',
+              message: 'Ocorreu um erro inesperado deletar as mensagens!'
+            })}
+          </>
+        )}
       </PerfectScrollbar>
       <TablePagination
         component="div"
@@ -245,24 +264,6 @@ const AdvocateContactManagement = (listClients) => {
             </DialogActions>
           </Dialog>
         </div>
-      )}
-      {showSuccess.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Mensagens deletadas com sucesso!'
-          })}
-        </>
-      )}
-      {showError.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'error',
-            message: 'Ocorreu um erro inesperado deletar as mensagens!'
-          })}
-        </>
       )}
     </Card>
   ) : (

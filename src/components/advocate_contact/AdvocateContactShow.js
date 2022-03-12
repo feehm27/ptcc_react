@@ -13,15 +13,16 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  IconButton,
   TextField,
   Typography
 } from '@material-ui/core';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 import { Formik } from 'formik';
 import { filter, first } from 'lodash';
 import moment from 'moment';
-import { useContext, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { UserContext } from 'src/contexts/UserContext';
 import AdvocateAnswerSchema from 'src/schemas/AdvocateAnswerSchema';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
@@ -29,7 +30,6 @@ import ToastAnimated, { showToast } from '../Toast';
 const AdvocateContactShow = () => {
   const navigate = useNavigate();
   const { client } = useLocation().state;
-  const { data } = useContext(UserContext);
 
   const [newClient, setNewClient] = useState(client);
   const [rows, setRows] = useState(client.messages);
@@ -39,6 +39,8 @@ const AdvocateContactShow = () => {
   const [messageSelected, setMessageSelected] = useState(false);
   const [messageClicked, setMessageClicked] = useState(null);
   const [reply, setReply] = useState(false);
+
+  const [clickedCard, setClickedCard] = useState([]);
 
   const [selectedMessageId, setSelectedMessageId] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -105,6 +107,8 @@ const AdvocateContactShow = () => {
    * @param {*} values
    */
   async function sendAnswer(values) {
+    showSuccess.current = false;
+
     setMessageSelected(false);
 
     setSubmitting(true);
@@ -117,7 +121,9 @@ const AdvocateContactShow = () => {
     const params = {
       answer: values.answer,
       code_message: messageClicked.code_message,
-      message_received_id: messageClicked.id
+      message_received_id: messageClicked.id,
+      response_advocate: true,
+      response_client: false
     };
 
     await API.post('advocates/messages/answers', params, config)
@@ -126,7 +132,6 @@ const AdvocateContactShow = () => {
         getMessages();
       })
       .catch(() => {
-        showSuccess.current = false;
         showError.current = true;
       });
     setSubmitting(false);
@@ -179,10 +184,6 @@ const AdvocateContactShow = () => {
           m: 3
         }}
       >
-        <Card sx={{ minWidth: 500 }}>
-          <CardHeader title="Lista de mensagens" />
-          <Divider />
-        </Card>
         <>
           <Formik
             initialValues={{
@@ -207,11 +208,16 @@ const AdvocateContactShow = () => {
                   <Grid container spacing={3} item xs={12} sm={12}>
                     <Grid container item xs={6} sm={6}>
                       <Card cursor="pointer" sx={{ minWidth: 595 }}>
+                        <CardHeader title="Mensagens Recebidas" />
+                        <Divider />
                         {rows.map((message) => (
                           <>
                             <Divider />
                             <CardContent
                               onClick={() => {
+                                setClickedCard(
+                                  Array(message.answers.length).fill(false)
+                                );
                                 setMessageClicked(message);
                                 setReply(false);
                                 setMessageSelected(true);
@@ -283,19 +289,6 @@ const AdvocateContactShow = () => {
                           </>
                         ))}
                       </Card>
-                      <Box
-                        sx={{
-                          marginTop: 2
-                        }}
-                      >
-                        <Button
-                          color="primary"
-                          variant="outlined"
-                          onClick={() => navigate('/advocate/contacts')}
-                        >
-                          Voltar
-                        </Button>
-                      </Box>
                     </Grid>
                     {reply && (
                       <>
@@ -376,69 +369,15 @@ const AdvocateContactShow = () => {
                         <Grid container item xs={6} sm={6}></Grid>
                       </>
                     )}
+
                     {messageSelected ? (
-                      <Grid
-                        container
-                        item
-                        xs={6}
-                        sm={6}
-                        style={{ marginTop: `${reply ? '-280px' : '0px'}` }}
-                      >
-                        {messageClicked.answers.length > 0 &&
-                          messageClicked.answers.map((answer) => (
-                            <Box>
-                              <Typography variant="h3">
-                                {`RES: ${messageClicked.subject}`}
-                              </Typography>
-                              <Divider />
-                              <Card sx={{ minWidth: 595 }}>
-                                <Divider />
-                                <CardContent>
-                                  <Typography
-                                    sx={{ fontSize: 14 }}
-                                    color="text.secondary"
-                                    gutterBottom
-                                  >
-                                    {`${moment(answer.created_at).format(
-                                      'DD/MM/YYYY'
-                                    )} ás ${moment(answer.created_at).format(
-                                      'H:s'
-                                    )}`}
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {`Para: ${data.email}`}
-                                  </Typography>
-                                  <br />
-                                  <Typography variant="body2">
-                                    {answer.answer}
-                                  </Typography>
-                                </CardContent>
-                                <CardActions>
-                                  <Button
-                                    color="primary"
-                                    variant="contained"
-                                    disabled={reply}
-                                    size="small"
-                                    onClick={() => {
-                                      setReply(true);
-                                      showSuccess.current = false;
-                                      showError.current = false;
-                                      showSuccessDelete.current = false;
-                                      showErrorDelete.current = false;
-                                    }}
-                                  >
-                                    Responder
-                                  </Button>
-                                </CardActions>
-                              </Card>
-                            </Box>
-                          ))}
+                      <Grid item xs={3} sm={3}>
                         <Box>
-                          <Typography variant="h3">
-                            {messageClicked.subject}
-                          </Typography>
-                          <Divider />
                           <Card sx={{ minWidth: 595 }}>
+                            <CardHeader
+                              style={{ cursor: 'pointer', color: 'primary' }}
+                              title={messageClicked.subject}
+                            />
                             <Divider />
                             <CardContent>
                               <Typography variant="h5" component="div">
@@ -455,10 +394,16 @@ const AdvocateContactShow = () => {
                                   messageClicked.created_at
                                 ).format('H:s')}`}
                               </Typography>
+                              <Typography variant="body2" color="primary">
+                                {`De: ${newClient.email}`}
+                              </Typography>
                               <Typography variant="body2">
-                                {`Para: ${data.email}`}
+                                Para: Você
                               </Typography>
                               <br />
+                              <Typography variant="body2">
+                                <b>Mensagem:</b>
+                              </Typography>
                               <Typography variant="body2">
                                 {messageClicked.message}
                               </Typography>
@@ -482,6 +427,120 @@ const AdvocateContactShow = () => {
                             </CardActions>
                           </Card>
                         </Box>
+                        {messageClicked.answers.length > 0 &&
+                          messageClicked.answers.map((answer, index) => (
+                            <Box>
+                              <Card sx={{ minWidth: 595, marginTop: '12px' }}>
+                                <CardHeader
+                                  onClick={() => {
+                                    clickedCard[index]
+                                      ? setClickedCard({
+                                          ...clickedCard,
+                                          [index]: false
+                                        })
+                                      : setClickedCard({
+                                          ...clickedCard,
+                                          [index]: true
+                                        });
+                                  }}
+                                  style={{ cursor: 'pointer' }}
+                                  title={`RES: ${
+                                    messageClicked.subject
+                                  } - ${moment(answer.created_at).format(
+                                    'DD/MM/YYYY'
+                                  )} ás ${moment(answer.created_at).format(
+                                    'H:s'
+                                  )}`}
+                                  action={
+                                    <div>
+                                      <IconButton aria-label="settings">
+                                        {clickedCard[index] ? (
+                                          <KeyboardArrowUp
+                                            onClick={() => {
+                                              setClickedCard({
+                                                ...clickedCard,
+                                                [index]: false
+                                              });
+                                            }}
+                                          />
+                                        ) : (
+                                          <KeyboardArrowDown
+                                            onClick={() => {
+                                              setClickedCard({
+                                                ...clickedCard,
+                                                [index]: true
+                                              });
+                                            }}
+                                          />
+                                        )}
+                                      </IconButton>
+                                    </div>
+                                  }
+                                />
+                                <CardContent
+                                  style={{
+                                    paddingTop: '0px',
+                                    display: clickedCard[index]
+                                      ? 'block'
+                                      : 'none'
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{ fontSize: 14 }}
+                                    color="text.secondary"
+                                    gutterBottom
+                                  >
+                                    {`${moment(answer.created_at).format(
+                                      'DD/MM/YYYY'
+                                    )} ás ${moment(answer.created_at).format(
+                                      'H:s'
+                                    )}`}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {`${
+                                      answer.response_advocate
+                                        ? `De: Você`
+                                        : `De: ${newClient.email} - Cliente`
+                                    }`}
+                                  </Typography>
+                                  <Typography variant="body2" color="primary">
+                                    {`${
+                                      answer.response_advocate
+                                        ? `Para: ${newClient.email}`
+                                        : `De: ${newClient.email}`
+                                    }`}
+                                  </Typography>
+                                  <br />
+                                  <Typography variant="body2">
+                                    <b>Mensagem:</b>
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {answer.answer}
+                                  </Typography>
+                                </CardContent>
+                                <CardActions>
+                                  {answer.response_client === true && (
+                                    <Button
+                                      color="primary"
+                                      variant="contained"
+                                      disabled={reply}
+                                      size="small"
+                                      hidden={answer.response_advocate}
+                                      onClick={() => {
+                                        setReply(true);
+                                        showSuccess.current = false;
+                                        showError.current = false;
+                                        showSuccessDelete.current = false;
+                                        showErrorDelete.current = false;
+                                      }}
+                                    >
+                                      Responder
+                                    </Button>
+                                  )}
+                                </CardActions>
+                              </Card>
+                            </Box>
+                          ))}
                       </Grid>
                     ) : (
                       <Grid container item xs={6} sm={6}>
@@ -520,6 +579,16 @@ const AdvocateContactShow = () => {
               </form>
             )}
           </Formik>
+
+          {showSuccess.current && (
+            <>
+              <ToastAnimated />
+              {showToast({
+                type: 'success',
+                message: 'Mensagem enviada com sucesso!'
+              })}
+            </>
+          )}
         </>
         {showDeleteModal && (
           <div>
@@ -576,15 +645,7 @@ const AdvocateContactShow = () => {
             })}
           </>
         )}
-        {showSuccess.current && (
-          <>
-            <ToastAnimated />
-            {showToast({
-              type: 'success',
-              message: 'Mensagem enviada com sucesso!'
-            })}
-          </>
-        )}
+
         {showError.current && (
           <>
             <ToastAnimated />
