@@ -227,7 +227,8 @@ const ProcessManagement = (listProcesses) => {
                 <TableCell>Número do processo</TableCell>
                 <TableCell>Nome do cliente</TableCell>
                 <TableCell>Data de inicio</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>Status Inicial</TableCell>
+                <TableCell>Status Atual</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -248,6 +249,7 @@ const ProcessManagement = (listProcesses) => {
                     {moment(process.start_date).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>{process.status}</TableCell>
+                  <TableCell>{process.current_status}</TableCell>
                   <TableCell>
                     <Tooltip title="Adicionar modificações">
                       {checkedPermission(5, 1) ? (

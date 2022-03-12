@@ -80,7 +80,7 @@ const ProcessHistoric = () => {
 
   return rows.length > 0 ? (
     <>
-      <Card>
+      <Card style={{ marginLeft: '14px', marginTop: '14px' }}>
         <CardHeader
           title={`Histórico do Processo - ${maskProcessNumber(process.number)}`}
         />
@@ -185,7 +185,7 @@ const ProcessHistoric = () => {
         sx={{
           display: 'flex',
           justifyContent: 'left',
-          p: 2
+          m: 3
         }}
       >
         <Stack direction="row" spacing={2}>
@@ -201,7 +201,7 @@ const ProcessHistoric = () => {
     </>
   ) : (
     <>
-      <Card sx={{ mt: 3, mb: 4, ml: 2, mr: 2 }}>
+      <Card sx={{ m: 3 }}>
         <Divider />
         <CardContent>
           <Typography color="textSecondary" variant="body1">
@@ -212,8 +212,7 @@ const ProcessHistoric = () => {
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'left',
-          p: 2
+          m: 3
         }}
       >
         <Stack direction="row" spacing={2}>
