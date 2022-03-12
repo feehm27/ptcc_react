@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   CardContent,
@@ -13,24 +14,24 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Stack,
   Tooltip,
   Typography
 } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import moment from 'moment';
-import { useRef, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { maskProcessNumber } from 'src/helpers/Helpers';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
 const ProcessHistoric = () => {
+  const navigate = useNavigate();
   const { process, historics } = useLocation().state;
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [selectedHistoricId, setSelectedHistoricId] = useState();
   const [rows, setRows] = useState(historics);
-
-  const showSuccessDelete = useRef(false);
 
   const handleClose = () => {
     setShowModalDelete(false);
@@ -40,7 +41,6 @@ const ProcessHistoric = () => {
    * Obtém a lista de historico do processo
    */
   async function getHistorics() {
-    showSuccessDelete.current = false;
     const tokenUser = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${tokenUser}` }
@@ -61,7 +61,6 @@ const ProcessHistoric = () => {
    * @param {*} values
    */
   async function deleteHistoric() {
-    showSuccessDelete.current = false;
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
@@ -72,128 +71,162 @@ const ProcessHistoric = () => {
       config
     )
       .then(() => {
-        showSuccessDelete.current = true;
         getHistorics();
       })
       .catch((err) => {
         console.log(err);
-        showSuccessDelete.current = false;
       });
   }
 
   return rows.length > 0 ? (
-    <Card>
-      <CardHeader
-        title={`Histórico do Processo - ${maskProcessNumber(process.number)}`}
-      />
-      <Divider />
-      <CardContent>
-        {rows.map((historic) => (
-          <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            <ListItem>
-              <ListItemAvatar
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center'
-                }}
-              >
-                <Tooltip title="Excluir histórico">
-                  <Delete
-                    style={{
-                      color: '#FF0000'
-                    }}
-                    cursor="pointer"
-                    onClick={() => {
-                      setShowModalDelete(true);
-                      setSelectedHistoricId(historic.id);
-                    }}
-                  ></Delete>
-                </Tooltip>
-                <Typography
-                  style={{
-                    ml: '10px'
+    <>
+      <Card>
+        <CardHeader
+          title={`Histórico do Processo - ${maskProcessNumber(process.number)}`}
+        />
+        <Divider />
+        <CardContent>
+          {rows.map((historic) => (
+            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+              <ListItem>
+                <ListItemAvatar
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center'
                   }}
                 >
-                  {' '}
-                  {moment(historic.modification_date).format('DD/MM/YYYY')}
+                  <Tooltip title="Excluir histórico">
+                    <Delete
+                      style={{
+                        color: '#FF0000'
+                      }}
+                      cursor="pointer"
+                      onClick={() => {
+                        setShowModalDelete(true);
+                        setSelectedHistoricId(historic.id);
+                      }}
+                    ></Delete>
+                  </Tooltip>
+                  <Typography
+                    style={{
+                      ml: '10px'
+                    }}
+                  >
+                    {' '}
+                    {moment(historic.modification_date).format('DD/MM/YYYY')}
+                  </Typography>
+                </ListItemAvatar>
+                <ListItemText
+                  sx={{ ml: 5 }}
+                  primary={`Status alterado para "${historic.status_process}"`}
+                  secondary={
+                    <div>
+                      <Typography
+                        sx={{ display: 'inline' }}
+                        component="span"
+                        variant="body2"
+                        color="text.primary"
+                      ></Typography>
+                      {`Descrição da modificação: ${historic.modification_description}`}
+                    </div>
+                  }
+                />
+              </ListItem>
+              <Divider />
+            </List>
+          ))}
+        </CardContent>
+        {showModalDelete && (
+          <div>
+            <Dialog
+              open={showModalDelete}
+              onClose={handleClose}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                <Typography color="primary" variant="h5" textAlign="center">
+                  Confirmar exclusão?
                 </Typography>
-              </ListItemAvatar>
-              <ListItemText
-                sx={{ ml: 5 }}
-                primary={`Status alterado para "${historic.status_process}"`}
-                secondary={
-                  <div>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    ></Typography>
-                    {`Descrição da modificação: ${historic.modification_description}`}
-                  </div>
-                }
-              />
-            </ListItem>
-            <Divider />
-          </List>
-        ))}
-      </CardContent>
-      {showModalDelete && (
-        <div>
-          <Dialog
-            open={showModalDelete}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Tem certeza que deseja excluir o histórico? Essa ação é
+                  irreversivel.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleClose();
+                    <>
+                      <ToastAnimated />
+                      {showToast({
+                        type: 'success',
+                        message: 'Histórico deletado com sucesso!'
+                      })}
+                      {deleteHistoric()}
+                    </>;
+                  }}
+                  autoFocuscolor="primary"
+                  variant="contained"
+                >
+                  Confirmar
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+        )}
+      </Card>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'left',
+          p: 2
+        }}
+      >
+        <Stack direction="row" spacing={2}>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => navigate('/processes')}
           >
-            <DialogTitle id="alert-dialog-title">
-              <Typography color="primary" variant="h5" textAlign="center">
-                Confirmar exclusão?
-              </Typography>
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Tem certeza que deseja excluir o histórico? Essa ação é
-                irreversivel.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose} color="primary">
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => {
-                  handleClose();
-                  deleteHistoric();
-                }}
-                autoFocuscolor="primary"
-                variant="contained"
-              >
-                Confirmar
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </div>
-      )}
-      {showSuccessDelete.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Histórico deletado com sucesso!'
-          })}
-        </>
-      )}
-    </Card>
+            Voltar
+          </Button>
+        </Stack>
+      </Box>
+    </>
   ) : (
-    <Card sx={{ mt: 3, mb: 4, ml: 2, mr: 2 }}>
-      <Divider />
-      <CardContent>
-        <Typography color="textSecondary" variant="body1">
-          Não existe histórico para o processo selecionado.
-        </Typography>
-      </CardContent>
-    </Card>
+    <>
+      <Card sx={{ mt: 3, mb: 4, ml: 2, mr: 2 }}>
+        <Divider />
+        <CardContent>
+          <Typography color="textSecondary" variant="body1">
+            Não existe histórico para o processo selecionado.
+          </Typography>
+        </CardContent>
+      </Card>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'left',
+          p: 2
+        }}
+      >
+        <Stack direction="row" spacing={2}>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => navigate('/processes')}
+          >
+            Voltar
+          </Button>
+        </Stack>
+      </Box>
+    </>
   );
 };
 
