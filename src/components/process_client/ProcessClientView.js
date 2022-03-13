@@ -145,7 +145,15 @@ const ProcessClientView = (props) => {
         <Divider />
         <CardHeader title="Histórico de alterações" />
         <Divider />
-        <CardContent>{getHistorics()}</CardContent>
+        <CardContent>
+          {props.process.historics.length === 0 ? (
+            <Typography variant="body1">
+              Não existe histórico de alterações no seu processo para exibição.
+            </Typography>
+          ) : (
+            getHistorics()
+          )}
+        </CardContent>
       </>
     </Card>
   );

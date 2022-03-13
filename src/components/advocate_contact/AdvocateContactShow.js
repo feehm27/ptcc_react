@@ -41,6 +41,9 @@ const AdvocateContactShow = () => {
   const [reply, setReply] = useState(false);
 
   const [clickedCard, setClickedCard] = useState([]);
+  const [changeColorCard, setChangeColorCard] = useState(
+    Array(client.messages.length).fill(false)
+  );
 
   const [selectedMessageId, setSelectedMessageId] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -93,8 +96,10 @@ const AdvocateContactShow = () => {
             </>
           );
         } else {
-          setNewClient(foundCard);
           setRows(foundCard.messages);
+          setNewClient(foundCard);
+          setMessageSelected(true);
+          setMessageClicked(messageClicked);
         }
 
         return null;
@@ -108,9 +113,7 @@ const AdvocateContactShow = () => {
    */
   async function sendAnswer(values) {
     showSuccess.current = false;
-
     setMessageSelected(false);
-
     setSubmitting(true);
     const config = {
       headers: {
@@ -167,12 +170,34 @@ const AdvocateContactShow = () => {
     setSubmittingDelete(false);
   }
 
+  const getMarginTop = () => {
+    if (reply) {
+      if (messageClicked.answers.length === 0) {
+        return '-200px';
+      } else {
+        return '12px';
+      }
+    }
+    return '0px';
+  };
+
   /**
    * Envia os dados do formulário
    * @param {*} values
    */
   const handleSubmit = (values) => {
     sendAnswer(values);
+  };
+
+  const changeColor = (index) => {
+    const newArray = [];
+    changeColorCard.map((card, indexCard) => {
+      newArray[indexCard] = false;
+      if (indexCard === index) {
+        newArray[indexCard] = true;
+      }
+    });
+    setChangeColorCard(newArray);
   };
 
   return (
@@ -210,11 +235,17 @@ const AdvocateContactShow = () => {
                       <Card cursor="pointer" sx={{ minWidth: 595 }}>
                         <CardHeader title="Mensagens Recebidas" />
                         <Divider />
-                        {rows.map((message) => (
+                        {rows.map((message, indexMessage) => (
                           <>
                             <Divider />
                             <CardContent
+                              style={{
+                                backgroundColor: changeColorCard[indexMessage]
+                                  ? '#f6f6f6'
+                                  : 'white'
+                              }}
                               onClick={() => {
+                                changeColor(indexMessage);
                                 setClickedCard(
                                   Array(message.answers.length).fill(false)
                                 );
@@ -290,302 +321,320 @@ const AdvocateContactShow = () => {
                         ))}
                       </Card>
                     </Grid>
-                    {reply && (
-                      <>
-                        <Grid container item xs={6} sm={6}>
+                    <Grid container item xs={6} sm={6} style={{}}>
+                      {reply && (
+                        <>
+                          <Grid container item xs={6} sm={6}>
+                            <Box>
+                              <Typography variant="body2">
+                                {`Para: ${newClient.name} <${newClient.email}>`}
+                              </Typography>
+                              <Divider />
+                              <Card sx={{ width: 595 }}>
+                                <CardContent>
+                                  <Grid item md={12} xs={12} spacing={3}>
+                                    <TextField
+                                      error={errors.answer}
+                                      fullWidth
+                                      helperText={errors.answer}
+                                      label="Resposta:"
+                                      onBlur={(event) => {
+                                        handleBlur(event);
+                                        showSuccess.current = false;
+                                        showError.current = false;
+                                        showSuccessDelete.current = false;
+                                        showErrorDelete.current = false;
+                                      }}
+                                      onChange={(event) => {
+                                        handleChange(event);
+                                        showSuccess.current = false;
+                                        showError.current = false;
+                                        showSuccessDelete.current = false;
+                                        showErrorDelete.current = false;
+                                      }}
+                                      multiline
+                                      value={values.answer}
+                                      placeholder="Resposta:"
+                                      name="answer"
+                                      inputProps={{
+                                        style: { height: '150px' }
+                                      }}
+                                    />
+                                  </Grid>
+                                </CardContent>
+                                <CardActions>
+                                  {submitting ? (
+                                    <Button
+                                      color="primary"
+                                      variant="contained"
+                                      disabled
+                                      size="small"
+                                    >
+                                      Carregando..
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      color="primary"
+                                      variant="contained"
+                                      size="small"
+                                      onClick={submitForm}
+                                    >
+                                      Enviar
+                                    </Button>
+                                  )}
+                                  <Button
+                                    color="primary"
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => {
+                                      setReply(false);
+                                      showSuccess.current = false;
+                                      showError.current = false;
+                                      showSuccessDelete.current = false;
+                                      showErrorDelete.current = false;
+                                    }}
+                                  >
+                                    Descartar
+                                  </Button>
+                                </CardActions>
+                              </Card>
+                            </Box>
+                          </Grid>
+                          <Grid container item xs={6} sm={6}></Grid>
+                        </>
+                      )}
+                      {messageSelected ? (
+                        <Grid item xs={3} sm={3}>
                           <Box>
-                            <Typography variant="body2">
-                              {`Para: ${newClient.name} <${newClient.email}>`}
-                            </Typography>
-                            <Divider />
-                            <Card sx={{ width: 595 }}>
+                            <Card
+                              sx={{
+                                minWidth: 595,
+                                marginTop: getMarginTop()
+                              }}
+                            >
+                              <CardHeader
+                                style={{ cursor: 'pointer', color: 'primary' }}
+                                title={messageClicked.subject}
+                              />
+                              <Divider />
                               <CardContent>
-                                <Grid item md={12} xs={12} spacing={3}>
-                                  <TextField
-                                    error={errors.answer}
-                                    fullWidth
-                                    helperText={errors.answer}
-                                    label="Resposta:"
-                                    onBlur={(event) => {
-                                      handleBlur(event);
-                                      showSuccess.current = false;
-                                      showError.current = false;
-                                      showSuccessDelete.current = false;
-                                      showErrorDelete.current = false;
-                                    }}
-                                    onChange={(event) => {
-                                      handleChange(event);
-                                      showSuccess.current = false;
-                                      showError.current = false;
-                                      showSuccessDelete.current = false;
-                                      showErrorDelete.current = false;
-                                    }}
-                                    multiline
-                                    value={values.answer}
-                                    placeholder="Resposta:"
-                                    name="answer"
-                                    inputProps={{ style: { height: '150px' } }}
-                                  />
-                                </Grid>
+                                <Typography variant="h5" component="div">
+                                  <span>{`${newClient.name} <${newClient.email}>`}</span>
+                                </Typography>
+                                <Typography
+                                  sx={{ fontSize: 14 }}
+                                  color="text.secondary"
+                                  gutterBottom
+                                >
+                                  {`${moment(messageClicked.created_at).format(
+                                    'DD/MM/YYYY'
+                                  )} ás ${moment(
+                                    messageClicked.created_at
+                                  ).format('H:s')}`}
+                                </Typography>
+                                <Typography variant="body2" color="primary">
+                                  {`De: ${newClient.email}`}
+                                </Typography>
+                                <Typography variant="body2">
+                                  Para: Você
+                                </Typography>
+                                <br />
+                                <Typography variant="body2">
+                                  <b>Mensagem:</b>
+                                </Typography>
+                                <Typography variant="body2">
+                                  {messageClicked.message}
+                                </Typography>
                               </CardContent>
                               <CardActions>
-                                {submitting ? (
-                                  <Button
-                                    color="primary"
-                                    variant="contained"
-                                    disabled
-                                    size="small"
-                                  >
-                                    Carregando..
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    color="primary"
-                                    variant="contained"
-                                    size="small"
-                                    onClick={submitForm}
-                                  >
-                                    Enviar
-                                  </Button>
-                                )}
                                 <Button
                                   color="primary"
-                                  variant="outlined"
+                                  variant="contained"
+                                  disabled={reply}
                                   size="small"
                                   onClick={() => {
-                                    setReply(false);
+                                    setReply(true);
                                     showSuccess.current = false;
                                     showError.current = false;
                                     showSuccessDelete.current = false;
                                     showErrorDelete.current = false;
                                   }}
                                 >
-                                  Descartar
+                                  Responder
                                 </Button>
                               </CardActions>
                             </Card>
                           </Box>
-                        </Grid>
-                        <Grid container item xs={6} sm={6}></Grid>
-                      </>
-                    )}
-
-                    {messageSelected ? (
-                      <Grid item xs={3} sm={3}>
-                        <Box>
-                          <Card sx={{ minWidth: 595 }}>
-                            <CardHeader
-                              style={{ cursor: 'pointer', color: 'primary' }}
-                              title={messageClicked.subject}
-                            />
-                            <Divider />
-                            <CardContent>
-                              <Typography variant="h5" component="div">
-                                <span>{`${newClient.name} <${newClient.email}>`}</span>
-                              </Typography>
-                              <Typography
-                                sx={{ fontSize: 14 }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                {`${moment(messageClicked.created_at).format(
-                                  'DD/MM/YYYY'
-                                )} ás ${moment(
-                                  messageClicked.created_at
-                                ).format('H:s')}`}
-                              </Typography>
-                              <Typography variant="body2" color="primary">
-                                {`De: ${newClient.email}`}
-                              </Typography>
-                              <Typography variant="body2">
-                                Para: Você
-                              </Typography>
-                              <br />
-                              <Typography variant="body2">
-                                <b>Mensagem:</b>
-                              </Typography>
-                              <Typography variant="body2">
-                                {messageClicked.message}
-                              </Typography>
-                            </CardContent>
-                            <CardActions>
-                              <Button
-                                color="primary"
-                                variant="contained"
-                                disabled={reply}
-                                size="small"
-                                onClick={() => {
-                                  setReply(true);
-                                  showSuccess.current = false;
-                                  showError.current = false;
-                                  showSuccessDelete.current = false;
-                                  showErrorDelete.current = false;
-                                }}
-                              >
-                                Responder
-                              </Button>
-                            </CardActions>
-                          </Card>
-                        </Box>
-                        {messageClicked.answers.length > 0 &&
-                          messageClicked.answers.map((answer, index) => (
-                            <Box>
-                              <Card sx={{ minWidth: 595, marginTop: '12px' }}>
-                                <CardHeader
-                                  onClick={() => {
-                                    clickedCard[index]
-                                      ? setClickedCard({
-                                          ...clickedCard,
-                                          [index]: false
-                                        })
-                                      : setClickedCard({
-                                          ...clickedCard,
-                                          [index]: true
-                                        });
-                                  }}
-                                  style={{ cursor: 'pointer' }}
-                                  title={`RES: ${
-                                    messageClicked.subject
-                                  } - ${moment(answer.created_at).format(
-                                    'DD/MM/YYYY'
-                                  )} ás ${moment(answer.created_at).format(
-                                    'H:s'
-                                  )}`}
-                                  action={
-                                    <div>
-                                      <IconButton aria-label="settings">
-                                        {clickedCard[index] ? (
-                                          <KeyboardArrowUp
-                                            onClick={() => {
-                                              setClickedCard({
-                                                ...clickedCard,
-                                                [index]: false
-                                              });
-                                            }}
-                                          />
-                                        ) : (
-                                          <KeyboardArrowDown
-                                            onClick={() => {
-                                              setClickedCard({
-                                                ...clickedCard,
-                                                [index]: true
-                                              });
-                                            }}
-                                          />
-                                        )}
-                                      </IconButton>
-                                    </div>
-                                  }
-                                />
-                                <CardContent
-                                  style={{
-                                    paddingTop: '0px',
-                                    display: clickedCard[index]
-                                      ? 'block'
-                                      : 'none'
+                          {messageClicked.answers.length > 0 &&
+                            messageClicked.answers.map((answer, index) => (
+                              <Box>
+                                <Card
+                                  sx={{
+                                    minWidth: 595,
+                                    marginTop: '12px'
                                   }}
                                 >
-                                  <Typography
-                                    sx={{ fontSize: 14 }}
-                                    color="text.secondary"
-                                    gutterBottom
-                                  >
-                                    {`${moment(answer.created_at).format(
+                                  <CardHeader
+                                    onClick={() => {
+                                      showSuccess.current = false;
+                                      showError.current = false;
+                                      clickedCard[index]
+                                        ? setClickedCard({
+                                            ...clickedCard,
+                                            [index]: false
+                                          })
+                                        : setClickedCard({
+                                            ...clickedCard,
+                                            [index]: true
+                                          });
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                    title={`RES: ${
+                                      messageClicked.subject
+                                    } - ${moment(answer.created_at).format(
                                       'DD/MM/YYYY'
                                     )} ás ${moment(answer.created_at).format(
                                       'H:s'
                                     )}`}
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {`${
-                                      answer.response_advocate
-                                        ? `De: Você`
-                                        : `De: ${newClient.email} - Cliente`
-                                    }`}
-                                  </Typography>
-                                  <Typography variant="body2" color="primary">
-                                    {`${
-                                      answer.response_advocate
-                                        ? `Para: ${newClient.email}`
-                                        : `De: ${newClient.email}`
-                                    }`}
-                                  </Typography>
-                                  <br />
-                                  <Typography variant="body2">
-                                    <b>Mensagem:</b>
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {answer.answer}
-                                  </Typography>
-                                </CardContent>
-                                <CardActions>
-                                  {answer.response_client === true && (
-                                    <Button
-                                      color="primary"
-                                      variant="contained"
-                                      disabled={reply}
-                                      size="small"
-                                      hidden={answer.response_advocate}
-                                      onClick={() => {
-                                        setReply(true);
-                                        showSuccess.current = false;
-                                        showError.current = false;
-                                        showSuccessDelete.current = false;
-                                        showErrorDelete.current = false;
-                                      }}
+                                    action={
+                                      <div>
+                                        <IconButton aria-label="settings">
+                                          {clickedCard[index] ? (
+                                            <KeyboardArrowUp
+                                              onClick={() => {
+                                                showSuccess.current = false;
+                                                showError.current = false;
+                                                setClickedCard({
+                                                  ...clickedCard,
+                                                  [index]: false
+                                                });
+                                              }}
+                                            />
+                                          ) : (
+                                            <KeyboardArrowDown
+                                              onClick={() => {
+                                                showSuccess.current = false;
+                                                showError.current = false;
+                                                setClickedCard({
+                                                  ...clickedCard,
+                                                  [index]: true
+                                                });
+                                              }}
+                                            />
+                                          )}
+                                        </IconButton>
+                                      </div>
+                                    }
+                                  />
+                                  <CardContent
+                                    style={{
+                                      paddingTop: '0px',
+                                      display: clickedCard[index]
+                                        ? 'block'
+                                        : 'none'
+                                    }}
+                                  >
+                                    <Typography
+                                      sx={{ fontSize: 14 }}
+                                      color="text.secondary"
+                                      gutterBottom
                                     >
-                                      Responder
-                                    </Button>
-                                  )}
-                                </CardActions>
-                              </Card>
+                                      {`${moment(answer.created_at).format(
+                                        'DD/MM/YYYY'
+                                      )} ás ${moment(answer.created_at).format(
+                                        'H:s'
+                                      )}`}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                      {`${
+                                        answer.response_advocate
+                                          ? `De: Você`
+                                          : `De: ${newClient.email} - Cliente`
+                                      }`}
+                                    </Typography>
+                                    <Typography variant="body2" color="primary">
+                                      {`${
+                                        answer.response_advocate
+                                          ? `Para: ${newClient.email}`
+                                          : `De: ${newClient.email}`
+                                      }`}
+                                    </Typography>
+                                    <br />
+                                    <Typography variant="body2">
+                                      <b>Mensagem:</b>
+                                    </Typography>
+                                    <Typography variant="body2">
+                                      {answer.answer}
+                                    </Typography>
+                                  </CardContent>
+                                  <CardActions>
+                                    {answer.response_client === true && (
+                                      <Button
+                                        color="primary"
+                                        variant="contained"
+                                        disabled={reply}
+                                        size="small"
+                                        hidden={answer.response_advocate}
+                                        onClick={() => {
+                                          setReply(true);
+                                          showSuccess.current = false;
+                                          showError.current = false;
+                                          showSuccessDelete.current = false;
+                                          showErrorDelete.current = false;
+                                        }}
+                                      >
+                                        Responder
+                                      </Button>
+                                    )}
+                                  </CardActions>
+                                </Card>
+                              </Box>
+                            ))}
+                        </Grid>
+                      ) : (
+                        <Grid container item xs={6} sm={6}>
+                          <Container maxWidth="md">
+                            <Box sx={{ textAlign: 'center' }}>
+                              <img
+                                alt="Under development"
+                                src="/static/images/message.png"
+                                style={{
+                                  marginTop: 50,
+                                  display: 'inline-block',
+                                  maxWidth: '100%',
+                                  width: 100
+                                }}
+                              />
                             </Box>
-                          ))}
-                      </Grid>
-                    ) : (
-                      <Grid container item xs={6} sm={6}>
-                        <Container maxWidth="md">
-                          <Box sx={{ textAlign: 'center' }}>
-                            <img
-                              alt="Under development"
-                              src="/static/images/message.png"
-                              style={{
-                                marginTop: 50,
-                                display: 'inline-block',
-                                maxWidth: '100%',
-                                width: 100
-                              }}
-                            />
-                          </Box>
-                          <Typography
-                            align="center"
-                            color="textPrimary"
-                            variant="h4"
-                          >
-                            Selecione um item para ler
-                          </Typography>
-                          <Typography
-                            align="center"
-                            color="textPrimary"
-                            variant="h5"
-                          >
-                            Nada foi selecionado
-                          </Typography>
-                        </Container>
-                      </Grid>
-                    )}
+                            <Typography
+                              align="center"
+                              color="textPrimary"
+                              variant="h4"
+                            >
+                              Selecione um item para ler
+                            </Typography>
+                            <Typography
+                              align="center"
+                              color="textPrimary"
+                              variant="h5"
+                            >
+                              Nada foi selecionado
+                            </Typography>
+                          </Container>
+                        </Grid>
+                      )}
+                    </Grid>
                   </Grid>
                 </Grid>
               </form>
             )}
           </Formik>
-
           {showSuccess.current && (
             <>
               <ToastAnimated />
               {showToast({
                 type: 'success',
-                message: 'Mensagem enviada com sucesso!'
+                message: 'Mensagem respondida com sucesso!'
               })}
             </>
           )}
@@ -645,7 +694,6 @@ const AdvocateContactShow = () => {
             })}
           </>
         )}
-
         {showError.current && (
           <>
             <ToastAnimated />
