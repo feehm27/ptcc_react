@@ -10,7 +10,8 @@ import {
   Info as InfoIcon,
   MessageSquare as MessageIcon,
   User as UserIcon,
-  Users as UsersIcon
+  Users as UsersIcon,
+  LogOut as LogOutIcon
 } from 'react-feather';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
@@ -154,6 +155,15 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       allowed: true
     });
   }
+
+  items.push({
+    id: null,
+    href: '/',
+    icon: LogOutIcon,
+    title: 'Sair',
+    disabled: false,
+    allowed: true
+  });
 
   useEffect(() => {
     if (openMobile && onMobileClose) {

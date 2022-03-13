@@ -117,7 +117,7 @@ const ClientContact = () => {
           </Box>
         </>
       ) : (
-        <Card sx={{ mt: 3, mb: 4 }}>
+        <Card sx={{ m: 3, mb: 4 }}>
           <Box sx={{ minWidth: 1050 }}>
             <Table>
               <TableHead>
@@ -125,8 +125,8 @@ const ClientContact = () => {
               </TableHead>
               <TableBody>
                 <TableCell>
-                  <Typography color="textSecondary" variant="body1">
-                    Não existem mensagens enviadas/recebidas.
+                  <Typography variant="body1">
+                    Não existem mensagens enviadas e/ou recebidas.
                   </Typography>
                 </TableCell>
               </TableBody>

@@ -6,7 +6,8 @@ import {
   Book as BookIcon,
   Calendar as CalendarIcon,
   FileText as FileIcon,
-  MessageSquare as MessageIcon
+  MessageSquare as MessageIcon,
+  LogOut as LogOutIcon
 } from 'react-feather';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
@@ -54,6 +55,14 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
       title: 'Contato',
       disabled: false,
       allowed: data && data.checkeds.menus_checked[13].checked === 1
+    },
+    {
+      id: null,
+      href: '/',
+      icon: LogOutIcon,
+      title: 'Sair',
+      disabled: false,
+      allowed: true
     }
   ];
 
