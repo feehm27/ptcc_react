@@ -11,7 +11,7 @@ const Meeting = () => {
   useEffect(() => {}, []);
 
   return (
-    <>
+    <div style={{ marginLeft: '14px', marginTop: '14px' }}>
       <Helmet>
         <title>Advoguez</title>
       </Helmet>
@@ -27,7 +27,7 @@ const Meeting = () => {
           <MeetingManagement />
         </Container>
       </Box>
-    </>
+    </div>
   );
 };
 

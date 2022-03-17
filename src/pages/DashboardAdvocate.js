@@ -19,6 +19,7 @@ const DashboardAdvocate = () => {
   const [loading, setLoading] = useState(false);
   const [loadingCountClients, setLoadingCountClients] = useState(true);
   const [loadingCountContracts, setLoadingCountContracts] = useState(true);
+  const [loadingCountMeetings, setLoadingCountMeetings] = useState(true);
   const [loadingProcesses, setLoadingProcesses] = useState(true);
   const [loadingContracts, setLoadingContracts] = useState(true);
   const [loadingClients, setLoadingClients] = useState(true);
@@ -26,6 +27,7 @@ const DashboardAdvocate = () => {
 
   const [clientsCount, setClientsCount] = useState(0);
   const [contractsCount, setContractsCount] = useState(0);
+  const [meetingsCount, setMeetingsCount] = useState(0);
   const [processes, setProcesses] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [clients, setClients] = useState([]);
@@ -68,6 +70,25 @@ const DashboardAdvocate = () => {
       }
     );
     setLoadingCountContracts(false);
+  }
+
+  /**
+   * Obtém a contagem de reuniões
+   */
+  async function getMeetingsCount() {
+    setLoadingCountMeetings(true);
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+
+    await API.get('/advocates/dashboard/count/meetings', config).then(
+      (response) => {
+        setMeetingsCount(response.data.data);
+      }
+    );
+    setLoadingCountMeetings(false);
   }
 
   /**
@@ -163,6 +184,7 @@ const DashboardAdvocate = () => {
     setLoading(true);
 
     getProcessesByStatus();
+    getMeetingsCount();
     getClientsCount();
     getContractsCount();
     getContracts();
@@ -185,9 +207,19 @@ const DashboardAdvocate = () => {
   ) : (
     <Container maxWidth={false}>
       <Grid container spacing={3}>
-        <Grid item lg={4} sm={4} xl={3} xs={12}>
-          <Meetings />
-        </Grid>
+        {loadingCountMeetings ? (
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Skeleton />
+            <Skeleton animation="wave" />
+            <Skeleton animation={false} />
+            <Skeleton />
+            <Skeleton />
+          </Grid>
+        ) : (
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Meetings meetingsCount={meetingsCount} />
+          </Grid>
+        )}
         {loadingCountClients ? (
           <Grid item lg={4} sm={4} xl={3} xs={12}>
             <Skeleton />
