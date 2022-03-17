@@ -1,7 +1,6 @@
 import DateFnsUtils from '@date-io/date-fns';
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Container,
@@ -27,10 +26,9 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { filter, first } from 'lodash';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Circle as CircleIcon } from 'react-feather';
 import { useNavigate } from 'react-router';
-
 import ScheduleSchema from 'src/schemas/ScheduleSchema';
 import { API } from 'src/services/api';
 
@@ -53,7 +51,8 @@ const MeetingManagement = () => {
         sx={{
           ...matchedStyles,
           [`&&.${pickersDayClasses.selected}`]: {
-            backgroundColor: 'green'
+            color: 'black',
+            backgroundColor: 'white'
           }
         }}
       />
@@ -78,7 +77,7 @@ const MeetingManagement = () => {
     if (submitting) return <div></div>;
 
     return (
-      <>
+      <div style={{ marginTop: 1 }}>
         <LocalizationProvider locale={ptBR} dateAdapter={AdapterDateFns}>
           <StaticDatePicker
             displayStaticWrapperAs="desktop"
@@ -157,7 +156,7 @@ const MeetingManagement = () => {
             }
           />
         </div>
-      </>
+      </div>
     );
   };
 
@@ -191,10 +190,16 @@ const MeetingManagement = () => {
    * Envia os dados do formulário
    * @param {*} values
    */
-  const handleSubmit = (errors) => {
-    console.log(errors);
+  const handleSubmit = () => {
     searchSchedules();
   };
+
+  /**
+   * Use Effect
+   */
+  useEffect(() => {
+    searchSchedules();
+  }, []);
 
   return (
     <Formik
@@ -204,12 +209,12 @@ const MeetingManagement = () => {
       onSubmit={handleSubmit}
       validationSchema={ScheduleSchema}
     >
-      {({ handleBlur, submitForm, errors }) => (
+      {({ handleBlur }) => (
         <form
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit(errors);
+            handleSubmit();
           }}
         >
           <Card>
@@ -226,16 +231,37 @@ const MeetingManagement = () => {
                 <Grid item md={6} xs={6}>
                   <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                     <KeyboardDatePicker
+                      minDate={new Date()}
+                      fullWidth
                       invalidDateMessage="Data inválida"
                       openTo="month"
                       format="MM/yyyy"
                       label="Selecione um mês/ano"
-                      minDateMessage="Mês inválido. Informe um mês maior que o mês atual"
+                      minDateMessage="O mês informado deve ser maior ou igual ao mês atual"
                       views={['month', 'year']}
+                      onKeyPress={(e) => {
+                        e.key === 'Enter' && e.preventDefault();
+                      }}
                       value={selectedMonth}
                       inputVariant="outlined"
                       disablePast={true}
                       onChange={(e) => {
+                        console.log('data no event', e);
+                        const formatChangeDate = moment(e);
+
+                        const checkedMonth = formatChangeDate.isSame(
+                          moment(),
+                          'month'
+                        );
+
+                        const checkedYear = formatChangeDate.isSame(
+                          moment(),
+                          'year'
+                        );
+
+                        console.log('checkedMonth', checkedMonth);
+                        console.log('checkedYear', checkedYear);
+
                         handleMonthChange(e);
                       }}
                       onBlur={(e) => {
@@ -245,24 +271,6 @@ const MeetingManagement = () => {
                       required
                     />
                   </MuiPickersUtilsProvider>
-                  {loading ? (
-                    <Button color="primary" variant="contained" disabled>
-                      Carregando..
-                    </Button>
-                  ) : (
-                    <Button
-                      style={{
-                        marginTop: '10px',
-                        marginLeft: '10px'
-                      }}
-                      color="primary"
-                      variant="contained"
-                      type="submit"
-                      onClick={submitForm}
-                    >
-                      Pesquisar
-                    </Button>
-                  )}
                 </Grid>
               </Grid>
             </CardContent>
