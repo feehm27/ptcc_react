@@ -12,35 +12,49 @@ const ScheduledMettingClient = (props) => (
   <Card sx={{ height: '100%' }} {...props}>
     <CardContent>
       <Grid container spacing={3} sx={{ justifyContent: 'space-between' }}>
-        <Grid item>
-          <Typography color="textSecondary" gutterBottom variant="h6">
-            Reunião Agendada
-          </Typography>
-          <span
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
-              <KeyboardDatePicker
-                initialFocusedDate="22/07/2021 21:00"
-                format="dd/MM/yyyy H:ii"
-                disabled={true}
-              />
-            </MuiPickersUtilsProvider>
+        {props.meeting === null ? (
+          <Grid item>
             <Typography
-              color="textPrimary"
-              variant="h3"
+              color="textSecondary"
+              gutterBottom
+              variant="h4"
+              textAlign="center"
+              style={{ marginTop: '20px' }}
+            >
+              Você não possui reunião agendada.
+            </Typography>
+          </Grid>
+        ) : (
+          <Grid item>
+            <Typography color="textSecondary" gutterBottom variant="h6">
+              Reunião Agendada
+            </Typography>
+            <span
               style={{
-                marginLeft: '6px'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              com João Carlos Almeida
-            </Typography>
-          </span>
-        </Grid>
+              <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  initialFocusedDate={`${props.meeting.date} ${props.meeting.hours}`}
+                  format="dd/MM/yyyy H:ii"
+                  disabled={true}
+                />
+              </MuiPickersUtilsProvider>
+              <Typography
+                color="textPrimary"
+                variant="h3"
+                style={{
+                  marginLeft: '6px'
+                }}
+              >
+                {`com ${props.meeting.advocate.name}`}
+              </Typography>
+            </span>
+          </Grid>
+        )}
         <Grid item>
           <Avatar
             sx={{
