@@ -18,7 +18,6 @@ import { findIndex, orderBy } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import SchedulesConstants from 'src/constants/SchedulesConstants';
-import SchedulesConstantsEmpty from 'src/constants/SchedulesConstantsEmpty';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
@@ -63,7 +62,7 @@ const MettingSchedules = () => {
        * Dia disponível
        */
       case 1:
-        setSchedules(SchedulesConstantsEmpty);
+        setSchedules(SchedulesConstants);
         break;
 
       /**
@@ -83,7 +82,7 @@ const MettingSchedules = () => {
         break;
 
       default:
-        setCheckedsList(SchedulesConstantsEmpty);
+        setCheckedsList(SchedulesConstants);
         break;
     }
   };
@@ -349,7 +348,7 @@ const MettingSchedules = () => {
                   variant="outlined"
                   onClick={() => {
                     navigate('/meetings');
-                    setCheckedsList(SchedulesConstantsEmpty);
+                    setCheckedsList(SchedulesConstants);
                   }}
                 >
                   Voltar

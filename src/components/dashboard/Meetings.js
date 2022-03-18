@@ -11,7 +11,7 @@ const Meetings = (props) => (
             Reuniões agendadas hoje
           </Typography>
           <Typography color="textPrimary" variant="h3">
-            5
+            {props.meetingsCount}
           </Typography>
         </Grid>
         <Grid item>

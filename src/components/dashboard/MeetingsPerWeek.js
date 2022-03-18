@@ -15,7 +15,7 @@ const MeetingsPerWeek = (props) => {
   const data = {
     datasets: [
       {
-        data: [18, 5, 19, 27, 29, 19, 20],
+        data: props.meetings.data,
         backgroundColor: [
           colors.indigo[500],
           colors.red[600],
@@ -29,15 +29,7 @@ const MeetingsPerWeek = (props) => {
         hoverBorderColor: colors.common.white
       }
     ],
-    labels: [
-      'Segunda',
-      'Terça',
-      'Quarta',
-      'Quinta',
-      'Sexta',
-      'Sábado',
-      'Domingo'
-    ]
+    labels: props.meetings.labels
   };
 
   const options = {
