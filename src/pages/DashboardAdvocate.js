@@ -24,6 +24,7 @@ const DashboardAdvocate = () => {
   const [loadingContracts, setLoadingContracts] = useState(true);
   const [loadingClients, setLoadingClients] = useState(true);
   const [loadingAnnualProfit, setLoadingAnnualProfit] = useState(true);
+  const [loadingMeeting, setLoadingMeeting] = useState(true);
 
   const [clientsCount, setClientsCount] = useState(0);
   const [contractsCount, setContractsCount] = useState(0);
@@ -32,6 +33,7 @@ const DashboardAdvocate = () => {
   const [contracts, setContracts] = useState([]);
   const [clients, setClients] = useState([]);
   const [annualProfit, setAnnualProfit] = useState([]);
+  const [meetings, setMeetings] = useState([]);
 
   /**
    * Obtém a contagem de clientes
@@ -164,6 +166,25 @@ const DashboardAdvocate = () => {
     setLoadingAnnualProfit(false);
   }
 
+  /**
+   * Obtém os clientes por ano
+   */
+  async function getMeetingsForWeek() {
+    setLoadingMeeting(true);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+
+    await API.get('/advocates/dashboard/meetings', config).then((response) => {
+      setMeetings(response.data.data);
+    });
+
+    setLoadingMeeting(false);
+  }
+
   const checkPermissionDashboard = () => {
     let isAllowed = true;
 
@@ -189,6 +210,7 @@ const DashboardAdvocate = () => {
     getContractsCount();
     getContracts();
     getClients();
+    getMeetingsForWeek();
     getAnnualProfit();
 
     setLoading(false);
@@ -276,9 +298,19 @@ const DashboardAdvocate = () => {
               <ContractsByMonth contracts={contracts} />
             </Grid>
           )}
-          <Grid item lg={4} md={4} xl={3} xs={12}>
-            <MeetingsPerWeek sx={{ height: '100%' }} />
-          </Grid>
+          {loadingMeeting ? (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <MeetingsPerWeek meetings={meetings} sx={{ height: '100%' }} />
+            </Grid>
+          )}
           {loadingAnnualProfit ? (
             <Grid item lg={8} md={8} xl={6} xs={12}>
               <Skeleton
