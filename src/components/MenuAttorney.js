@@ -10,7 +10,8 @@ import {
   Info as InfoIcon,
   MessageSquare as MessageIcon,
   User as UserIcon,
-  Users as UsersIcon
+  Users as UsersIcon,
+  LogOut as LogOutIcon
 } from 'react-feather';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
@@ -111,10 +112,10 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 8,
-      href: '/construction',
+      href: '/advocate/contacts',
       icon: MessageIcon,
       title: 'Mensagens',
-      disabled: true,
+      disabled: false,
       allowed:
         data && !data.isAdmin
           ? data.checkeds.menus_checked[7].checked === 1
@@ -154,6 +155,15 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
       allowed: true
     });
   }
+
+  items.push({
+    id: 99,
+    href: '/',
+    icon: LogOutIcon,
+    title: 'Sair',
+    disabled: false,
+    allowed: true
+  });
 
   useEffect(() => {
     if (openMobile && onMobileClose) {

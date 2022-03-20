@@ -178,107 +178,339 @@ const ClientEdit = () => {
   }, []);
 
   return (
-    <Formik
-      initialValues={{
-        name: client.name || '',
-        email: client.email || '',
-        cpf: client.cpf || '',
-        rg: client.rg || '',
-        issuing_organ: client.issuing_organ || '',
-        nationality: client.nationality || '',
-        birthday: client.birthday || undefined,
-        gender: client.gender || '',
-        civil_status: client.civil_status || '',
-        telephone: client.telephone || '',
-        cellphone: client.cellphone || '',
-        cep: client.cep || '',
-        street: client.street || '',
-        number: client.number || '',
-        complement: client.complement || null,
-        district: client.district || '',
-        state: client.state || '',
-        city: client.city || ''
-      }}
-      validationSchema={ClientEditSchema}
-      onSubmit={handleSubmit}
-    >
-      {({ errors, handleBlur, handleChange, values, submitForm }) => (
-        <form
-          autoComplete="off"
-          onSubmit={(e) => {
-            e.preventDefault();
-            showSuccess.current = false;
-            showError.current = false;
-            handleSubmit(values, errors);
-          }}
-        >
-          <Card>
-            <CardHeader title="Dados básicos" />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={errors.name}
-                    fullWidth
-                    helperText={errors.name}
-                    label="Nome completo"
-                    name="name"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    value={values.name}
-                    required
-                    variant="outlined"
-                    disabled={show}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={
-                      errors.email ||
-                      (error && error.email ? error.email[0] : '')
-                    }
-                    fullWidth
-                    helperText={
-                      errors.email ||
-                      (error && error.email ? error.email[0] : '')
-                    }
-                    label="Email"
-                    name="email"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    required
-                    value={values.email}
-                    variant="outlined"
-                    disabled={show}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  {show ? (
-                    <ReactInputMask
-                      mask="999.999.999-99"
-                      value={values.cpf}
-                      disabled={show}
+    <div style={{ marginLeft: '14px', marginTop: '14px' }}>
+      <Formik
+        initialValues={{
+          name: client.name || '',
+          email: client.email || '',
+          cpf: client.cpf || '',
+          rg: client.rg || '',
+          issuing_organ: client.issuing_organ || '',
+          nationality: client.nationality || '',
+          birthday: client.birthday || undefined,
+          gender: client.gender || '',
+          civil_status: client.civil_status || '',
+          telephone: client.telephone || '',
+          cellphone: client.cellphone || '',
+          cep: client.cep || '',
+          street: client.street || '',
+          number: client.number || '',
+          complement: client.complement || null,
+          district: client.district || '',
+          state: client.state || '',
+          city: client.city || ''
+        }}
+        validationSchema={ClientEditSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, handleBlur, handleChange, values, submitForm }) => (
+          <form
+            autoComplete="off"
+            onSubmit={(e) => {
+              e.preventDefault();
+              showSuccess.current = false;
+              showError.current = false;
+              handleSubmit(values, errors);
+            }}
+          >
+            <Card>
+              <CardHeader title="Dados básicos" />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={errors.name}
+                      fullWidth
+                      helperText={errors.name}
+                      label="Nome completo"
+                      name="name"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
                       onChange={(event) => {
-                        if (error && error.cpf) {
-                          error.cpf = null;
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      value={values.name}
+                      required
+                      variant="outlined"
+                      disabled={show}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={
+                        errors.email ||
+                        (error && error.email ? error.email[0] : '')
+                      }
+                      fullWidth
+                      helperText={
+                        errors.email ||
+                        (error && error.email ? error.email[0] : '')
+                      }
+                      label="Email"
+                      name="email"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      required
+                      value={values.email}
+                      variant="outlined"
+                      disabled={show}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    {show ? (
+                      <ReactInputMask
+                        mask="999.999.999-99"
+                        value={values.cpf}
+                        disabled={show}
+                        onChange={(event) => {
+                          if (error && error.cpf) {
+                            error.cpf = null;
+                          }
+                          handleChange(event);
+                          showSuccess.current = false;
+                          showError.current = false;
+                        }}
+                      >
+                        {() => (
+                          <TextField
+                            error={
+                              errors.cpf ||
+                              (error && error.cpf ? error.cpf[0] : '')
+                            }
+                            fullWidth
+                            helperText={
+                              errors.cpf ||
+                              (error && error.cpf ? error.cpf[0] : '')
+                            }
+                            label="CPF"
+                            name="cpf"
+                            required
+                            variant="outlined"
+                            maxLength="14"
+                            disabled={show}
+                          />
+                        )}
+                      </ReactInputMask>
+                    ) : (
+                      <ReactInputMask
+                        mask="999.999.999-99"
+                        value={values.cpf}
+                        onChange={(event) => {
+                          if (error && error.cpf) {
+                            error.cpf = null;
+                          }
+                          handleChange(event);
+                          showSuccess.current = false;
+                          showError.current = false;
+                        }}
+                      >
+                        {() => (
+                          <TextField
+                            error={
+                              errors.cpf ||
+                              (error && error.cpf ? error.cpf[0] : '')
+                            }
+                            fullWidth
+                            helperText={
+                              errors.cpf ||
+                              (error && error.cpf ? error.cpf[0] : '')
+                            }
+                            label="CPF"
+                            name="cpf"
+                            required
+                            variant="outlined"
+                            maxLength="14"
+                          />
+                        )}
+                      </ReactInputMask>
+                    )}
+                  </Grid>
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      error={errors.rg}
+                      fullWidth
+                      helperText={errors.rg}
+                      label="RG"
+                      name="rg"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      required
+                      value={values.rg}
+                      variant="outlined"
+                      disabled={show}
+                    />
+                  </Grid>
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      error={errors.issuing_organ}
+                      fullWidth
+                      helperText={errors.issuing_organ}
+                      label="Orgão Emissor"
+                      name="issuing_organ"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      required
+                      value={values.issuing_organ}
+                      variant="outlined"
+                      disabled={show}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
+                      <KeyboardDatePicker
+                        error={
+                          errors.birthday ||
+                          (error && error.birthday ? error.birthday[0] : '')
                         }
+                        fullWidth
+                        helperText={
+                          errors.birthday ||
+                          (error && error.birthday ? error.birthday[0] : '')
+                        }
+                        disableFuture
+                        openTo="year"
+                        format="dd/MM/yyyy"
+                        label="Data de nascimento"
+                        views={['year', 'month', 'date']}
+                        value={selectedDate}
+                        defaultValue={undefined}
+                        onChange={(e) => {
+                          handleDateChange(e);
+                          showSuccess.current = false;
+                          showError.current = false;
+                        }}
+                        onBlur={(e) => {
+                          showSuccess.current = false;
+                          showError.current = false;
+                          handleBlur(e);
+                        }}
+                        name="birthday"
+                        required
+                        disabled={show}
+                      />
+                    </MuiPickersUtilsProvider>
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={errors.nationality}
+                      fullWidth
+                      helperText={errors.nationality}
+                      label="Nacionalidade"
+                      name="nationality"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      required
+                      value={values.nationality}
+                      variant="outlined"
+                      disabled={show}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={errors.gender}
+                      fullWidth
+                      helperText={errors.gender}
+                      label="Gênero"
+                      name="gender"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      required
+                      select
+                      SelectProps={{ native: true }}
+                      value={values.gender}
+                      variant="outlined"
+                      disabled={show}
+                    >
+                      {gender.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={errors.civil_status}
+                      fullWidth
+                      helperText={errors.civil_status}
+                      label="Estado Civil"
+                      name="civil_status"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                      required
+                      select
+                      SelectProps={{ native: true }}
+                      value={values.civil_status}
+                      variant="outlined"
+                      disabled={show}
+                    >
+                      {civilStatus.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <ReactInputMask
+                      disabled={show}
+                      mask="(99) 99999-9999"
+                      value={values.cellphone}
+                      onChange={(event) => {
                         handleChange(event);
                         showSuccess.current = false;
                         showError.current = false;
@@ -286,32 +518,24 @@ const ClientEdit = () => {
                     >
                       {() => (
                         <TextField
-                          error={
-                            errors.cpf ||
-                            (error && error.cpf ? error.cpf[0] : '')
-                          }
+                          error={errors.cellphone}
                           fullWidth
-                          helperText={
-                            errors.cpf ||
-                            (error && error.cpf ? error.cpf[0] : '')
-                          }
-                          label="CPF"
-                          name="cpf"
+                          helperText={errors.cellphone}
+                          label="Telefone Celular"
+                          name="cellphone"
                           required
                           variant="outlined"
-                          maxLength="14"
                           disabled={show}
                         />
                       )}
                     </ReactInputMask>
-                  ) : (
+                  </Grid>
+                  <Grid item md={6} xs={12}>
                     <ReactInputMask
-                      mask="999.999.999-99"
-                      value={values.cpf}
+                      disabled={show}
+                      mask="(99) 9999-9999"
+                      value={values.telephone}
                       onChange={(event) => {
-                        if (error && error.cpf) {
-                          error.cpf = null;
-                        }
                         handleChange(event);
                         showSuccess.current = false;
                         showError.current = false;
@@ -319,501 +543,285 @@ const ClientEdit = () => {
                     >
                       {() => (
                         <TextField
-                          error={
-                            errors.cpf ||
-                            (error && error.cpf ? error.cpf[0] : '')
-                          }
+                          error={errors.telephone}
                           fullWidth
-                          helperText={
-                            errors.cpf ||
-                            (error && error.cpf ? error.cpf[0] : '')
-                          }
-                          label="CPF"
-                          name="cpf"
-                          required
+                          helperText={errors.telephone}
+                          label="Telefone Fixo"
+                          name="telephone"
                           variant="outlined"
-                          maxLength="14"
+                          disabled={show}
                         />
                       )}
                     </ReactInputMask>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+            <Card style={{ marginTop: 8 }}>
+              <CardHeader title="Dados do endereço" />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={6} xs={12}>
+                    <ReactInputMask
+                      disabled={show}
+                      mask="99.999-999"
+                      value={values.cep}
+                      onChange={(event) => {
+                        values.street = '';
+                        values.number = '';
+                        values.city = '';
+                        values.state = '';
+                        values.district = '';
+                        handleChange(event);
+                        const unmask = event.target.value.replace(/[^\d]/g, '');
+                        if (unmask.length === 8) {
+                          getAddressByZipCode(unmask, errors, values);
+                        }
+                        showSuccess.current = false;
+                        showError.current = false;
+                      }}
+                    >
+                      {() => (
+                        <TextField
+                          error={
+                            errors.cep ||
+                            (error && error.cep ? error.cep[0] : '')
+                          }
+                          fullWidth
+                          helperText={
+                            errors.cep ||
+                            (error && error.cep ? error.cep[0] : '')
+                          }
+                          label="CEP"
+                          name="cep"
+                          required
+                          variant="outlined"
+                          maxLength="8"
+                          disabled={show}
+                        />
+                      )}
+                    </ReactInputMask>
+                  </Grid>
+
+                  {loadingAddress ? (
+                    <Skeleton
+                      variant="rectangular"
+                      animation="wave"
+                      width="100%"
+                      height="100%"
+                    >
+                      <div style={{ paddingTop: '57%' }} />
+                    </Skeleton>
+                  ) : (
+                    <>
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          error={errors.street}
+                          fullWidth
+                          helperText={errors.street}
+                          label="Rua"
+                          name="street"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          onChange={(event) => {
+                            handleChange(event);
+                            address.street = null;
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          value={
+                            address.street ? address.street : values.street
+                          }
+                          variant="outlined"
+                          required
+                          disabled={show}
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          error={errors.number}
+                          fullWidth
+                          helperText={errors.number}
+                          label="Número"
+                          name="number"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          onChange={(event) => {
+                            handleChange(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          value={values.number}
+                          variant="outlined"
+                          required
+                          disabled={show}
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          error={errors.district}
+                          fullWidth
+                          helperText={errors.district}
+                          label="Bairro"
+                          name="district"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          onChange={(event) => {
+                            address.district = null;
+                            handleChange(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          value={
+                            address.district
+                              ? address.district
+                              : values.district
+                          }
+                          variant="outlined"
+                          required
+                          disabled={show}
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          error={errors.complement}
+                          fullWidth
+                          helperText={errors.complement}
+                          label="Complemento"
+                          name="complement"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          onChange={(event) => {
+                            handleChange(event);
+                            showSuccess.current = true;
+                          }}
+                          value={values.complement}
+                          variant="outlined"
+                          disabled={show}
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          error={errors.state}
+                          fullWidth
+                          helperText={errors.state}
+                          label="Estado"
+                          name="state"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          onChange={(event) => {
+                            address.state = null;
+                            handleChange(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          value={address.state ? address.state : values.state}
+                          variant="outlined"
+                          required
+                          disabled={show}
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <TextField
+                          error={errors.city}
+                          fullWidth
+                          helperText={errors.city}
+                          label="Cidade"
+                          name="city"
+                          onBlur={(event) => {
+                            handleBlur(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          onChange={(event) => {
+                            address.city = null;
+                            handleChange(event);
+                            showSuccess.current = false;
+                            showError.current = false;
+                          }}
+                          value={address.city ? address.city : values.city}
+                          variant="outlined"
+                          required
+                          disabled={show}
+                        />
+                      </Grid>
+                    </>
                   )}
                 </Grid>
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    error={errors.rg}
-                    fullWidth
-                    helperText={errors.rg}
-                    label="RG"
-                    name="rg"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    required
-                    value={values.rg}
-                    variant="outlined"
-                    disabled={show}
-                  />
-                </Grid>
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    error={errors.issuing_organ}
-                    fullWidth
-                    helperText={errors.issuing_organ}
-                    label="Orgão Emissor"
-                    name="issuing_organ"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    required
-                    value={values.issuing_organ}
-                    variant="outlined"
-                    disabled={show}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
-                    <KeyboardDatePicker
-                      error={
-                        errors.birthday ||
-                        (error && error.birthday ? error.birthday[0] : '')
-                      }
-                      fullWidth
-                      helperText={
-                        errors.birthday ||
-                        (error && error.birthday ? error.birthday[0] : '')
-                      }
-                      disableFuture
-                      openTo="year"
-                      format="dd/MM/yyyy"
-                      label="Data de nascimento"
-                      views={['year', 'month', 'date']}
-                      value={selectedDate}
-                      defaultValue={undefined}
-                      onChange={(e) => {
-                        handleDateChange(e);
-                        showSuccess.current = false;
-                        showError.current = false;
-                      }}
-                      onBlur={(e) => {
-                        showSuccess.current = false;
-                        showError.current = false;
-                        handleBlur(e);
-                      }}
-                      name="birthday"
-                      required
-                      disabled={show}
-                    />
-                  </MuiPickersUtilsProvider>
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={errors.nationality}
-                    fullWidth
-                    helperText={errors.nationality}
-                    label="Nacionalidade"
-                    name="nationality"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    required
-                    value={values.nationality}
-                    variant="outlined"
-                    disabled={show}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={errors.gender}
-                    fullWidth
-                    helperText={errors.gender}
-                    label="Gênero"
-                    name="gender"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    required
-                    select
-                    SelectProps={{ native: true }}
-                    value={values.gender}
-                    variant="outlined"
-                    disabled={show}
-                  >
-                    {gender.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={errors.civil_status}
-                    fullWidth
-                    helperText={errors.civil_status}
-                    label="Estado Civil"
-                    name="civil_status"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                    required
-                    select
-                    SelectProps={{ native: true }}
-                    value={values.civil_status}
-                    variant="outlined"
-                    disabled={show}
-                  >
-                    {civilStatus.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <ReactInputMask
-                    disabled={show}
-                    mask="(99) 99999-9999"
-                    value={values.cellphone}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                  >
-                    {() => (
-                      <TextField
-                        error={errors.cellphone}
-                        fullWidth
-                        helperText={errors.cellphone}
-                        label="Telefone Celular"
-                        name="cellphone"
-                        required
-                        variant="outlined"
-                        disabled={show}
-                      />
-                    )}
-                  </ReactInputMask>
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <ReactInputMask
-                    disabled={show}
-                    mask="(99) 9999-9999"
-                    value={values.telephone}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                  >
-                    {() => (
-                      <TextField
-                        error={errors.telephone}
-                        fullWidth
-                        helperText={errors.telephone}
-                        label="Telefone Fixo"
-                        name="telephone"
-                        variant="outlined"
-                        disabled={show}
-                      />
-                    )}
-                  </ReactInputMask>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader title="Dados do endereço" />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={6} xs={12}>
-                  <ReactInputMask
-                    disabled={show}
-                    mask="99.999-999"
-                    value={values.cep}
-                    onChange={(event) => {
-                      values.street = '';
-                      values.number = '';
-                      values.city = '';
-                      values.state = '';
-                      values.district = '';
-                      handleChange(event);
-                      const unmask = event.target.value.replace(/[^\d]/g, '');
-                      if (unmask.length === 8) {
-                        getAddressByZipCode(unmask, errors, values);
-                      }
-                      showSuccess.current = false;
-                      showError.current = false;
-                    }}
-                  >
-                    {() => (
-                      <TextField
-                        error={
-                          errors.cep || (error && error.cep ? error.cep[0] : '')
-                        }
-                        fullWidth
-                        helperText={
-                          errors.cep || (error && error.cep ? error.cep[0] : '')
-                        }
-                        label="CEP"
-                        name="cep"
-                        required
-                        variant="outlined"
-                        maxLength="8"
-                        disabled={show}
-                      />
-                    )}
-                  </ReactInputMask>
-                </Grid>
-
-                {loadingAddress ? (
-                  <Skeleton
-                    variant="rectangular"
-                    animation="wave"
-                    width="100%"
-                    height="100%"
-                  >
-                    <div style={{ paddingTop: '57%' }} />
-                  </Skeleton>
-                ) : (
-                  <>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.street}
-                        fullWidth
-                        helperText={errors.street}
-                        label="Rua"
-                        name="street"
-                        onBlur={(event) => {
-                          handleBlur(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        onChange={(event) => {
-                          handleChange(event);
-                          address.street = null;
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        value={address.street ? address.street : values.street}
-                        variant="outlined"
-                        required
-                        disabled={show}
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.number}
-                        fullWidth
-                        helperText={errors.number}
-                        label="Número"
-                        name="number"
-                        onBlur={(event) => {
-                          handleBlur(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        onChange={(event) => {
-                          handleChange(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        value={values.number}
-                        variant="outlined"
-                        required
-                        disabled={show}
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.district}
-                        fullWidth
-                        helperText={errors.district}
-                        label="Bairro"
-                        name="district"
-                        onBlur={(event) => {
-                          handleBlur(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        onChange={(event) => {
-                          address.district = null;
-                          handleChange(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        value={
-                          address.district ? address.district : values.district
-                        }
-                        variant="outlined"
-                        required
-                        disabled={show}
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.complement}
-                        fullWidth
-                        helperText={errors.complement}
-                        label="Complemento"
-                        name="complement"
-                        onBlur={(event) => {
-                          handleBlur(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        onChange={(event) => {
-                          handleChange(event);
-                          showSuccess.current = true;
-                        }}
-                        value={values.complement}
-                        variant="outlined"
-                        disabled={show}
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.state}
-                        fullWidth
-                        helperText={errors.state}
-                        label="Estado"
-                        name="state"
-                        onBlur={(event) => {
-                          handleBlur(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        onChange={(event) => {
-                          address.state = null;
-                          handleChange(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        value={address.state ? address.state : values.state}
-                        variant="outlined"
-                        required
-                        disabled={show}
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <TextField
-                        error={errors.city}
-                        fullWidth
-                        helperText={errors.city}
-                        label="Cidade"
-                        name="city"
-                        onBlur={(event) => {
-                          handleBlur(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        onChange={(event) => {
-                          address.city = null;
-                          handleChange(event);
-                          showSuccess.current = false;
-                          showError.current = false;
-                        }}
-                        value={address.city ? address.city : values.city}
-                        variant="outlined"
-                        required
-                        disabled={show}
-                      />
-                    </Grid>
-                  </>
-                )}
-              </Grid>
-            </CardContent>
-            <Divider />
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                p: 2
-              }}
-            >
-              <Stack direction="row" spacing={2}>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={() => navigate('/clients')}
-                >
-                  Voltar
-                </Button>
-                {submitting ? (
-                  <Button color="primary" variant="contained" disabled>
-                    Carregando..
-                  </Button>
-                ) : (
+              </CardContent>
+              <Divider />
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  p: 2
+                }}
+              >
+                <Stack direction="row" spacing={2}>
                   <Button
                     color="primary"
-                    variant="contained"
-                    type="submit"
-                    disabled={checkedPermission()}
-                    onClick={submitForm}
+                    variant="outlined"
+                    onClick={() => navigate('/clients')}
                   >
-                    Salvar
+                    Voltar
                   </Button>
-                )}
-              </Stack>
-            </Box>
-          </Card>
-          {showSuccess.current && (
-            <>
-              <ToastAnimated />
-              {showToast({
-                type: 'success',
-                message: 'Cliente atualizado com sucesso!'
-              })}
-            </>
-          )}
-          {showError.current && (
-            <>
-              <ToastAnimated />
-              {showToast({
-                type: 'error',
-                message:
-                  'Um erro inesperado aconteceu. Não foi possivel atualizar o cliente!'
-              })}
-            </>
-          )}
-        </form>
-      )}
-    </Formik>
+                  {submitting ? (
+                    <Button color="primary" variant="contained" disabled>
+                      Carregando..
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      type="submit"
+                      disabled={checkedPermission()}
+                      onClick={submitForm}
+                    >
+                      Salvar
+                    </Button>
+                  )}
+                </Stack>
+              </Box>
+            </Card>
+            {showSuccess.current && (
+              <>
+                <ToastAnimated />
+                {showToast({
+                  type: 'success',
+                  message: 'Cliente atualizado com sucesso!'
+                })}
+              </>
+            )}
+            {showError.current && (
+              <>
+                <ToastAnimated />
+                {showToast({
+                  type: 'error',
+                  message:
+                    'Um erro inesperado aconteceu. Não foi possivel atualizar o cliente!'
+                })}
+              </>
+            )}
+          </form>
+        )}
+      </Formik>
+    </div>
   );
 };
 

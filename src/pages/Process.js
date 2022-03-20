@@ -38,7 +38,24 @@ const Process = () => {
       <Helmet>
         <title>Advoguez</title>
       </Helmet>
-      <Skeleton />
+      <Box
+        sx={{
+          backgroundColor: 'background.default',
+          minHeight: '100%',
+          py: 3
+        }}
+      >
+        <Container maxWidth="lg">
+          <Skeleton
+            variant="rectangular"
+            animation="wave"
+            width="100%"
+            height="100%"
+          >
+            <div style={{ paddingTop: '57%', margin: '16px' }} />
+          </Skeleton>
+        </Container>
+      </Box>
     </>
   ) : (
     <>

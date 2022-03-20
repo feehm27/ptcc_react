@@ -27,6 +27,13 @@ const ClientContactCreate = () => {
   const showError = useRef(false);
 
   /**
+   * Atualiza a página depois de um tempo
+   */
+  const callTimeOut = () => {
+    setTimeout(() => navigate('/contacts'), 1000);
+  };
+
+  /**
    * Envia os dados do advogado
    * @param {*} values
    */
@@ -39,16 +46,13 @@ const ClientContactCreate = () => {
     };
 
     const params = {
-      sender_name: values.name,
       subject: values.subject,
       message: values.message,
-      read: 0,
-      client_sent: true,
-      advocate_sent: false,
-      user_id: data.id
+      client_id: data.client.id,
+      advocate_user_id: data.client.advocate_user_id
     };
 
-    await API.post('messages', params, config)
+    await API.post('advocates/messages/received', params, config)
       .then(() => {
         showSuccess.current = true;
       })
@@ -56,6 +60,7 @@ const ClientContactCreate = () => {
         showSuccess.current = false;
         showError.current = true;
       });
+
     setSubmitting(false);
   }
 
@@ -73,147 +78,150 @@ const ClientContactCreate = () => {
   useEffect(() => {}, []);
 
   return (
-    <Formik
-      initialValues={{
-        name: data && data.name ? data.name : '',
-        email: data && data.email ? data.email : '',
-        subject: '',
-        message: ''
-      }}
-      validationSchema={ClientContactSchema}
-      onSubmit={handleSubmit}
-    >
-      {({ errors, handleBlur, handleChange, values, submitForm }) => (
-        <form
-          autoComplete="off"
-          onSubmit={(e) => {
-            e.preventDefault();
-            showSuccess.current = false;
-            handleSubmit(values, errors);
-          }}
-        >
-          <Card>
-            <CardHeader title="Dados de envio" />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Nome completo"
-                    name="name"
-                    value={values.name}
-                    disabled
-                    variant="outlined"
-                  />
+    <div style={{ marginLeft: '14px', marginTop: '14px' }}>
+      <Formik
+        initialValues={{
+          name: data.client && data.client.name ? data.client.name : '',
+          email: data && data.email ? data.email : '',
+          subject: '',
+          message: ''
+        }}
+        validationSchema={ClientContactSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, handleBlur, handleChange, values, submitForm }) => (
+          <form
+            autoComplete="off"
+            onSubmit={(e) => {
+              e.preventDefault();
+              showSuccess.current = false;
+              handleSubmit(values, errors);
+            }}
+          >
+            <Card>
+              <CardHeader title="Dados de envio" />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Nome do remetente"
+                      name="name"
+                      value={values.name}
+                      disabled
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Email do remetente"
+                      name="email"
+                      disabled
+                      value={values.email}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <TextField
+                      error={errors.subject}
+                      fullWidth
+                      helperText={errors.subject}
+                      label="Assunto"
+                      name="subject"
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                      }}
+                      required
+                      value={values.subject}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <TextField
+                      error={errors.message}
+                      fullWidth
+                      helperText={errors.message}
+                      label="Mensagem"
+                      multiline
+                      rowsMax={Infinity}
+                      onBlur={(event) => {
+                        handleBlur(event);
+                        showSuccess.current = false;
+                      }}
+                      onChange={(event) => {
+                        handleChange(event);
+                        showSuccess.current = false;
+                      }}
+                      placeholder="Mensagem:"
+                      name="message"
+                      required
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item md={12} xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    disabled
-                    value={values.email}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <TextField
-                    error={errors.subject}
-                    fullWidth
-                    helperText={errors.subject}
-                    label="Assunto"
-                    name="subject"
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                    }}
-                    required
-                    value={values.subject}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <TextField
-                    error={errors.message}
-                    fullWidth
-                    helperText={errors.message}
-                    label="Mensagem"
-                    multiline
-                    rowsMax={Infinity}
-                    onBlur={(event) => {
-                      handleBlur(event);
-                      showSuccess.current = false;
-                    }}
-                    onChange={(event) => {
-                      handleChange(event);
-                      showSuccess.current = false;
-                    }}
-                    placeholder="Mensagem:"
-                    name="message"
-                    required
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                p: 2
-              }}
-            >
-              <Stack direction="row" spacing={2}>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={() => navigate('/contacts')}
-                >
-                  Voltar
-                </Button>
-                {submitting ? (
-                  <Button color="primary" variant="contained" disabled>
-                    Carregando..
-                  </Button>
-                ) : (
+              </CardContent>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  p: 2
+                }}
+              >
+                <Stack direction="row" spacing={2}>
                   <Button
                     color="primary"
-                    variant="contained"
-                    type="submit"
-                    onClick={submitForm}
+                    variant="outlined"
+                    onClick={() => navigate('/contacts')}
                   >
-                    Enviar
+                    Voltar
                   </Button>
-                )}
-              </Stack>
-            </Box>
-          </Card>
-          {showSuccess.current && (
-            <>
-              <ToastAnimated />
-              {showToast({
-                type: 'success',
-                message: 'Mensagem enviada com sucesso!'
-              })}
-            </>
-          )}
-          {showError.current && (
-            <>
-              <ToastAnimated />
-              {showToast({
-                type: 'error',
-                message:
-                  'Ocorreu um erro ao enviar a mensagem. Tente novamente.'
-              })}
-            </>
-          )}
-        </form>
-      )}
-    </Formik>
+                  {submitting ? (
+                    <Button color="primary" variant="contained" disabled>
+                      Carregando..
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      type="submit"
+                      onClick={submitForm}
+                    >
+                      Enviar
+                    </Button>
+                  )}
+                </Stack>
+              </Box>
+            </Card>
+            {showSuccess.current && (
+              <>
+                <ToastAnimated />
+                {showToast({
+                  type: 'success',
+                  message: 'Mensagem enviada com sucesso!'
+                })}
+                {callTimeOut()}
+              </>
+            )}
+            {showError.current && (
+              <>
+                <ToastAnimated />
+                {showToast({
+                  type: 'error',
+                  message:
+                    'Ocorreu um erro ao enviar a mensagem. Tente novamente.'
+                })}
+              </>
+            )}
+          </form>
+        )}
+      </Formik>
+    </div>
   );
 };
 

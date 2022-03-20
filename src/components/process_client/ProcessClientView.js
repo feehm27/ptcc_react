@@ -73,13 +73,13 @@ const ProcessClientView = (props) => {
     });
   };
 
-  return props.process.length === 0 ? (
+  return props.process.length === 0 || props.process.number_process === null ? (
     <Card>
-      <CardHeader title="Visualização do Contrato" />
+      <CardHeader title="Visualização do Processo" />
       <Divider />
       <CardContent>
-        <Typography color="primary" variant="body1">
-          Não existem processos vinculados ao seu usuário para visualização.
+        <Typography variant="body1">
+          Não existe processo vinculado ao seu usuário para visualização.
         </Typography>
       </CardContent>
     </Card>
@@ -145,7 +145,15 @@ const ProcessClientView = (props) => {
         <Divider />
         <CardHeader title="Histórico de alterações" />
         <Divider />
-        <CardContent>{getHistorics()}</CardContent>
+        <CardContent>
+          {props.process.historics.length === 0 ? (
+            <Typography variant="body1">
+              Não existe histórico de alterações no seu processo para exibição.
+            </Typography>
+          ) : (
+            getHistorics()
+          )}
+        </CardContent>
       </>
     </Card>
   );

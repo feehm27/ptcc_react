@@ -95,7 +95,7 @@ const ProcessCreate = () => {
   };
 
   return (
-    <>
+    <div style={{ marginLeft: '14px', marginTop: '14px' }}>
       <Formik
         initialValues={{
           number: '',
@@ -383,7 +383,7 @@ const ProcessCreate = () => {
           </form>
         )}
       </Formik>
-    </>
+    </div>
   );
 };
 

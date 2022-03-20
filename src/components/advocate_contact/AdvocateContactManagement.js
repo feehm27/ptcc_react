@@ -1,7 +1,13 @@
 import {
   Box,
+  Button,
   Card,
   CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Table,
   TableBody,
   TableCell,
@@ -11,11 +17,13 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
-import { Visibility } from '@material-ui/icons';
+import { Delete, Visibility } from '@material-ui/icons';
 import SearchBar from 'material-ui-search-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useNavigate } from 'react-router';
+import { API } from 'src/services/api';
+import ToastAnimated, { showToast } from '../Toast';
 
 const AdvocateContactManagement = (listClients) => {
   const navigate = useNavigate();
@@ -23,6 +31,15 @@ const AdvocateContactManagement = (listClients) => {
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState(listClients.clients);
   const [searched, setSearched] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState([]);
+
+  const showSuccess = useRef(false);
+  const showError = useRef(false);
+
+  const handleClose = () => {
+    setShowModal(false);
+  };
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -31,6 +48,49 @@ const AdvocateContactManagement = (listClients) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
+
+  /**
+   * Obtém as informações das mensagens
+   */
+  async function getMessages() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+    await API.get(`advocates/messages/received`, config)
+      .then((response) => {
+        setRows(response.data.data);
+      })
+      .catch((err) => console.error(err));
+  }
+
+  /**
+   * Envia os dados do advogado
+   * @param {*} values
+   */
+  async function deleteAllMessages() {
+    showSuccess.current = false;
+    const token = window.localStorage.getItem('token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+
+    const values = {
+      all_messages: true,
+      client_id: selectedClientId
+    };
+
+    await API.post(`advocates/messages/received/destroy`, values, config)
+      .then(() => {
+        showSuccess.current = true;
+        getMessages();
+      })
+      .catch((err) => {
+        console.log(err);
+        showError.current = true;
+      });
+  }
 
   /**
    * Busca os clientes na tabela
@@ -77,9 +137,10 @@ const AdvocateContactManagement = (listClients) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Cliente</TableCell>
+                <TableCell>Nome do Cliente</TableCell>
+                <TableCell>Email</TableCell>
                 <TableCell>CPF</TableCell>
-                <TableCell>Qtd. Mensagens Enviadas</TableCell>
+                <TableCell>Qtd. Mensagens</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -93,20 +154,41 @@ const AdvocateContactManagement = (listClients) => {
                   </TableCell>
                   <TableCell>
                     <Typography color="textPrimary" variant="body1">
+                      {client.email}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography color="textPrimary" variant="body1">
                       {client.cpf}
                     </Typography>
                   </TableCell>
-                  <TableCell>{`${client.messages.length} mensagens`}</TableCell>
+                  <TableCell>{`${client.messages.length}`}</TableCell>
                   <TableCell>
                     <Tooltip title="Visualizar mensagens">
                       <Visibility
                         cursor="pointer"
                         onClick={() => {
                           navigate('/advocates/contacts/show', {
-                            state: { messages: client.messages, show: true }
+                            state: {
+                              client,
+                              show: true
+                            }
                           });
+                          showSuccess.current = false;
+                          showError.current = false;
                         }}
                       ></Visibility>
+                    </Tooltip>
+                    <Tooltip title="Excluir todas as mensagens">
+                      <Delete
+                        cursor="pointer"
+                        onClick={() => {
+                          setSelectedClientId(client.id);
+                          setShowModal(true);
+                          showSuccess.current = false;
+                          showError.current = false;
+                        }}
+                      ></Delete>
                     </Tooltip>
                   </TableCell>
                 </TableRow>
@@ -114,6 +196,25 @@ const AdvocateContactManagement = (listClients) => {
             </TableBody>
           </Table>
         </Box>
+        {console.log(showSuccess.current)}
+        {showSuccess.current && (
+          <>
+            <ToastAnimated />
+            {showToast({
+              type: 'success',
+              message: 'Mensagens deletadas com sucesso!'
+            })}
+          </>
+        )}
+        {showError.current && (
+          <>
+            <ToastAnimated />
+            {showToast({
+              type: 'error',
+              message: 'Ocorreu um erro inesperado deletar as mensagens!'
+            })}
+          </>
+        )}
       </PerfectScrollbar>
       <TablePagination
         component="div"
@@ -124,6 +225,46 @@ const AdvocateContactManagement = (listClients) => {
         rowsPerPage={limit}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      {showModal && (
+        <div>
+          <Dialog
+            open={showModal}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              <Typography color="primary" variant="h5" textAlign="center">
+                Confirmar exclusão?
+              </Typography>
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Todas as mensagens relacionadas a esse cliente, incluindo suas
+                respostas também serão deletadas. Tem certeza que deseja
+                confirmar a exclusão?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="primary">
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => {
+                  showSuccess.current = false;
+                  showError.current = false;
+                  handleClose();
+                  deleteAllMessages();
+                }}
+                autoFocuscolor="primary"
+                variant="contained"
+              >
+                Confirmar
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+      )}
     </Card>
   ) : (
     <Card sx={{ mt: 3, mb: 4 }}>

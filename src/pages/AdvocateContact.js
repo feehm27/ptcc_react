@@ -19,7 +19,7 @@ const AdvocateContact = () => {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
       }
     };
-    await API.get(`messages`, config)
+    await API.get(`advocates/messages/received`, config)
       .then((response) => {
         setClients(response.data.data);
       })
@@ -39,7 +39,24 @@ const AdvocateContact = () => {
       <Helmet>
         <title>Advoguez</title>
       </Helmet>
-      <Skeleton />
+      <Box
+        sx={{
+          backgroundColor: 'background.default',
+          minHeight: '100%',
+          py: 3
+        }}
+      >
+        <Container maxWidth="lg">
+          <Skeleton
+            variant="rectangular"
+            animation="wave"
+            width="100%"
+            height="100%"
+          >
+            <div style={{ paddingTop: '57%', margin: '16px' }} />
+          </Skeleton>
+        </Container>
+      </Box>
     </>
   ) : (
     <>

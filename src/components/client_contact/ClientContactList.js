@@ -51,7 +51,7 @@ const ClientContactList = (messages) => {
                 : false
             }
           >
-            Entrar em contato
+            Nova Mensagem
           </Button>
           <Button
             sx={{ mx: 1 }}

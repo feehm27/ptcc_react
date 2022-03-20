@@ -53,7 +53,7 @@ const ContractClientView = (props) => {
       <CardHeader title="Visualização do Contrato" />
       <Divider />
       <CardContent>
-        <Typography color="textSecondary" variant="body1">
+        <Typography variant="body1">
           Não existe contrato vinculado ao seu usuário para visualização.
         </Typography>
       </CardContent>

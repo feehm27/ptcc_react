@@ -227,7 +227,8 @@ const ProcessManagement = (listProcesses) => {
                 <TableCell>Número do processo</TableCell>
                 <TableCell>Nome do cliente</TableCell>
                 <TableCell>Data de inicio</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>Etapa Inicial</TableCell>
+                <TableCell>Etapa Atual</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -248,6 +249,7 @@ const ProcessManagement = (listProcesses) => {
                     {moment(process.start_date).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>{process.status}</TableCell>
+                  <TableCell>{process.current_status}</TableCell>
                   <TableCell>
                     <Tooltip title="Adicionar modificações">
                       {checkedPermission(5, 1) ? (
@@ -575,6 +577,24 @@ const ProcessManagement = (listProcesses) => {
             </DialogActions>
           </Dialog>
         </div>
+      )}
+      {showSuccessHistory.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Modificação adicionada com sucesso!'
+          })}
+        </>
+      )}
+      {showErrorHistory.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'error',
+            message: 'Ocorreu um erro inesperado! Tente novamente mais tarde.'
+          })}
+        </>
       )}
       {showSuccess.current && (
         <>

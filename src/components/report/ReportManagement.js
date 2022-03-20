@@ -29,7 +29,6 @@ import ToastAnimated, { showToast } from '../Toast';
 
 const ReportManagement = (listReports) => {
   const navigate = useNavigate();
-  const showExportSuccess = useRef(false);
   const showSuccess = useRef(false);
   const { data } = useContext(UserContext);
 
@@ -69,7 +68,6 @@ const ReportManagement = (listReports) => {
    * @param {*} values
    */
   async function exportReport(report) {
-    showExportSuccess.current = false;
     setSubmitting(true);
 
     const req = new XMLHttpRequest();
@@ -84,10 +82,8 @@ const ReportManagement = (listReports) => {
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       link.download = fileName;
-      showExportSuccess.current = true;
       link.click();
     };
-
     req.send();
     setSubmitting(false);
   }
@@ -212,7 +208,6 @@ const ReportManagement = (listReports) => {
                         <Edit
                           cursor="pointer"
                           onClick={() => {
-                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             navigate('/reports/edit', {
                               state: { report, show: true }
@@ -254,7 +249,6 @@ const ReportManagement = (listReports) => {
                           }}
                           cursor="pointer"
                           onClick={() => {
-                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             setSelectedReport(report);
                             setShowModal(true);
@@ -264,7 +258,6 @@ const ReportManagement = (listReports) => {
                         <Delete
                           cursor="pointer"
                           onClick={() => {
-                            showExportSuccess.current = false;
                             showSuccess.current = false;
                             setSelectedReport(report);
                             setShowModal(true);
@@ -276,6 +269,15 @@ const ReportManagement = (listReports) => {
                 </TableRow>
               ))}
             </TableBody>
+            {showSuccess.current && (
+              <>
+                <ToastAnimated />
+                {showToast({
+                  type: 'success',
+                  message: 'Relatório deletado com sucesso!'
+                })}
+              </>
+            )}
           </Table>
         </Box>
       </PerfectScrollbar>
@@ -324,24 +326,6 @@ const ReportManagement = (listReports) => {
             </DialogActions>
           </Dialog>
         </div>
-      )}
-      {showExportSuccess.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Relatório baixado com sucesso!'
-          })}
-        </>
-      )}
-      {showSuccess.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Relatório deletado com sucesso!'
-          })}
-        </>
       )}
     </Card>
   ) : (

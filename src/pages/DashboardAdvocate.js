@@ -19,17 +19,21 @@ const DashboardAdvocate = () => {
   const [loading, setLoading] = useState(false);
   const [loadingCountClients, setLoadingCountClients] = useState(true);
   const [loadingCountContracts, setLoadingCountContracts] = useState(true);
+  const [loadingCountMeetings, setLoadingCountMeetings] = useState(true);
   const [loadingProcesses, setLoadingProcesses] = useState(true);
   const [loadingContracts, setLoadingContracts] = useState(true);
   const [loadingClients, setLoadingClients] = useState(true);
   const [loadingAnnualProfit, setLoadingAnnualProfit] = useState(true);
+  const [loadingMeeting, setLoadingMeeting] = useState(true);
 
   const [clientsCount, setClientsCount] = useState(0);
   const [contractsCount, setContractsCount] = useState(0);
+  const [meetingsCount, setMeetingsCount] = useState(0);
   const [processes, setProcesses] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [clients, setClients] = useState([]);
   const [annualProfit, setAnnualProfit] = useState([]);
+  const [meetings, setMeetings] = useState([]);
 
   /**
    * Obtém a contagem de clientes
@@ -68,6 +72,25 @@ const DashboardAdvocate = () => {
       }
     );
     setLoadingCountContracts(false);
+  }
+
+  /**
+   * Obtém a contagem de reuniões
+   */
+  async function getMeetingsCount() {
+    setLoadingCountMeetings(true);
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+
+    await API.get('/advocates/dashboard/count/meetings', config).then(
+      (response) => {
+        setMeetingsCount(response.data.data);
+      }
+    );
+    setLoadingCountMeetings(false);
   }
 
   /**
@@ -143,6 +166,25 @@ const DashboardAdvocate = () => {
     setLoadingAnnualProfit(false);
   }
 
+  /**
+   * Obtém os clientes por ano
+   */
+  async function getMeetingsForWeek() {
+    setLoadingMeeting(true);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    };
+
+    await API.get('/advocates/dashboard/meetings', config).then((response) => {
+      setMeetings(response.data.data);
+    });
+
+    setLoadingMeeting(false);
+  }
+
   const checkPermissionDashboard = () => {
     let isAllowed = true;
 
@@ -163,10 +205,12 @@ const DashboardAdvocate = () => {
     setLoading(true);
 
     getProcessesByStatus();
+    getMeetingsCount();
     getClientsCount();
     getContractsCount();
     getContracts();
     getClients();
+    getMeetingsForWeek();
     getAnnualProfit();
 
     setLoading(false);
@@ -185,103 +229,115 @@ const DashboardAdvocate = () => {
   ) : (
     <Container maxWidth={false}>
       <Grid container spacing={3}>
-        <Grid item lg={4} sm={4} xl={3} xs={12}>
-          <Meetings />
-        </Grid>
+        {loadingCountMeetings ? (
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Skeleton />
+            <Skeleton animation="wave" />
+            <Skeleton animation={false} />
+            <Skeleton />
+            <Skeleton />
+          </Grid>
+        ) : (
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Meetings meetingsCount={meetingsCount} />
+          </Grid>
+        )}
         {loadingCountClients ? (
-          <Skeleton
-            variant="rectangular"
-            animation="wave"
-            width="210"
-            height="118"
-          >
-            <div style={{ paddingTop: '57%' }} />
-          </Skeleton>
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Skeleton />
+            <Skeleton animation="wave" />
+            <Skeleton animation={false} />
+            <Skeleton />
+            <Skeleton />
+          </Grid>
         ) : (
           <Grid item lg={4} sm={4} xl={3} xs={12}>
             <Clients clientsCount={clientsCount} />
           </Grid>
         )}
         {loadingCountContracts ? (
-          <Skeleton
-            variant="rectangular"
-            animation="wave"
-            width="210"
-            height="118"
-          >
-            <div style={{ paddingTop: '57%' }} />
-          </Skeleton>
+          <Grid item lg={4} sm={4} xl={3} xs={12}>
+            <Skeleton />
+            <Skeleton animation="wave" />
+            <Skeleton animation={false} />
+            <Skeleton />
+            <Skeleton />
+          </Grid>
         ) : (
           <Grid item lg={4} sm={4} xl={3} xs={12}>
             <ActiveContracts contractsCount={contractsCount} />
           </Grid>
         )}
-        {loadingProcesses ? (
-          <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width="210"
-              height="118"
-            >
-              <div style={{ paddingTop: '57%' }} />
-            </Skeleton>
-          </Grid>
-        ) : (
-          <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
+        <Grid container spacing={3} sx={{ mt: 2, ml: '0px' }}>
+          {loadingProcesses ? (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
             <Grid item lg={4} md={4} xl={3} xs={12}>
               <ProcessesByStatus
                 sx={{ height: '100%' }}
                 processes={processes}
               />
             </Grid>
-            {loadingContracts ? (
-              <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
-            ) : (
-              <Grid item lg={4} md={4} xl={3} xs={12}>
-                <ContractsByMonth contracts={contracts} />
-              </Grid>
-            )}
+          )}
+          {loadingContracts ? (
             <Grid item lg={4} md={4} xl={3} xs={12}>
-              <MeetingsPerWeek sx={{ height: '100%' }} />
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
             </Grid>
-            {loadingAnnualProfit ? (
+          ) : (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <ContractsByMonth contracts={contracts} />
+            </Grid>
+          )}
+          {loadingMeeting ? (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
               <Skeleton
                 variant="rectangular"
                 animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
-            ) : (
-              <Grid item lg={8} md={8} xl={6} xs={12}>
-                <AnnualProfit profit={annualProfit} />
-              </Grid>
-            )}
-            {loadingClients ? (
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <MeetingsPerWeek meetings={meetings} sx={{ height: '100%' }} />
+            </Grid>
+          )}
+          {loadingAnnualProfit ? (
+            <Grid item lg={8} md={8} xl={6} xs={12}>
               <Skeleton
                 variant="rectangular"
                 animation="wave"
-                width="210"
-                height="118"
-              >
-                <div style={{ paddingTop: '57%' }} />
-              </Skeleton>
-            ) : (
-              <Grid item lg={4} md={4} xl={3} xs={12}>
-                <ClientsByYear clients={clients} />
-              </Grid>
-            )}
-          </Grid>
-        )}
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
+            <Grid item lg={8} md={8} xl={6} xs={12}>
+              <AnnualProfit profit={annualProfit} />
+            </Grid>
+          )}
+          {loadingClients ? (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <Skeleton
+                variant="rectangular"
+                animation="wave"
+                style={{ height: '100%', width: '100%' }}
+              ></Skeleton>
+            </Grid>
+          ) : (
+            <Grid item lg={4} md={4} xl={3} xs={12}>
+              <ClientsByYear clients={clients} />
+            </Grid>
+          )}
+        </Grid>
       </Grid>
     </Container>
   );

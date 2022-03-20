@@ -15,7 +15,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import ClientJoinSchema from 'src/schemas/ClientJoinSchema';
-
 import { API } from 'src/services/api';
 
 const ProcessJoin = () => {
@@ -36,7 +35,7 @@ const ProcessJoin = () => {
       }
     };
 
-    await API.get('advocates/clients', config)
+    await API.get(`advocates/clients?check_process=1`, config)
       .then((response) => {
         setClients(response.data.data);
         setShowSelectedClients(true);
@@ -132,7 +131,7 @@ const ProcessJoin = () => {
                     <DialogActions>
                       <Button
                         onClick={() => {
-                          navigate('/contracts');
+                          navigate('/processes');
                         }}
                         color="primary"
                       >
@@ -173,19 +172,21 @@ const ProcessJoin = () => {
                     <DialogContent>
                       <DialogContentText
                         id="alert-dialog-description"
-                        textAlign="center"
+                        textAlign="justify"
                       >
-                        Você não possui clientes cadastrados para vínculo.
-                        <p>
-                          <NavLink
-                            to={{
-                              pathname: '/clients'
-                            }}
-                          >
-                            Clique aqui
-                          </NavLink>{' '}
-                          para cadastrar um novo cliente.
-                        </p>
+                        <b>
+                          Você não possui clientes cadastrados para vínculo ou
+                          todos os seus clientes já estão vinculados a um
+                          processo.
+                        </b>
+                        <NavLink
+                          to={{
+                            pathname: '/clients'
+                          }}
+                        >
+                          &nbsp;Clique aqui
+                        </NavLink>{' '}
+                        <b>para cadastrar um novo cliente.</b>
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -194,6 +195,8 @@ const ProcessJoin = () => {
                           navigate('/processes');
                         }}
                         color="primary"
+                        variant="outlined"
+                        style={{ margin: '0 auto', display: 'block' }}
                       >
                         Voltar
                       </Button>

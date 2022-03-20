@@ -21,10 +21,10 @@ import SchedulesConstants from 'src/constants/SchedulesConstants';
 import { API } from 'src/services/api';
 import ToastAnimated, { showToast } from '../Toast';
 
-const MettingSchedules = () => {
+const MeetingClientSchedules = () => {
   const navigate = useNavigate();
 
-  const { day, typeDay, datas } = useLocation().state;
+  const { day, datas, client } = useLocation().state;
   const [schedules, setSchedules] = useState(SchedulesConstants);
   const [submitting, setSubmitting] = useState(false);
   const [checkedsList, setCheckedsList] = useState(SchedulesConstants);
@@ -38,7 +38,7 @@ const MettingSchedules = () => {
    * Atualiza a página depois de um tempo
    */
   const callTimeOut = () => {
-    setTimeout(() => navigate('/meetings'), 1500);
+    setTimeout(() => navigate('/meetings/clients'), 1500);
   };
 
   const mountHours = () => {
@@ -49,42 +49,13 @@ const MettingSchedules = () => {
 
       hoursArray.hours.forEach((hour) => {
         newHours.push({
-          value: hour,
-          client_name: data.client ? data.client.client_name : undefined
+          value: hour
         });
       });
     });
 
     const hours = orderBy(newHours, ['value'], ['asc']);
-
-    switch (typeDay) {
-      /**
-       * Dia disponível
-       */
-      case 1:
-        setSchedules(SchedulesConstants);
-        break;
-
-      /**
-       * Dia com agendamento
-       */
-      /**
-       */
-      case 2:
-        setSchedules(hours);
-        break;
-
-      /**
-       * Dia disponivel
-       */
-      case 3:
-        setSchedules(hours);
-        break;
-
-      default:
-        setCheckedsList(SchedulesConstants);
-        break;
-    }
+    setSchedules(hours);
   };
 
   /**
@@ -97,45 +68,21 @@ const MettingSchedules = () => {
   };
 
   /**
-   * Use Effect
-   */
-  useEffect(() => {}, []);
-
-  const getTitle = () => {
-    switch (typeDay) {
-      case 1:
-        return `Dia ${day} - Selecione os horários disponíveis para agendamento`;
-      case 2:
-        return `Dia ${day} - Selecione os horários que deseja remover disponibilidade`;
-      case 3:
-        return `Dia ${day} - Selecione os horários que deseja cancelar reunião`;
-
-      default:
-        return `Dia ${day} - Horários`;
-    }
-  };
-
-  /**
    * Salva a configuração dos horários
    * @param {*} values
    */
   async function sendHours(params) {
     showSuccess.current = false;
     showError.current = false;
-    showSuccessCancel.current = false;
 
     const token = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
 
-    await API.post(`advocates/schedules`, params, config)
+    await API.post(`clients/schedules`, params, config)
       .then(() => {
-        if (params.is_cancel !== undefined) {
-          showSuccessCancel.current = true;
-        } else {
-          showSuccess.current = true;
-        }
+        showSuccess.current = true;
       })
       .catch((err) => {
         console.log(err);
@@ -143,62 +90,6 @@ const MettingSchedules = () => {
       });
     setSubmitting(false);
   }
-
-  /**
-   * Cancela os dias de agendamento
-   */
-  const cancelSchedule = () => {
-    setSubmitting(true);
-    const hours = [];
-
-    SchedulesConstants.map((schedule, index) => {
-      if (checkedsList[index].value === schedule.value) {
-        if (checkedsList[index].checked === true) hours.push(schedule.value);
-      }
-    });
-
-    if (hours.length > 0) {
-      const [newDay, month, year] = day.split('/');
-      const formatDate = `${year}-${month}-${newDay}`;
-
-      const params = {
-        date: formatDate,
-        horarys: { hours },
-        time_type: 2,
-        is_cancel: 1
-      };
-
-      sendHours(params);
-    }
-  };
-
-  /**
-   * Remove os dias disponíveis selecionados
-   */
-  const removeAvailableTime = () => {
-    setSubmitting(true);
-    const hours = [];
-
-    SchedulesConstants.map((schedule, index) => {
-      if (checkedsList[index].value === schedule.value) {
-        if (checkedsList[index].checked === true) hours.push(schedule.value);
-      }
-    });
-
-    if (hours.length > 0) {
-      const [newDay, month, year] = day.split('/');
-      const formatDate = `${year}-${month}-${newDay}`;
-
-      const params = {
-        date: formatDate,
-        horarys: { hours },
-        time_type: 1,
-        is_removed: 1
-      };
-
-      sendHours(params);
-    }
-  };
 
   /**
    * Monta os parametros dos dias disponíveis
@@ -220,7 +111,9 @@ const MettingSchedules = () => {
       const params = {
         date: formatDate,
         horarys: { hours },
-        time_type: 1
+        time_type: 3,
+        advocate_user_id: client.advocate_user_id,
+        client_id: client.id
       };
 
       sendHours(params);
@@ -228,19 +121,7 @@ const MettingSchedules = () => {
   };
 
   const handleSubmit = () => {
-    switch (typeDay) {
-      case 1:
-        sendTimesToSchedule();
-        break;
-      case 2:
-        removeAvailableTime();
-        break;
-      case 3:
-        cancelSchedule();
-        break;
-      default:
-        break;
-    }
+    sendTimesToSchedule();
   };
 
   const getChecked = (schedule) => {
@@ -253,8 +134,14 @@ const MettingSchedules = () => {
     const index = findIndex(Object.values(checkedsList), {
       value: schedule.value
     });
+
     Object.values(checkedsList)[index].checked = e.target.checked;
 
+    Object.values(checkedsList).map((checked) => {
+      if (checked.value !== schedule.value) {
+        checked.checked = false;
+      }
+    });
     setCheckedsList(Object.values(checkedsList));
   };
   /**
@@ -282,7 +169,9 @@ const MettingSchedules = () => {
             }}
           >
             <Card>
-              <CardHeader title={getTitle()} />
+              <CardHeader
+                title={`Dia ${day} - Selecione um horário para agendamento`}
+              />
               <Divider />
               {loading ? (
                 <Skeleton
@@ -348,7 +237,7 @@ const MettingSchedules = () => {
                   color="primary"
                   variant="outlined"
                   onClick={() => {
-                    navigate('/meetings');
+                    navigate('/meetings/clients');
                     setCheckedsList(SchedulesConstants);
                   }}
                 >
@@ -370,23 +259,12 @@ const MettingSchedules = () => {
                 )}
               </Stack>
             </Box>
-            {showSuccessCancel.current && (
-              <>
-                <ToastAnimated />
-                {showToast({
-                  type: 'success',
-                  message:
-                    'Reuniões canceladas com sucesso! Seus clientes serão avisados por email!'
-                })}
-                {callTimeOut()}
-              </>
-            )}
             {showSuccess.current && (
               <>
                 <ToastAnimated />
                 {showToast({
                   type: 'success',
-                  message: 'Horários cadastrados com sucesso!'
+                  message: 'Horário agendado com sucesso!'
                 })}
                 {callTimeOut()}
               </>
@@ -408,4 +286,4 @@ const MettingSchedules = () => {
   );
 };
 
-export default MettingSchedules;
+export default MeetingClientSchedules;

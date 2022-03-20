@@ -11,7 +11,7 @@ import { Book } from '@material-ui/icons';
 import moment from 'moment';
 
 const ProcessStatusClient = (props) => (
-  <Card {...props}>
+  <Card sx={{ height: '100%' }} {...props}>
     <CardHeader title="Dados do Processo" />
     <Divider />
     <CardContent>

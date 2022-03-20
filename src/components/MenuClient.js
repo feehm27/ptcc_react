@@ -6,7 +6,8 @@ import {
   Book as BookIcon,
   Calendar as CalendarIcon,
   FileText as FileIcon,
-  MessageSquare as MessageIcon
+  MessageSquare as MessageIcon,
+  LogOut as LogOutIcon
 } from 'react-feather';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from 'src/contexts/UserContext';
@@ -41,19 +42,27 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 13,
-      href: '/construction',
+      href: 'meetings/clients',
       icon: CalendarIcon,
       title: 'Agendar Reunião',
-      disabled: true,
+      disabled: false,
       allowed: data && data.checkeds.menus_checked[12].checked === 1
     },
     {
       id: 14,
-      href: '/construction',
+      href: '/contacts',
       icon: MessageIcon,
       title: 'Contato',
-      disabled: true,
+      disabled: false,
       allowed: data && data.checkeds.menus_checked[13].checked === 1
+    },
+    {
+      id: null,
+      href: '/',
+      icon: LogOutIcon,
+      title: 'Sair',
+      disabled: false,
+      allowed: true
     }
   ];
 
