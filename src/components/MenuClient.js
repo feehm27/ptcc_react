@@ -42,10 +42,10 @@ const MenuClient = ({ onMobileClose, openMobile }) => {
     },
     {
       id: 13,
-      href: '/construction',
+      href: 'meetings/clients',
       icon: CalendarIcon,
       title: 'Agendar Reunião',
-      disabled: true,
+      disabled: false,
       allowed: data && data.checkeds.menus_checked[12].checked === 1
     },
     {

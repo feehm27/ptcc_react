@@ -17,6 +17,7 @@ import ContractJoin from './components/contract/ContractJoin';
 import ContractView from './components/contract/ContractView';
 import ContractClientView from './components/contract_client/ContractClientView';
 import MainLayout from './components/MainLayout';
+import MeetingClientSchedules from './components/meeting/MeetingClientSchedules';
 import MettingSchedules from './components/meeting/MeetingSchedules';
 import PageLayout from './components/PageLayout';
 import Permissions from './components/Permissions';
@@ -26,6 +27,8 @@ import ProcessHistoric from './components/process/ProcessHistoric';
 import ProcessJoin from './components/process/ProcessJoin';
 import ProcessClientView from './components/process_client/ProcessClientView';
 import ProfileTypes from './components/ProfileTypes';
+import ReportCreate from './components/report/ReportCreate';
+import ReportEdit from './components/report/ReportEdit';
 import UserCreate from './components/users/UserCreate';
 import UserEdit from './components/users/UserEdit';
 import { UserStorage } from './contexts/UserContext';
@@ -44,6 +47,7 @@ import DashboardClient from './pages/DashboardClient';
 import Identity from './pages/Identity';
 import Login from './pages/Login';
 import Meeting from './pages/Meeting';
+import MeetingClient from './pages/MeetingClient';
 import MyInformation from './pages/MyInformation';
 import NotAllowed from './pages/NotAllowed';
 import NotFound from './pages/NotFound';
@@ -51,13 +55,11 @@ import Process from './pages/Process';
 import ProcessClient from './pages/ProcessClient';
 import ProductList from './pages/ProductList';
 import Register from './pages/Register';
+import Report from './pages/Report';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import User from './pages/User';
 import UserProfile from './pages/UserProfile';
-import Report from './pages/Report';
-import ReportCreate from './components/report/ReportCreate';
-import ReportEdit from './components/report/ReportEdit';
 
 function App() {
   return (
@@ -169,6 +171,16 @@ function App() {
                 <ProtectedRoute
                   path="/meetings/schedules"
                   element={<MettingSchedules />}
+                />
+
+                <ProtectedRoute
+                  path="/meetings/clients"
+                  element={<MeetingClient />}
+                />
+
+                <ProtectedRoute
+                  path="/meetings/clients/schedules"
+                  element={<MeetingClientSchedules />}
                 />
 
                 <ProtectedRoute path="/clients/edit" element={<ClientEdit />} />

@@ -157,7 +157,7 @@ const MenuAttorney = ({ onMobileClose, openMobile }) => {
   }
 
   items.push({
-    id: null,
+    id: 99,
     href: '/',
     icon: LogOutIcon,
     title: 'Sair',

@@ -1,12 +1,13 @@
-import { Avatar, Card, CardContent, Grid, Typography } from '@material-ui/core';
+import {
+  Avatar,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  Typography
+} from '@material-ui/core';
 import { red } from '@material-ui/core/colors';
 import EventIcon from '@material-ui/icons/EventOutlined';
-import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider
-} from '@material-ui/pickers';
-import { ptBR } from 'date-fns/locale';
-import DateFnsUtils from '@date-io/date-fns';
 
 const ScheduledMettingClient = (props) => (
   <Card sx={{ height: '100%' }} {...props}>
@@ -36,13 +37,13 @@ const ScheduledMettingClient = (props) => (
                 justifyContent: 'center'
               }}
             >
-              <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
-                <KeyboardDatePicker
-                  initialFocusedDate={`${props.meeting.date} ${props.meeting.hours}`}
-                  format="dd/MM/yyyy H:ii"
-                  disabled={true}
-                />
-              </MuiPickersUtilsProvider>
+              <TextField
+                variant="outlined"
+                fullWidth
+                defaultValue={`${props.meeting.date} ás ${props.meeting.hours}`}
+                disabled={true}
+              />
+
               <Typography
                 color="textPrimary"
                 variant="h3"

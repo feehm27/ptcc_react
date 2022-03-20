@@ -21,14 +21,17 @@ import { ptBR } from 'date-fns/locale';
 import { Formik } from 'formik';
 import { filter, first, orderBy } from 'lodash';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Circle as CircleIcon } from 'react-feather';
 import { useNavigate } from 'react-router';
+import { UserContext } from 'src/contexts/UserContext';
 import ScheduleSchema from 'src/schemas/ScheduleSchema';
 import { API } from 'src/services/api';
 
-const MeetingManagement = () => {
+const MeetingClientManagement = () => {
+  const { data } = useContext(UserContext);
   const navigate = useNavigate();
+
   const [highlightedDays, setHighlightedDays] = useState();
   const [selectedMonth, handleMonthChange] = useState(new Date());
   const [loading, setLoading] = useState(false);
@@ -55,9 +58,9 @@ const MeetingManagement = () => {
 
     Object.keys(listDates).forEach((day) => {
       newHighlightedDays.push({
-        date: addDays(new Date(day.split('$')[0]), 1),
+        date: addDays(new Date(day), 1),
         styles: {
-          backgroundColor: day.split('%')[1]
+          backgroundColor: '#5ab5cb'
         }
       });
     });
@@ -79,27 +82,27 @@ const MeetingManagement = () => {
             openTo="day"
             value={selectedMonth}
             onChange={(e) => {
-              let typeDay = 1;
               let datas = [];
 
               const foundKey = first(
                 filter(Object.keys(days), function getTypeDay(date) {
-                  return date.split('$')[0] === moment(e).format('YYYY-MM-DD');
+                  return date === moment(e).format('YYYY-MM-DD');
                 })
               );
 
               if (foundKey) {
-                typeDay = Number(foundKey.split('$')[1].split('%')[0]);
                 datas = Object.values(days[foundKey]);
               }
 
-              navigate('/meetings/schedules', {
-                state: {
-                  day: moment(e).format('DD/MM/YYYY'),
-                  typeDay,
-                  datas
-                }
-              });
+              if (datas.length > 0) {
+                navigate('/meetings/clients/schedules', {
+                  state: {
+                    day: moment(e).format('DD/MM/YYYY'),
+                    datas,
+                    client: data.client
+                  }
+                });
+              }
             }}
             renderDay={renderWeekPickerDay}
             renderInput={(params) => <TextField {...params} />}
@@ -108,20 +111,6 @@ const MeetingManagement = () => {
           />
         </LocalizationProvider>
         <div style={{ marginLeft: '10px', marginTop: '15px' }}>
-          <FormControlLabel
-            label="Horários com agendamento"
-            defaultChecked
-            control={
-              <CircleIcon
-                style={{
-                  cursor: 'initial',
-                  marginRight: '2px',
-                  fill: '#EE96AA',
-                  stroke: '#EE96AA'
-                }}
-              ></CircleIcon>
-            }
-          />
           <FormControlLabel
             style={{ marginLeft: '5px' }}
             label="Horários disponíveis"
@@ -132,19 +121,6 @@ const MeetingManagement = () => {
                   marginRight: '2px',
                   fill: '#5ab5cb',
                   stroke: '#5ab5cb'
-                }}
-              ></CircleIcon>
-            }
-          />
-          <FormControlLabel
-            style={{ marginLeft: '5px' }}
-            label="Horários neutros"
-            control={
-              <CircleIcon
-                style={{
-                  cursor: 'initial',
-                  marginRight: '2px',
-                  fill: 'white'
                 }}
               ></CircleIcon>
             }
@@ -172,7 +148,10 @@ const MeetingManagement = () => {
         ? moment(selectedMonth).format('YYYY-MM')
         : moment(selectedDate).format('YYYY-MM');
 
-    await API.get(`advocates/schedules?date=${date}`, config)
+    await API.get(
+      `clients/schedules?client_id=${data.client.id}&date=${date}`,
+      config
+    )
       .then((response) => {
         setDays(response.data.data);
         mountDays(response.data.data);
@@ -182,14 +161,6 @@ const MeetingManagement = () => {
     setLoading(false);
     setSubmitting(false);
   }
-
-  /**
-   * Envia os dados do formulário
-   * @param {*} values
-   */
-  const handleSubmit = () => {
-    searchSchedules();
-  };
 
   /**
    * Use Effect
@@ -203,15 +174,13 @@ const MeetingManagement = () => {
       initialValues={{
         research_month: moment().format('MM/yyyy')
       }}
-      onSubmit={handleSubmit}
       validationSchema={ScheduleSchema}
     >
-      {({ handleBlur }) => (
+      {() => (
         <form
           autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
           }}
         >
           <Card>
@@ -249,9 +218,6 @@ const MeetingManagement = () => {
                           searchSchedules(e);
                         }
                       }}
-                      onBlur={(e) => {
-                        handleBlur(e);
-                      }}
                       name="research_month"
                       required
                     />
@@ -285,4 +251,4 @@ const MeetingManagement = () => {
   );
 };
 
-export default MeetingManagement;
+export default MeetingClientManagement;
