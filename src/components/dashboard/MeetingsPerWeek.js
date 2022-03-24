@@ -5,7 +5,6 @@ import {
   CardHeader,
   colors,
   Divider,
-  Typography,
   useTheme
 } from '@material-ui/core';
 import { Pie } from 'react-chartjs-2';
@@ -23,7 +22,8 @@ const MeetingsPerWeek = (props) => {
           colors.orange[600],
           colors.yellow[500],
           colors.green[500],
-          colors.red[200]
+          colors.red[200],
+          colors.deepPurple[200]
         ],
         borderWidth: 8,
         borderColor: colors.common.white,
@@ -65,33 +65,6 @@ const MeetingsPerWeek = (props) => {
           }}
         >
           <Pie data={data} options={options} />
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            pt: 2
-          }}
-        >
-          {props.meetings.labels.map((label, index) => (
-            <Box
-              sx={{
-                p: 1,
-                textAlign: 'center'
-              }}
-            >
-              <Typography
-                color="textPrimary"
-                variant="body1"
-                style={{ fontSize: '11px' }}
-              >
-                {label}
-              </Typography>
-              <Typography variant="body1">
-                {props.meetings.data[index]}
-              </Typography>
-            </Box>
-          ))}
         </Box>
       </CardContent>
     </Card>

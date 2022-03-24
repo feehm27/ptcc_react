@@ -81,6 +81,13 @@ const ProcessManagement = (listProcesses) => {
     setShowAdd(false);
   };
 
+  /**
+   * Atualiza a página depois de um tempo
+   */
+  const callTimeOut = () => {
+    setTimeout(() => handleCloseAdd(), 1500);
+  };
+
   const checkedPermission = (positionMenu, positionPermission) => {
     if (data && !data.isAdmin) {
       return (
@@ -95,13 +102,16 @@ const ProcessManagement = (listProcesses) => {
   /**
    * Obtém os dados do processo
    */
-  async function getProcesses() {
+  async function getProcesses(isHistoric) {
     const tokenUser = window.localStorage.getItem('token');
     const config = {
       headers: { Authorization: `Bearer ${tokenUser}` }
     };
     await API.get('advocates/processes', config)
       .then((response) => {
+        if (isHistoric) {
+          showSuccessHistory.current = true;
+        }
         setRows(response.data.data);
       })
       .catch((err) => console.error(err));
@@ -126,8 +136,7 @@ const ProcessManagement = (listProcesses) => {
 
     await API.post('advocates/processes/historic', values, config)
       .then(() => {
-        showSuccessHistory.current = true;
-        getProcesses();
+        getProcesses(true);
       })
       .catch((err) => {
         showSuccessHistory.current = false;
@@ -148,7 +157,6 @@ const ProcessManagement = (listProcesses) => {
     }
 
     if (isEmpty(errors)) {
-      handleCloseAdd();
       sendProcessHistoric(values);
     }
   };
@@ -390,7 +398,6 @@ const ProcessManagement = (listProcesses) => {
           <Dialog
             fullWidth
             open={showAdd}
-            onClose={handleCloseAdd}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
@@ -413,9 +420,9 @@ const ProcessManagement = (listProcesses) => {
                   <form
                     autoComplete="off"
                     onSubmit={(e) => {
-                      e.preventDefault();
                       showSuccessHistory.current = false;
                       showErrorHistory.current = false;
+                      e.preventDefault();
                       handleSubmit(values, errors);
                     }}
                   >
@@ -532,6 +539,30 @@ const ProcessManagement = (listProcesses) => {
                         </Grid>
                       </CardContent>
                     </Card>
+                    {console.log(
+                      'showSuccessHistory',
+                      showSuccessHistory.current
+                    )}
+                    {showSuccessHistory.current && (
+                      <>
+                        <ToastAnimated />
+                        {showToast({
+                          type: 'success',
+                          message: 'Modificação adicionada com sucesso!'
+                        })}
+                        {callTimeOut()}
+                      </>
+                    )}
+                    {showErrorHistory.current && (
+                      <>
+                        <ToastAnimated />
+                        {showToast({
+                          type: 'error',
+                          message:
+                            'Ocorreu um erro inesperado! Tente novamente mais tarde.'
+                        })}
+                      </>
+                    )}
                   </form>
                 )}
               </Formik>
@@ -577,24 +608,6 @@ const ProcessManagement = (listProcesses) => {
             </DialogActions>
           </Dialog>
         </div>
-      )}
-      {showSuccessHistory.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'success',
-            message: 'Modificação adicionada com sucesso!'
-          })}
-        </>
-      )}
-      {showErrorHistory.current && (
-        <>
-          <ToastAnimated />
-          {showToast({
-            type: 'error',
-            message: 'Ocorreu um erro inesperado! Tente novamente mais tarde.'
-          })}
-        </>
       )}
       {showSuccess.current && (
         <>
