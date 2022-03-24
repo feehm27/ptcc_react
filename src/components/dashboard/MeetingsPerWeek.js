@@ -22,7 +22,8 @@ const MeetingsPerWeek = (props) => {
           colors.orange[600],
           colors.yellow[500],
           colors.green[500],
-          colors.red[200]
+          colors.red[200],
+          colors.deepPurple[200]
         ],
         borderWidth: 8,
         borderColor: colors.common.white,

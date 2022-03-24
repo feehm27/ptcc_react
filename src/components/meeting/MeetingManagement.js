@@ -35,6 +35,11 @@ const MeetingManagement = () => {
   const [submitting, setSubmitting] = useState(true);
   const [days, setDays] = useState();
 
+  const AddStyle = {
+    '.ant-picker-header-next-btn': {
+      visibility: 'hidden'
+    }
+  };
   const renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
     const matchedStyles = highlightedDays.reduce((a, v) => {
       return isSameDay(date, v.date) ? v.styles : a;
@@ -101,6 +106,8 @@ const MeetingManagement = () => {
                 }
               });
             }}
+            style={AddStyle}
+            dropdownClassName={AddStyle}
             renderDay={renderWeekPickerDay}
             renderInput={(params) => <TextField {...params} />}
             disablePast={true}

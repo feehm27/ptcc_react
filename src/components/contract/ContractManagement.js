@@ -186,7 +186,7 @@ const ContractManagement = (listContracts) => {
                   </TableCell>
                   <TableCell>
                     {contract.canceled_at !== null
-                      ? moment(contract.finish_date).format('DD/MM/YYYY')
+                      ? moment(contract.canceled_at).format('DD/MM/YYYY')
                       : '-'}
                   </TableCell>
                   <TableCell>

@@ -14,6 +14,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  Stack,
   TextField,
   Typography
 } from '@material-ui/core';
@@ -68,7 +69,7 @@ const AdvocateContactShow = () => {
   /**
    * Obtém as informações das mensagens
    */
-  async function getMessages() {
+  async function getMessages(isDelete) {
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -100,6 +101,19 @@ const AdvocateContactShow = () => {
           setNewClient(foundCard);
           setMessageSelected(true);
           setMessageClicked(messageClicked);
+
+          if (isDelete) {
+            return (
+              <>
+                <ToastAnimated />
+                {showToast({
+                  type: 'success',
+                  message: 'Mensagem deletada com sucesso!'
+                })}
+                {callTimeOut()}
+              </>
+            );
+          }
         }
 
         return null;
@@ -160,8 +174,7 @@ const AdvocateContactShow = () => {
 
     await API.post(`advocates/messages/received/destroy`, values, config)
       .then(() => {
-        getMessages();
-        showSuccessDelete.current = true;
+        getMessages(true);
       })
       .catch((err) => {
         console.log(err);
@@ -173,7 +186,7 @@ const AdvocateContactShow = () => {
   const getMarginTop = () => {
     if (reply) {
       if (messageClicked.answers.length === 0) {
-        return '-200px';
+        return '0px';
       } else {
         return '12px';
       }
@@ -229,6 +242,15 @@ const AdvocateContactShow = () => {
                   handleSubmit(values);
                 }}
               >
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => navigate('/advocate/contacts')}
+                  >
+                    Voltar
+                  </Button>
+                </Stack>
                 <Grid sx={{ marginTop: 2 }}>
                   <Grid container spacing={3} item xs={12} sm={12}>
                     <Grid container item xs={6} sm={6}>
