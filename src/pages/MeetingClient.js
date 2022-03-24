@@ -30,7 +30,7 @@ const MeetingClient = () => {
 
   const [schedule, setSchedule] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [submittingCancel, setSubmittingCancel] = useState(false);
 
   const showSuccess = useRef(false);
   const showError = useRef(false);
@@ -65,6 +65,7 @@ const MeetingClient = () => {
    * Obtém as informações das mensagens
    */
   async function cancelMeeting() {
+    setSubmittingCancel(true);
     showSuccess.current = false;
     showError.current = false;
 
@@ -89,12 +90,12 @@ const MeetingClient = () => {
       .catch(() => {
         showError.current = true;
       });
+
+    setSubmittingCancel(false);
   }
 
   const handleSubmit = () => {
-    setSubmitting(true);
     cancelMeeting();
-    setSubmitting(false);
   };
   /**
    * Use Effect
@@ -178,7 +179,7 @@ const MeetingClient = () => {
                         </CardContent>
                       </Card>
                       <DialogActions sx={{ ml: 1 }}>
-                        {submitting ? (
+                        {submittingCancel ? (
                           <Button color="primary" variant="contained" disabled>
                             Carregando..
                           </Button>
