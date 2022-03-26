@@ -37,6 +37,7 @@ const MeetingClientManagement = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(true);
   const [days, setDays] = useState();
+  const [error, setError] = useState();
 
   const renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
     const matchedStyles = highlightedDays.reduce((a, v) => {
@@ -197,7 +198,8 @@ const MeetingClientManagement = () => {
                 <Grid item md={6} xs={6}>
                   <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                     <KeyboardDatePicker
-                      minDate={new Date()}
+                      error={error}
+                      helperText={error}
                       fullWidth
                       invalidDateMessage="Data inválida"
                       openTo="month"
@@ -214,7 +216,16 @@ const MeetingClientManagement = () => {
                       onChange={(e) => {
                         handleMonthChange(e);
                         const selectedDate = moment(e);
-                        if (selectedDate.isValid()) {
+                        const currentMonth = moment().startOf('month');
+
+                        if (!selectedDate.isValid()) {
+                          setError('Data inválida');
+                        } else if (selectedDate < currentMonth) {
+                          setError(
+                            'O mês informado deve ser maior ou igual ao mês atual'
+                          );
+                        } else if (selectedDate.isValid()) {
+                          setError(null);
                           searchSchedules(e);
                         }
                       }}
