@@ -26,6 +26,7 @@ import { Circle as CircleIcon } from 'react-feather';
 import { useNavigate } from 'react-router';
 import ScheduleSchema from 'src/schemas/ScheduleSchema';
 import { API } from 'src/services/api';
+import './meeting.css';
 
 const MeetingManagement = () => {
   const navigate = useNavigate();
@@ -34,12 +35,8 @@ const MeetingManagement = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(true);
   const [days, setDays] = useState();
+  const [error, setError] = useState();
 
-  const AddStyle = {
-    '.ant-picker-header-next-btn': {
-      visibility: 'hidden'
-    }
-  };
   const renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
     const matchedStyles = highlightedDays.reduce((a, v) => {
       return isSameDay(date, v.date) ? v.styles : a;
@@ -106,8 +103,6 @@ const MeetingManagement = () => {
                 }
               });
             }}
-            style={AddStyle}
-            dropdownClassName={AddStyle}
             renderDay={renderWeekPickerDay}
             renderInput={(params) => <TextField {...params} />}
             disablePast={true}
@@ -235,7 +230,8 @@ const MeetingManagement = () => {
                 <Grid item md={6} xs={6}>
                   <MuiPickersUtilsProvider locale={ptBR} utils={DateFnsUtils}>
                     <KeyboardDatePicker
-                      minDate={new Date()}
+                      error={error}
+                      helperText={error}
                       fullWidth
                       invalidDateMessage="Data inválida"
                       openTo="month"
@@ -252,7 +248,16 @@ const MeetingManagement = () => {
                       onChange={(e) => {
                         handleMonthChange(e);
                         const selectedDate = moment(e);
-                        if (selectedDate.isValid()) {
+                        const currentMonth = moment().startOf('month');
+
+                        if (!selectedDate.isValid()) {
+                          setError('Data inválida');
+                        } else if (selectedDate < currentMonth) {
+                          setError(
+                            'O mês informado deve ser maior ou igual ao mês atual'
+                          );
+                        } else if (selectedDate.isValid()) {
+                          setError(null);
                           searchSchedules(e);
                         }
                       }}

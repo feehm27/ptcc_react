@@ -24,7 +24,6 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { maskProcessNumber } from 'src/helpers/Helpers';
 import { API } from 'src/services/api';
-import ToastAnimated, { showToast } from '../Toast';
 
 const ProcessHistoric = () => {
   const navigate = useNavigate();
@@ -162,14 +161,7 @@ const ProcessHistoric = () => {
                 <Button
                   onClick={() => {
                     handleClose();
-                    <>
-                      <ToastAnimated />
-                      {showToast({
-                        type: 'success',
-                        message: 'Histórico deletado com sucesso!'
-                      })}
-                      {deleteHistoric()}
-                    </>;
+                    deleteHistoric();
                   }}
                   autoFocuscolor="primary"
                   variant="contained"
