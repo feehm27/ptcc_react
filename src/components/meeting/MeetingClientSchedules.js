@@ -14,7 +14,7 @@ import {
   Typography
 } from '@material-ui/core';
 import { Formik } from 'formik';
-import { findIndex, orderBy } from 'lodash';
+import { every, findIndex, orderBy } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import SchedulesConstants from 'src/constants/SchedulesConstants';
@@ -29,6 +29,7 @@ const MeetingClientSchedules = () => {
   const [submitting, setSubmitting] = useState(false);
   const [checkedsList, setCheckedsList] = useState(SchedulesConstants);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const showSuccess = useRef(false);
   const showSuccessCancel = useRef(false);
@@ -121,7 +122,14 @@ const MeetingClientSchedules = () => {
   };
 
   const handleSubmit = () => {
-    sendTimesToSchedule();
+    const noneSelected = every(checkedsList, { checked: false });
+
+    if (noneSelected) {
+      setError('Selecione pelo menos um horário');
+      setSubmitting(false);
+    } else {
+      sendTimesToSchedule();
+    }
   };
 
   const getChecked = (schedule) => {
@@ -173,6 +181,21 @@ const MeetingClientSchedules = () => {
                 title={`Dia ${day} - Selecione um horário para agendamento`}
               />
               <Divider />
+              {error ? (
+                <>
+                  <p
+                    style={{
+                      color: '#f44336',
+                      marginLeft: '32px',
+                      marginTop: '24px'
+                    }}
+                  >
+                    {error}
+                  </p>
+                </>
+              ) : (
+                ''
+              )}
               {loading ? (
                 <Skeleton
                   variant="rectangular"
