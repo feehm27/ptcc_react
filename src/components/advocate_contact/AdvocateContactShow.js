@@ -22,7 +22,7 @@ import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 import { Formik } from 'formik';
 import { filter, first } from 'lodash';
 import moment from 'moment';
-import { useRef, useState } from 'react';
+import { useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import AdvocateAnswerSchema from 'src/schemas/AdvocateAnswerSchema';
 import { API } from 'src/services/api';
@@ -49,11 +49,11 @@ const AdvocateContactShow = () => {
   const [selectedMessageId, setSelectedMessageId] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const showDeleteSuccess = useRef(false);
+  const showDeleteError = useRef(false);
+
   const showSuccess = useRef(false);
   const showError = useRef(false);
-
-  const showSuccessDelete = useRef(false);
-  const showErrorDelete = useRef(false);
 
   /**
    * Atualiza a página depois de um tempo
@@ -70,6 +70,8 @@ const AdvocateContactShow = () => {
    * Obtém as informações das mensagens
    */
   async function getMessages() {
+    showSuccess.current = false;
+
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -133,10 +135,10 @@ const AdvocateContactShow = () => {
     await API.post('advocates/messages/answers', params, config)
       .then(() => {
         showSuccess.current = true;
-        getMessages();
       })
       .catch(() => {
         showError.current = true;
+        showSuccess.current = false;
       });
     setSubmitting(false);
   }
@@ -146,8 +148,8 @@ const AdvocateContactShow = () => {
    * @param {*} values
    */
   async function deleteMessageReceived() {
+    showDeleteSuccess.current = false;
     setSubmittingDelete(true);
-    showSuccessDelete.current = false;
 
     const token = window.localStorage.getItem('token');
     const config = {
@@ -161,11 +163,12 @@ const AdvocateContactShow = () => {
 
     await API.post(`advocates/messages/received/destroy`, values, config)
       .then(() => {
-        getMessages();
+        showDeleteSuccess.current = true;
       })
       .catch((err) => {
+        showDeleteSuccess.current = false;
+        showDeleteError.current = true;
         console.log(err);
-        showErrorDelete.current = true;
       });
     setSubmittingDelete(false);
   }
@@ -198,6 +201,27 @@ const AdvocateContactShow = () => {
       }
     });
     setChangeColorCard(newArray);
+  };
+
+  /**
+   *  Atualiza a tela com as mensagens
+   */
+  const callSubmit = () => {
+    setTimeout(() => {
+      showSuccess.current = false;
+      setReply(false);
+      getMessages();
+    }, 1000);
+  };
+
+  /**
+   * Atualiza a tela com as mensagens
+   */
+  const callSubmitDelete = () => {
+    setTimeout(() => {
+      showDeleteSuccess.current = false;
+      getMessages();
+    }, 1000);
   };
 
   return (
@@ -244,6 +268,10 @@ const AdvocateContactShow = () => {
                                   : 'white'
                               }}
                               onClick={() => {
+                                showDeleteSuccess.current = false;
+                                showDeleteError.current = false;
+                                showError.current = false;
+                                showSuccess.current = false;
                                 changeColor(indexMessage);
                                 setClickedCard(
                                   Array(message.answers.length).fill(false)
@@ -251,10 +279,6 @@ const AdvocateContactShow = () => {
                                 setMessageClicked(message);
                                 setReply(false);
                                 setMessageSelected(true);
-                                showSuccessDelete.current = false;
-                                showErrorDelete.current = false;
-                                showSuccess.current = false;
-                                showError.current = false;
                               }}
                             >
                               <Typography
@@ -300,10 +324,10 @@ const AdvocateContactShow = () => {
                                 ) : (
                                   <Button
                                     onClick={() => {
+                                      showDeleteSuccess.current = false;
+                                      showDeleteError.current = false;
                                       showError.current = false;
                                       showSuccess.current = false;
-                                      showSuccessDelete.current = false;
-                                      showErrorDelete.current = false;
                                       setSelectedMessageId(message.id);
                                       setShowDeleteModal(true);
                                     }}
@@ -339,17 +363,9 @@ const AdvocateContactShow = () => {
                                       label="Resposta:"
                                       onBlur={(event) => {
                                         handleBlur(event);
-                                        showSuccess.current = false;
-                                        showError.current = false;
-                                        showSuccessDelete.current = false;
-                                        showErrorDelete.current = false;
                                       }}
                                       onChange={(event) => {
                                         handleChange(event);
-                                        showSuccess.current = false;
-                                        showError.current = false;
-                                        showSuccessDelete.current = false;
-                                        showErrorDelete.current = false;
                                       }}
                                       multiline
                                       value={values.answer}
@@ -377,10 +393,12 @@ const AdvocateContactShow = () => {
                                       variant="contained"
                                       size="small"
                                       onClick={(e) => {
+                                        showDeleteSuccess.current = false;
+                                        showDeleteError.current = false;
+                                        showError.current = false;
+                                        showSuccess.current = false;
                                         e.preventDefault();
                                         handleSubmit(values);
-                                        showSuccess.current = false;
-                                        showError.current = false;
                                       }}
                                     >
                                       Enviar
@@ -391,11 +409,11 @@ const AdvocateContactShow = () => {
                                     variant="outlined"
                                     size="small"
                                     onClick={() => {
-                                      setReply(false);
-                                      showSuccess.current = false;
+                                      showDeleteSuccess.current = false;
+                                      showDeleteError.current = false;
                                       showError.current = false;
-                                      showSuccessDelete.current = false;
-                                      showErrorDelete.current = false;
+                                      showSuccess.current = false;
+                                      setReply(false);
                                     }}
                                   >
                                     Descartar
@@ -457,11 +475,11 @@ const AdvocateContactShow = () => {
                                   disabled={reply}
                                   size="small"
                                   onClick={() => {
-                                    setReply(true);
-                                    showSuccess.current = false;
+                                    showDeleteSuccess.current = false;
+                                    showDeleteError.current = false;
                                     showError.current = false;
-                                    showSuccessDelete.current = false;
-                                    showErrorDelete.current = false;
+                                    showSuccess.current = false;
+                                    setReply(true);
                                   }}
                                 >
                                   Responder
@@ -480,8 +498,10 @@ const AdvocateContactShow = () => {
                                 >
                                   <CardHeader
                                     onClick={() => {
-                                      showSuccess.current = false;
+                                      showDeleteSuccess.current = false;
+                                      showDeleteError.current = false;
                                       showError.current = false;
+                                      showSuccess.current = false;
                                       clickedCard[index]
                                         ? setClickedCard({
                                             ...clickedCard,
@@ -506,8 +526,10 @@ const AdvocateContactShow = () => {
                                           {clickedCard[index] ? (
                                             <KeyboardArrowUp
                                               onClick={() => {
-                                                showSuccess.current = false;
+                                                showDeleteSuccess.current = false;
+                                                showDeleteError.current = false;
                                                 showError.current = false;
+                                                showSuccess.current = false;
                                                 setClickedCard({
                                                   ...clickedCard,
                                                   [index]: false
@@ -517,8 +539,10 @@ const AdvocateContactShow = () => {
                                           ) : (
                                             <KeyboardArrowDown
                                               onClick={() => {
-                                                showSuccess.current = false;
+                                                showDeleteSuccess.current = false;
+                                                showDeleteError.current = false;
                                                 showError.current = false;
+                                                showSuccess.current = false;
                                                 setClickedCard({
                                                   ...clickedCard,
                                                   [index]: true
@@ -580,11 +604,11 @@ const AdvocateContactShow = () => {
                                         size="small"
                                         hidden={answer.response_advocate}
                                         onClick={() => {
-                                          setReply(true);
-                                          showSuccess.current = false;
+                                          showDeleteSuccess.current = false;
+                                          showDeleteError.current = false;
                                           showError.current = false;
-                                          showSuccessDelete.current = false;
-                                          showErrorDelete.current = false;
+                                          showSuccess.current = false;
+                                          setReply(true);
                                         }}
                                       >
                                         Responder
@@ -633,15 +657,6 @@ const AdvocateContactShow = () => {
               </form>
             )}
           </Formik>
-          {showSuccess.current && (
-            <>
-              <ToastAnimated />
-              {showToast({
-                type: 'success',
-                message: 'Mensagem respondida com sucesso!'
-              })}
-            </>
-          )}
         </>
         {showDeleteModal && (
           <div>
@@ -668,6 +683,10 @@ const AdvocateContactShow = () => {
                 </Button>
                 <Button
                   onClick={() => {
+                    showDeleteSuccess.current = false;
+                    showDeleteError.current = false;
+                    showError.current = false;
+                    showSuccess.current = false;
                     handleClose();
                     deleteMessageReceived();
                   }}
@@ -680,34 +699,45 @@ const AdvocateContactShow = () => {
             </Dialog>
           </div>
         )}
-        {showSuccessDelete.current && (
-          <>
-            <ToastAnimated />
-            {showToast({
-              type: 'success',
-              message: 'Mensagem deletada com sucesso!'
-            })}
-          </>
-        )}
-        {showErrorDelete.current && (
-          <>
-            <ToastAnimated />
-            {showToast({
-              type: 'error',
-              message: 'Ocorreu um erro inesperado ao deletar a mensagem!'
-            })}
-          </>
-        )}
-        {showError.current && (
-          <>
-            <ToastAnimated />
-            {showToast({
-              type: 'error',
-              message: 'Ocorreu um erro inesperado ao responder a mensagem!'
-            })}
-          </>
-        )}
       </Box>
+      {showSuccess.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Mensagem respondida com sucesso!'
+          })}
+          {callSubmit()}
+        </>
+      )}
+      {showDeleteSuccess.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'success',
+            message: 'Mensagem deletada com sucesso!'
+          })}
+          {callSubmitDelete()}
+        </>
+      )}
+      {showDeleteError.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'error',
+            message: 'Ocorreu um erro inesperado ao deletar a mensagem!'
+          })}
+        </>
+      )}
+      {showError.current && (
+        <>
+          <ToastAnimated />
+          {showToast({
+            type: 'error',
+            message: 'Ocorreu um erro inesperado ao responder a mensagem!'
+          })}
+        </>
+      )}
     </>
   );
 };

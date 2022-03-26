@@ -60,6 +60,17 @@ const ClientContactShow = (messages) => {
       .catch((err) => console.error(err));
   }
 
+  /**
+   *  Atualiza a tela com as mensagens
+   */
+  const callTimeOut = () => {
+    setTimeout(() => {
+      showSuccess.current = false;
+      setReply(false);
+      getMessages();
+    }, 1000);
+  };
+
   /* Envia os dados do advogado
    * @param {*} values
    */
@@ -86,7 +97,6 @@ const ClientContactShow = (messages) => {
     await API.post('advocates/messages/answers', params, config)
       .then(() => {
         showSuccess.current = true;
-        getMessages();
       })
       .catch((e) => {
         showError.current = true;
@@ -498,6 +508,7 @@ const ClientContactShow = (messages) => {
               type: 'success',
               message: 'Mensagem respondida com sucesso!'
             })}
+            {callTimeOut()}
           </>
         )}
         {showError.current && (
