@@ -42,6 +42,11 @@ const MeetingManagement = () => {
       return isSameDay(date, v.date) ? v.styles : a;
     }, {});
 
+    if (pickersDayProps.selected === true) {
+      pickersDayProps.selected = false;
+      pickersDayProps.today = false;
+    }
+
     return (
       <PickersDay
         {...pickersDayProps}
@@ -79,6 +84,7 @@ const MeetingManagement = () => {
             displayStaticWrapperAs="desktop"
             label="Week picker"
             openTo="day"
+            selected={true}
             value={selectedMonth}
             onChange={(e) => {
               let typeDay = 1;
@@ -103,6 +109,7 @@ const MeetingManagement = () => {
                 }
               });
             }}
+            today={false}
             renderDay={renderWeekPickerDay}
             renderInput={(params) => <TextField {...params} />}
             disablePast={true}

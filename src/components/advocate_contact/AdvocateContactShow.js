@@ -69,7 +69,7 @@ const AdvocateContactShow = () => {
   /**
    * Obtém as informações das mensagens
    */
-  async function getMessages(isDelete) {
+  async function getMessages() {
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -101,19 +101,6 @@ const AdvocateContactShow = () => {
           setNewClient(foundCard);
           setMessageSelected(true);
           setMessageClicked(messageClicked);
-
-          if (isDelete) {
-            return (
-              <>
-                <ToastAnimated />
-                {showToast({
-                  type: 'success',
-                  message: 'Mensagem deletada com sucesso!'
-                })}
-                {callTimeOut()}
-              </>
-            );
-          }
         }
 
         return null;
@@ -174,7 +161,7 @@ const AdvocateContactShow = () => {
 
     await API.post(`advocates/messages/received/destroy`, values, config)
       .then(() => {
-        getMessages(true);
+        getMessages();
       })
       .catch((err) => {
         console.log(err);
@@ -230,18 +217,8 @@ const AdvocateContactShow = () => {
             validationSchema={AdvocateAnswerSchema}
             onSubmit={handleSubmit}
           >
-            {({ errors, values, handleBlur, handleChange, submitForm }) => (
-              <form
-                autoComplete="off"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  showSuccess.current = false;
-                  showError.current = false;
-                  showSuccessDelete.current = false;
-                  showErrorDelete.current = false;
-                  handleSubmit(values);
-                }}
-              >
+            {({ errors, values, handleBlur, handleChange }) => (
+              <form autoComplete="off">
                 <Stack direction="row" spacing={2}>
                   <Button
                     color="primary"
@@ -399,7 +376,12 @@ const AdvocateContactShow = () => {
                                       color="primary"
                                       variant="contained"
                                       size="small"
-                                      onClick={submitForm}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSubmit(values);
+                                        showSuccess.current = false;
+                                        showError.current = false;
+                                      }}
                                     >
                                       Enviar
                                     </Button>
