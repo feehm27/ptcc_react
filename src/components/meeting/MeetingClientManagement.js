@@ -44,6 +44,11 @@ const MeetingClientManagement = () => {
       return isSameDay(date, v.date) ? v.styles : a;
     }, {});
 
+    if (pickersDayProps.selected === true) {
+      pickersDayProps.selected = false;
+      pickersDayProps.today = false;
+    }
+
     return (
       <PickersDay
         {...pickersDayProps}
