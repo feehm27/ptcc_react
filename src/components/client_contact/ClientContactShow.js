@@ -459,7 +459,7 @@ const ClientContactShow = (messages) => {
                           <Box sx={{ textAlign: 'center' }}>
                             <img
                               alt="Under development"
-                              src="/static/images/message.png"
+                              src="/static/message.png"
                               style={{
                                 marginTop: 50,
                                 display: 'inline-block',
