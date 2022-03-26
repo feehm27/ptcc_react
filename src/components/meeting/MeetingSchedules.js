@@ -14,7 +14,7 @@ import {
   Typography
 } from '@material-ui/core';
 import { Formik } from 'formik';
-import { findIndex, orderBy } from 'lodash';
+import { every, findIndex, orderBy } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import SchedulesConstants from 'src/constants/SchedulesConstants';
@@ -29,6 +29,7 @@ const MettingSchedules = () => {
   const [submitting, setSubmitting] = useState(false);
   const [checkedsList, setCheckedsList] = useState(SchedulesConstants);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const showSuccess = useRef(false);
   const showSuccessCancel = useRef(false);
@@ -228,18 +229,26 @@ const MettingSchedules = () => {
   };
 
   const handleSubmit = () => {
-    switch (typeDay) {
-      case 1:
-        sendTimesToSchedule();
-        break;
-      case 2:
-        removeAvailableTime();
-        break;
-      case 3:
-        cancelSchedule();
-        break;
-      default:
-        break;
+    const noneSelected = every(checkedsList, { checked: false });
+
+    if (noneSelected) {
+      setError('Selecione pelo menos um horário');
+      setSubmitting(false);
+    } else {
+      setError(null);
+      switch (typeDay) {
+        case 1:
+          sendTimesToSchedule();
+          break;
+        case 2:
+          removeAvailableTime();
+          break;
+        case 3:
+          cancelSchedule();
+          break;
+        default:
+          break;
+      }
     }
   };
 
@@ -275,6 +284,7 @@ const MettingSchedules = () => {
             autoComplete="off"
             onSubmit={(e) => {
               e.preventDefault();
+              setSubmitting(false);
               showSuccess.current = false;
               showError.current = false;
               showSuccessCancel.current = false;
@@ -284,6 +294,21 @@ const MettingSchedules = () => {
             <Card>
               <CardHeader title={getTitle()} />
               <Divider />
+              {error ? (
+                <>
+                  <p
+                    style={{
+                      color: '#f44336',
+                      marginLeft: '32px',
+                      marginTop: '24px'
+                    }}
+                  >
+                    {error}
+                  </p>
+                </>
+              ) : (
+                ''
+              )}
               {loading ? (
                 <Skeleton
                   variant="rectangular"
