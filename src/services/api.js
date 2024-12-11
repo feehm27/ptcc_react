@@ -1,15 +1,19 @@
 import axios from 'axios';
 
 export const API_AUTHENTICATED = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
+  baseURL: 'https://advoguez-php.herokuapp.com',
   auth: '',
-  withCredentials: true
+  withCredentials: true,
+  xsrfHeaderName: 'X-CSRFTOKEN',
+  xsrfCookieName: 'csrftoken'
 });
 
 export const API = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+  baseURL: 'https://advoguez-php.herokuapp.com/api',
   auth: '',
-  withCredentials: true
+  withCredentials: true,
+  xsrfHeaderName: 'X-CSRFTOKEN',
+  xsrfCookieName: 'csrftoken'
 });
 
 export function TOKEN_POST(body) {
